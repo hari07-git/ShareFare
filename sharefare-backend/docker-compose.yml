@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: sharefare
+      POSTGRES_USER: sharefare
+      POSTGRES_PASSWORD: sharefare
+    ports:
+      - "5432:5432"
+    volumes:
+      - sharefare_pg:/var/lib/postgresql/data
+
+volumes:
+  sharefare_pg:
+

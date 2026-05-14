@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:sharefare_dev;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+app:
+  jwt:
+    secret: dev-dev-dev-dev-dev-dev-dev-dev-dev-dev
+    ttlSeconds: 86400
+  admin:
+    email: admin@sharefare.com
+    password: Admin@12345
