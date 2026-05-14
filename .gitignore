@@ -1,0 +1,21 @@
+# OS / editor
+.DS_Store
+.idea
+.vscode
+
+# Logs
+*.log
+
+# Backend (Maven/Spring)
+sharefare-backend/target/
+sharefare-backend/*.iml
+
+# Frontend (Node/Vite)
+sharefare-frontend/node_modules/
+sharefare-frontend/dist/
+sharefare-frontend/.env
+sharefare-frontend/.env.*
+
+# Local dependency cache used by this workspace
+.m2/
+
