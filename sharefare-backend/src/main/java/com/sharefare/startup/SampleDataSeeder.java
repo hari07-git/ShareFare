@@ -1,9 +1,12 @@
 package com.sharefare.startup;
 
+import com.sharefare.model.Booking;
+import com.sharefare.model.BookingStatus;
 import com.sharefare.model.Ride;
 import com.sharefare.model.RideStatus;
 import com.sharefare.model.User;
 import com.sharefare.model.UserRole;
+import com.sharefare.repo.BookingRepository;
 import com.sharefare.repo.RideRepository;
 import com.sharefare.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,17 +23,20 @@ import java.util.List;
 @Component
 public class SampleDataSeeder implements ApplicationRunner {
   private final RideRepository rideRepository;
+  private final BookingRepository bookingRepository;
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final boolean enabled;
   private final int ridesToCreate;
 
   public SampleDataSeeder(RideRepository rideRepository,
+                          BookingRepository bookingRepository,
                           UserRepository userRepository,
                           PasswordEncoder passwordEncoder,
                           @Value("${app.sampleData.enabled:true}") boolean enabled,
                           @Value("${app.sampleData.rides:8}") int ridesToCreate) {
     this.rideRepository = rideRepository;
+    this.bookingRepository = bookingRepository;
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.enabled = enabled;
@@ -73,6 +79,21 @@ public class SampleDataSeeder implements ApplicationRunner {
       r.setStatus(RideStatus.OPEN);
       rideRepository.save(r);
     }
+
+    // Create a sample rider + 1 booking so "My bookings" isn't empty.
+    User rider = ensureRider();
+    var firstRide = rideRepository.findAll().stream().findFirst().orElse(null);
+    if (firstRide != null && firstRide.getSeatsAvailable() > 0) {
+      Booking b = new Booking();
+      b.setRide(firstRide);
+      b.setPassenger(rider);
+      b.setSeatsBooked(1);
+      b.setStatus(BookingStatus.CONFIRMED);
+      bookingRepository.save(b);
+      firstRide.setSeatsAvailable(firstRide.getSeatsAvailable() - 1);
+      if (firstRide.getSeatsAvailable() == 0) firstRide.setStatus(RideStatus.FULL);
+      rideRepository.save(firstRide);
+    }
   }
 
   private User ensureDriver() {
@@ -84,6 +105,19 @@ public class SampleDataSeeder implements ApplicationRunner {
       u.setRole(UserRole.DRIVER);
       u.setCollegeVerified(true);
       u.setPasswordHash(passwordEncoder.encode("Driver@12345"));
+      return userRepository.save(u);
+    });
+  }
+
+  private User ensureRider() {
+    String email = "student@sharefare.com";
+    return userRepository.findByEmailIgnoreCase(email).orElseGet(() -> {
+      User u = new User();
+      u.setEmail(email);
+      u.setFullName("ShareFare Student");
+      u.setRole(UserRole.STUDENT);
+      u.setCollegeVerified(true);
+      u.setPasswordHash(passwordEncoder.encode("Student@12345"));
       return userRepository.save(u);
     });
   }
@@ -101,4 +135,3 @@ public class SampleDataSeeder implements ApplicationRunner {
                               double dLat, double dLng,
                               int price) {}
 }
-

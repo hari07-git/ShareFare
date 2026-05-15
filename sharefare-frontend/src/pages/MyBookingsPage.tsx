@@ -25,7 +25,11 @@ export function MyBookingsPage() {
       const res = await api.get<Booking[]>("/api/me/bookings");
       setItems(res.data);
     } catch (err: any) {
-      setError(err?.response?.data?.message ?? "Failed to load bookings");
+      const status = err?.response?.status;
+      const msg = err?.response?.data?.message;
+      if (status === 401) setError("Please login again.");
+      else if (status === 403) setError("You are not allowed to view bookings.");
+      else setError(msg ?? "Failed to load bookings");
     }
   }
 
@@ -55,7 +59,7 @@ export function MyBookingsPage() {
       />
       <Card title="Booking history" subtitle="Your latest bookings">
         {error ? <div className="mb-4 text-sm text-red-600">{error}</div> : null}
-        {items.length === 0 ? <div className="text-sm text-slate-600">No bookings yet.</div> : null}
+        {!error && items.length === 0 ? <div className="text-sm text-slate-600">No bookings yet.</div> : null}
         <div className="space-y-3">
           {items.map((b) => (
             <div key={b.bookingId} className="rounded-2xl border border-white/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-[1px] hover:shadow-md">

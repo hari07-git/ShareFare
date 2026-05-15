@@ -15,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.nio.charset.StandardCharsets;
+
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -45,6 +47,20 @@ public class SecurityConfig {
         .cors(cors -> {})
         .csrf(csrf -> csrf.disable())
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .exceptionHandling(eh -> eh
+            .authenticationEntryPoint((req, res, ex) -> {
+              res.setStatus(401);
+              res.setContentType("application/json");
+              res.setCharacterEncoding(StandardCharsets.UTF_8.name());
+              res.getWriter().write("{\"message\":\"Unauthorized\"}");
+            })
+            .accessDeniedHandler((req, res, ex) -> {
+              res.setStatus(403);
+              res.setContentType("application/json");
+              res.setCharacterEncoding(StandardCharsets.UTF_8.name());
+              res.getWriter().write("{\"message\":\"Forbidden\"}");
+            })
+        )
         .authorizeHttpRequests(registry -> registry
             .requestMatchers("/api/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/rides/**").permitAll()
