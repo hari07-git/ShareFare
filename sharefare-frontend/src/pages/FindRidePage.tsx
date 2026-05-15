@@ -29,18 +29,20 @@ export function FindRidePage() {
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [date, setDate] = useState("");
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(0); // UI page selection
+  const [appliedPage, setAppliedPage] = useState(0); // page used for the last "Find"
+  const [searchTick, setSearchTick] = useState(0); // increments when user hits "Find"/"Clear"
   const [data, setData] = useState<Page<Ride> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const params = useMemo(() => {
-    const p: any = { page, size: 20 };
+    const p: any = { page: appliedPage, size: 20 };
     if (origin.trim()) p.origin = origin.trim();
     if (destination.trim()) p.destination = destination.trim();
     if (date) p.date = date;
     return p;
-  }, [origin, destination, date, page]);
+  }, [origin, destination, date, appliedPage]);
 
   async function load() {
     setBusy(true);
@@ -58,7 +60,7 @@ export function FindRidePage() {
   useEffect(() => {
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
+  }, [searchTick, appliedPage]);
 
   return (
     <div className="space-y-6">
@@ -76,7 +78,6 @@ export function FindRidePage() {
             <Input
               value={origin}
               onChange={(e) => {
-                setPage(0);
                 setOrigin(e.target.value);
               }}
               placeholder="Gachibowli"
@@ -86,17 +87,27 @@ export function FindRidePage() {
             <Input
               value={destination}
               onChange={(e) => {
-                setPage(0);
                 setDestination(e.target.value);
               }}
               placeholder="Hitech City"
             />
           </FormField>
           <FormField label="Date">
-            <Input value={date} onChange={(e) => { setPage(0); setDate(e.target.value); }} type="date" />
+            <Input value={date} onChange={(e) => { setDate(e.target.value); }} type="date" />
           </FormField>
-          <div className="flex items-end">
-            <Button type="button" variant="secondary" onClick={() => { setOrigin(""); setDestination(""); setDate(""); setPage(0); }}>
+          <div className="flex items-end gap-2">
+            <Button
+              type="button"
+              onClick={() => {
+                setPage(0);
+                setAppliedPage(0);
+                setSearchTick((t) => t + 1);
+              }}
+              disabled={busy}
+            >
+              {busy ? "Finding..." : "Find"}
+            </Button>
+            <Button type="button" variant="secondary" onClick={() => { setOrigin(""); setDestination(""); setDate(""); setPage(0); setAppliedPage(0); setSearchTick((t) => t + 1); }}>
               Clear
             </Button>
           </div>
@@ -150,14 +161,20 @@ export function FindRidePage() {
               <Button
                 variant="secondary"
                 disabled={data.number <= 0}
-                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                onClick={() => {
+                  setPage((p) => Math.max(0, p - 1));
+                  setAppliedPage((p) => Math.max(0, p - 1));
+                }}
               >
                 Prev
               </Button>
               <Button
                 variant="secondary"
                 disabled={data.number + 1 >= data.totalPages}
-                onClick={() => setPage((p) => p + 1)}
+                onClick={() => {
+                  setPage((p) => p + 1);
+                  setAppliedPage((p) => p + 1);
+                }}
               >
                 Next
               </Button>
