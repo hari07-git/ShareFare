@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { MapPicker } from "./MapPicker";
 import { Button } from "./Button";
-import { reverseGeocode } from "../lib/geocode";
+import { reverseGeocode, searchPlaces } from "../lib/geocode";
 import { LocationAutocomplete } from "./LocationAutocomplete";
 
 type LatLng = { lat: number; lng: number };
@@ -22,6 +22,8 @@ export function RouteMapFilter({
   const [originPin, setOriginPin] = useState<LatLng | null>(null);
   const [destinationPin, setDestinationPin] = useState<LatLng | null>(null);
   const [busy, setBusy] = useState<"o" | "d" | null>(null);
+  const [originQuery, setOriginQuery] = useState(originText);
+  const [destQuery, setDestQuery] = useState(destinationText);
 
   const originCenter = useMemo(() => originPin ?? { lat: 17.385, lng: 78.4867 }, [originPin]);
   const destCenter = useMemo(() => destinationPin ?? { lat: 17.385, lng: 78.4867 }, [destinationPin]);
@@ -43,6 +45,28 @@ export function RouteMapFilter({
     setBusy(null);
   }
 
+  async function searchAndPick(which: "o" | "d") {
+    const q = (which === "o" ? originQuery : destQuery).trim();
+    if (!q) return;
+    setBusy(which);
+    const res = await searchPlaces(q);
+    const first = res[0];
+    if (first) {
+      const p = { lat: first.lat, lng: first.lng };
+      if (which === "o") {
+        setOriginPin(p);
+        setOriginQuery(first.displayName);
+        onOriginText(first.displayName);
+      } else {
+        setDestinationPin(p);
+        setDestQuery(first.displayName);
+        onDestinationText(first.displayName);
+      }
+      onResetPage();
+    }
+    setBusy(null);
+  }
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <div>
@@ -50,22 +74,30 @@ export function RouteMapFilter({
           <div className="text-sm font-semibold text-slate-900">Source pin</div>
           <div className="text-xs text-slate-600">{busy === "o" ? "Working..." : null}</div>
         </div>
-        <div className="mb-3">
-          <LocationAutocomplete
-            value={originText}
-            onValue={(v) => {
-              onOriginText(v);
-              onResetPage();
-            }}
-            placeholder="Type source (area/college)…"
-            disabled={busy !== null}
-            onSelect={(place) => {
-              const p = { lat: place.lat, lng: place.lng };
-              setOriginPin(p);
-              onOriginText(place.displayName);
-              onResetPage();
-            }}
-          />
+        <div className="mb-3 flex gap-2">
+          <div className="w-full">
+            <LocationAutocomplete
+              value={originQuery}
+              onValue={setOriginQuery}
+              placeholder="Type source (area/college)…"
+              disabled={busy !== null}
+              onSelect={(place) => {
+                const p = { lat: place.lat, lng: place.lng };
+                setOriginPin(p);
+                setOriginQuery(place.displayName);
+                onOriginText(place.displayName);
+                onResetPage();
+              }}
+            />
+          </div>
+          <Button
+            variant="secondary"
+            type="button"
+            onClick={() => void searchAndPick("o")}
+            disabled={!originQuery.trim() || busy !== null}
+          >
+            Search
+          </Button>
         </div>
         <MapPicker
           value={originPin}
@@ -88,22 +120,30 @@ export function RouteMapFilter({
           <div className="text-sm font-semibold text-slate-900">Destination pin</div>
           <div className="text-xs text-slate-600">{busy === "d" ? "Working..." : null}</div>
         </div>
-        <div className="mb-3">
-          <LocationAutocomplete
-            value={destinationText}
-            onValue={(v) => {
-              onDestinationText(v);
-              onResetPage();
-            }}
-            placeholder="Type destination (area/college)…"
-            disabled={busy !== null}
-            onSelect={(place) => {
-              const p = { lat: place.lat, lng: place.lng };
-              setDestinationPin(p);
-              onDestinationText(place.displayName);
-              onResetPage();
-            }}
-          />
+        <div className="mb-3 flex gap-2">
+          <div className="w-full">
+            <LocationAutocomplete
+              value={destQuery}
+              onValue={setDestQuery}
+              placeholder="Type destination (area/college)…"
+              disabled={busy !== null}
+              onSelect={(place) => {
+                const p = { lat: place.lat, lng: place.lng };
+                setDestinationPin(p);
+                setDestQuery(place.displayName);
+                onDestinationText(place.displayName);
+                onResetPage();
+              }}
+            />
+          </div>
+          <Button
+            variant="secondary"
+            type="button"
+            onClick={() => void searchAndPick("d")}
+            disabled={!destQuery.trim() || busy !== null}
+          >
+            Search
+          </Button>
         </div>
         <MapPicker
           value={destinationPin}
