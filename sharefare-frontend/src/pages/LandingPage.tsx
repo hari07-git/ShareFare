@@ -175,31 +175,59 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-4">
-        {[
-          { from: "Gachibowli", to: "HITEC City", price: "₹59", riders: "24 riders" },
-          { from: "Kukatpally", to: "JNTU College", price: "₹40", riders: "18 riders" },
-          { from: "Miyapur", to: "Kondapur", price: "₹55", riders: "31 riders" },
-          { from: "Secunderabad", to: "Ameerpet", price: "₹35", riders: "19 riders" }
-        ].map((r) => (
-          <Card key={`${r.from}-${r.to}`} className="hover:-translate-y-[2px] transition">
-            <div className="flex items-center justify-between text-sm text-slate-200/90">
-              <div>
-                <div className="font-semibold text-white">{r.from}</div>
-                <div className="mt-1 text-xs text-slate-300/80">{r.to}</div>
+      <section className="space-y-5">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200/90">
+              Trending routes
+            </div>
+            <div className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">
+              Popular destinations
+            </div>
+            <div className="mt-2 text-sm text-slate-300/90">Frequently travelled by students</div>
+          </div>
+          <Link to="/rides/find">
+            <GradientButton variant="secondary">
+              View all routes <ArrowRight className="h-4 w-4" />
+            </GradientButton>
+          </Link>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-4">
+          {[
+            { from: "IIIT Hyderabad", to: "Gachibowli", price: "₹59", seats: "3 seats left", riders: "24 riders" },
+            { from: "JNTU College", to: "Kukatpally Metro", price: "₹40", seats: "2 seats left", riders: "18 riders" },
+            { from: "HITEC City", to: "Financial District", price: "₹70", seats: "4 seats left", riders: "31 riders" },
+            { from: "Secunderabad", to: "Ameerpet", price: "₹35", seats: "2 seats left", riders: "19 riders" }
+          ].map((r) => (
+            <div
+              key={`${r.from}-${r.to}`}
+              className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[0_30px_90px_-65px_rgba(2,6,23,0.85)] backdrop-blur-xl transition hover:-translate-y-[2px] hover:bg-white/7"
+            >
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2 text-white">
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                  <span className="font-semibold">{r.from}</span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-200/90">
+                  <span className="h-2.5 w-2.5 rounded-full bg-rose-400" />
+                  <span className="font-semibold">{r.to}</span>
+                </div>
               </div>
-              <div className="text-right">
-                <div className="text-2xl font-semibold text-white">{r.price}</div>
-                <div className="mt-1 text-xs text-slate-300/80">{r.riders}</div>
+              <div className="mt-4 border-t border-white/10 pt-4">
+                <div className="flex items-end justify-between">
+                  <div>
+                    <div className="text-3xl font-semibold text-white">{r.price}</div>
+                    <div className="mt-1 text-xs text-slate-300/80">{r.seats}</div>
+                  </div>
+                  <div className="rounded-full border border-cyan-300/25 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-200">
+                    {r.riders}
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="mt-4">
-              <Link to="/rides/find" className="text-xs font-semibold text-cyan-200 hover:text-white">
-                View routes →
-              </Link>
-            </div>
-          </Card>
-        ))}
+          ))}
+        </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
