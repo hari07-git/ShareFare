@@ -10,6 +10,9 @@ type Booking = {
   origin: string;
   destination: string;
   departureTime: string;
+  driverName: string;
+  driverEmail: string;
+  driverPhone: string | null;
   seatsBooked: number;
   status: string;
 };
@@ -58,21 +61,24 @@ export function MyBookingsPage() {
         imageUrl="https://images.unsplash.com/photo-1520916784675-1b97f1fc1c05?auto=format&fit=crop&w=1600&q=80"
       />
       <Card title="Booking history" subtitle="Your latest bookings">
-        {error ? <div className="mb-4 text-sm text-red-600">{error}</div> : null}
-        {!error && items.length === 0 ? <div className="text-sm text-slate-600">No bookings yet.</div> : null}
+        {error ? <div className="mb-4 text-sm text-rose-300">{error}</div> : null}
+        {!error && items.length === 0 ? <div className="text-sm text-slate-300/90">No bookings yet.</div> : null}
         <div className="space-y-3">
           {items.map((b) => (
-            <div key={b.bookingId} className="rounded-2xl border border-white/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-[1px] hover:shadow-md">
+            <div key={b.bookingId} className="rounded-3xl border border-white/10 bg-white/5 p-4 shadow-[0_30px_90px_-65px_rgba(2,6,23,0.85)] transition hover:-translate-y-[2px] hover:bg-white/7">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="font-semibold">
+                <div className="font-semibold text-white">
                   {b.origin} → {b.destination}
                 </div>
-                <div className="text-sm text-slate-600">
+                <div className="text-sm text-slate-300/90">
                   Seats: {b.seatsBooked} • Status: {b.status}
                 </div>
               </div>
-              <div className="mt-1 text-sm text-slate-600">
+              <div className="mt-1 text-sm text-slate-300/90">
                 Departure: {new Date(b.departureTime).toLocaleString()} • Ride ID: {b.rideId}
+              </div>
+              <div className="mt-1 text-sm text-slate-200/90">
+                Contact: {b.driverName} ({b.driverEmail}){b.driverPhone ? ` • ${b.driverPhone}` : ""}
               </div>
               <div className="mt-3">
                 <Button

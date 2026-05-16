@@ -28,6 +28,7 @@ public class RideDtos {
       Long id,
       String driverEmail,
       String driverName,
+      String driverPhone,
       String origin,
       String destination,
       Double originLat,

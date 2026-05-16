@@ -2,11 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { useAuth } from "../state/auth";
-import { Card } from "../components/Card";
 import { FormField } from "../components/FormField";
 import { Input } from "../components/Input";
-import { Button } from "../components/Button";
-import { PageHeader } from "../components/PageHeader";
+import { GradientButton } from "../components/GradientButton";
+import { AuthShell } from "../components/AuthShell";
+import { Lock, Mail } from "lucide-react";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
@@ -33,29 +33,37 @@ export function LoginPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md space-y-6">
-      <PageHeader
-        title="Login"
-        subtitle="Sign in to book rides, manage your profile, and get updates."
-        imageUrl="https://images.unsplash.com/photo-1520975661595-6453be3f7070?auto=format&fit=crop&w=1600&q=80"
-      />
-      <Card title="Login" subtitle="Sign in to book rides, manage profile, and get notifications">
-        <form className="space-y-4" onSubmit={onSubmit}>
-          <FormField label="Email">
-            <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required />
-          </FormField>
-          <FormField label="Password">
-            <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required />
-          </FormField>
-          {error ? <div className="text-sm text-red-600">{error}</div> : null}
-          <Button disabled={busy} type="submit">
-            {busy ? "Signing in..." : "Sign in"}
-          </Button>
-        </form>
-        <div className="mt-4 text-sm text-slate-700">
-          No account? <Link className="underline" to="/auth/register">Register</Link>
-        </div>
-      </Card>
-    </div>
+    <AuthShell
+      title="Welcome back"
+      subtitle="Sign in to book rides, manage your profile, and get updates."
+      sideTitle="ShareFare"
+      sideBody="Premium student mobility for Hyderabad — fast booking, map pins, and trusted community."
+    >
+      <form className="space-y-4" onSubmit={onSubmit}>
+        <FormField label="Email">
+          <div className="relative">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+              <Mail className="h-4 w-4" />
+            </span>
+            <Input value={email} onChange={(e) => setEmail(e.target.value)} className="pl-11" type="email" required />
+          </div>
+        </FormField>
+        <FormField label="Password">
+          <div className="relative">
+            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+              <Lock className="h-4 w-4" />
+            </span>
+            <Input value={password} onChange={(e) => setPassword(e.target.value)} className="pl-11" type="password" required />
+          </div>
+        </FormField>
+        {error ? <div className="text-sm text-rose-300">{error}</div> : null}
+        <GradientButton disabled={busy} type="submit" className="w-full">
+          {busy ? "Signing in..." : "Sign in"}
+        </GradientButton>
+      </form>
+      <div className="mt-5 text-sm text-slate-300/90">
+        No account? <Link className="font-semibold text-white hover:underline" to="/auth/register">Register</Link>
+      </div>
+    </AuthShell>
   );
 }

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
-import { Card } from "../components/Card";
 import { FormField } from "../components/FormField";
 import { Input } from "../components/Input";
-import { Button } from "../components/Button";
-import { PageHeader } from "../components/PageHeader";
+import { GradientButton } from "../components/GradientButton";
+import { AuthShell } from "../components/AuthShell";
+import { Lock, Mail, Phone, User } from "lucide-react";
 
 type Role = "STUDENT" | "DRIVER";
 
@@ -14,6 +14,7 @@ export function RegisterPage() {
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("STUDENT");
+  const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
@@ -33,42 +34,66 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md space-y-6">
-      <PageHeader
-        title="Register"
-        subtitle="Create your ShareFare account in seconds."
-        imageUrl="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=80"
-      />
-      <Card title="Create account" subtitle="Choose Student or Driver (Driver can offer rides and see inbox)">
+    <AuthShell
+      title="Create your account"
+      subtitle="Join ShareFare in seconds. Choose Student or Driver (drivers can offer rides)."
+      sideTitle="Join the movement"
+      sideBody="Save money, meet verified commuters, and travel sustainably across Hyderabad."
+    >
         <form className="space-y-4" onSubmit={onSubmit}>
           <FormField label="Full name">
-            <Input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+            <div className="relative">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                <User className="h-4 w-4" />
+              </span>
+              <Input value={fullName} onChange={(e) => setFullName(e.target.value)} className="pl-11" required />
+            </div>
           </FormField>
           <FormField label="Email">
-            <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required />
+            <div className="relative">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                <Mail className="h-4 w-4" />
+              </span>
+              <Input value={email} onChange={(e) => setEmail(e.target.value)} className="pl-11" type="email" required />
+            </div>
+          </FormField>
+          <FormField label="Phone (recommended)">
+            <div className="relative">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                <Phone className="h-4 w-4" />
+              </span>
+              <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="pl-11" placeholder="+91 9XXXXXXXXX" />
+            </div>
+            <div className="mt-2 text-xs text-slate-300/80">
+              You can update phone anytime from Profile. Phone is shown to riders only after booking.
+            </div>
           </FormField>
           <FormField label="Password (min 8 chars)">
-            <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required />
+            <div className="relative">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                <Lock className="h-4 w-4" />
+              </span>
+              <Input value={password} onChange={(e) => setPassword(e.target.value)} className="pl-11" type="password" required />
+            </div>
           </FormField>
           <FormField label="Role">
             <select
               value={role}
               onChange={(e) => setRole(e.target.value as Role)}
-              className="w-full rounded-lg border px-3 py-2 text-sm"
+              className="w-full rounded-2xl border border-white/12 bg-white/6 px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/25"
             >
               <option value="STUDENT">Student</option>
               <option value="DRIVER">Driver</option>
             </select>
           </FormField>
-          {error ? <div className="text-sm text-red-600">{error}</div> : null}
-          <Button disabled={busy} type="submit">
+          {error ? <div className="text-sm text-rose-300">{error}</div> : null}
+          <GradientButton disabled={busy} type="submit" className="w-full">
             {busy ? "Creating..." : "Create account"}
-          </Button>
+          </GradientButton>
         </form>
-        <div className="mt-4 text-sm text-slate-700">
-          Already have an account? <Link className="underline" to="/auth/login">Login</Link>
+        <div className="mt-5 text-sm text-slate-300/90">
+          Already have an account? <Link className="font-semibold text-white hover:underline" to="/auth/login">Login</Link>
         </div>
-      </Card>
-    </div>
+    </AuthShell>
   );
 }

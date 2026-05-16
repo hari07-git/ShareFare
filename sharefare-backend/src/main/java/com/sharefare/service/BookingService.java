@@ -22,15 +22,18 @@ public class BookingService {
   private final BookingRepository bookingRepository;
   private final UserRepository userRepository;
   private final NotificationService notificationService;
+  private final EmailService emailService;
 
   public BookingService(RideRepository rideRepository,
                         BookingRepository bookingRepository,
                         UserRepository userRepository,
-                        NotificationService notificationService) {
+                        NotificationService notificationService,
+                        EmailService emailService) {
     this.rideRepository = rideRepository;
     this.bookingRepository = bookingRepository;
     this.userRepository = userRepository;
     this.notificationService = notificationService;
+    this.emailService = emailService;
   }
 
   @Transactional
@@ -77,6 +80,31 @@ public class BookingService {
         passenger.getFullName() + " booked " + booking.getSeatsBooked() + " seat(s) for your ride #" + ride.getId() + "."
     );
 
+    emailService.sendBookingConfirmedToPassenger(
+        passenger.getEmail(),
+        passenger.getFullName(),
+        ride.getId(),
+        ride.getOrigin(),
+        ride.getDestination(),
+        ride.getDepartureTime(),
+        booking.getSeatsBooked(),
+        ride.getDriver().getFullName(),
+        ride.getDriver().getEmail(),
+        ride.getDriver().getPhone()
+    );
+    emailService.sendNewBookingToDriver(
+        ride.getDriver().getEmail(),
+        ride.getDriver().getFullName(),
+        ride.getId(),
+        ride.getOrigin(),
+        ride.getDestination(),
+        ride.getDepartureTime(),
+        booking.getSeatsBooked(),
+        passenger.getFullName(),
+        passenger.getEmail(),
+        passenger.getPhone()
+    );
+
     return new BookingResponse(booking.getId(), ride.getId(), booking.getSeatsBooked(), booking.getStatus(),
         booking.getCreatedAt());
   }
@@ -92,6 +120,9 @@ public class BookingService {
             b.getRide().getOrigin(),
             b.getRide().getDestination(),
             b.getRide().getDepartureTime(),
+            b.getRide().getDriver().getFullName(),
+            b.getRide().getDriver().getEmail(),
+            b.getRide().getDriver().getPhone(),
             b.getSeatsBooked(),
             b.getStatus()
         )

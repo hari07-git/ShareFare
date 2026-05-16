@@ -13,6 +13,7 @@ type Ride = {
   id: number;
   driverEmail: string;
   driverName: string;
+  driverPhone: string | null;
   origin: string;
   destination: string;
   originLat: number | null;
@@ -108,7 +109,7 @@ export function RideDetailsPage() {
   if (!ride) {
     return (
       <div className="space-y-3">
-        {error ? <div className="text-sm text-red-600">{error}</div> : <div className="text-sm text-slate-600">Loading...</div>}
+        {error ? <div className="text-sm text-rose-300">{error}</div> : <div className="text-sm text-slate-300/90">Loading...</div>}
         <Link className="underline text-sm" to="/rides/find">Back</Link>
       </div>
     );
@@ -132,6 +133,11 @@ export function RideDetailsPage() {
           <div>
             <span className="font-medium">Driver:</span> {ride.driverName} ({ride.driverEmail})
           </div>
+          {ride.driverPhone ? (
+            <div>
+              <span className="font-medium">Driver phone:</span> {ride.driverPhone}
+            </div>
+          ) : null}
           <div>
             <span className="font-medium">Seats:</span> {ride.seatsAvailable}/{ride.seatsTotal} • <span className="font-medium">Price:</span> ₹{ride.pricePerSeat}
           </div>
@@ -139,7 +145,7 @@ export function RideDetailsPage() {
             <span className="font-medium">Status:</span> {ride.status}
           </div>
         </div>
-        {error ? <div className="mt-4 text-sm text-red-600">{error}</div> : null}
+        {error ? <div className="mt-4 text-sm text-rose-300">{error}</div> : null}
       </Card>
 
       {(ride.originLat && ride.originLng) || (ride.destinationLat && ride.destinationLng) ? (

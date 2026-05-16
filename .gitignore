@@ -9,6 +9,9 @@
 # Backend (Maven/Spring)
 sharefare-backend/target/
 sharefare-backend/*.iml
+sharefare-backend/data/
+sharefare-backend/*.mv.db
+sharefare-backend/*.trace.db
 
 # Frontend (Node/Vite)
 sharefare-frontend/node_modules/
@@ -18,4 +21,3 @@ sharefare-frontend/.env.*
 
 # Local dependency cache used by this workspace
 .m2/
-

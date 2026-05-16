@@ -78,6 +78,7 @@ public class RideService {
         r.getId(),
         r.getDriver().getEmail(),
         r.getDriver().getFullName(),
+        r.getDriver().getPhone(),
         r.getOrigin(),
         r.getDestination(),
         r.getOriginLat(),

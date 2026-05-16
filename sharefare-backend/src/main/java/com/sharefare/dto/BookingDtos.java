@@ -27,8 +27,10 @@ public class BookingDtos {
       String origin,
       String destination,
       OffsetDateTime departureTime,
+      String driverName,
+      String driverEmail,
+      String driverPhone,
       int seatsBooked,
       BookingStatus status
   ) {}
 }
-

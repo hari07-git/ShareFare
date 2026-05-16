@@ -3,6 +3,7 @@ package com.sharefare.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -34,6 +35,20 @@ public class ApiExceptionHandler {
     ex.getBindingResult().getFieldErrors().forEach(fe -> fields.put(fe.getField(), fe.getDefaultMessage()));
     body.put("fields", fields);
     return ResponseEntity.badRequest().body(body);
+  }
+
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<Map<String, Object>> handleIntegrity(DataIntegrityViolationException ex) {
+    // Common cases:
+    // - Unique booking constraint (ride_id, passenger_id)
+    String msg = "Request violates a database constraint";
+    String low = String.valueOf(ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage()).toLowerCase();
+    if (low.contains("uk_booking_ride_passenger") || (low.contains("booking") && low.contains("passenger") && low.contains("ride"))) {
+      msg = "You already booked this ride";
+      return ResponseEntity.status(HttpStatus.CONFLICT).body(error(HttpStatus.CONFLICT, msg));
+    }
+    log.warn("Data integrity violation", ex);
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(error(HttpStatus.CONFLICT, msg));
   }
 
   @ExceptionHandler(Exception.class)
