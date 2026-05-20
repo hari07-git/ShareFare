@@ -15,6 +15,23 @@ import java.util.Map;
 public class ShareFareApplication {
   public static void main(String[] args) {
     loadDotenv();
+    
+    // Auto-fix raw postgresql:// URLs from Render
+    String dbUrl = System.getenv("DB_URL");
+    if (dbUrl == null || dbUrl.isBlank()) {
+      dbUrl = System.getProperty("DB_URL");
+    }
+    if (dbUrl != null && !dbUrl.isBlank()) {
+      if (dbUrl.startsWith("postgresql://") || dbUrl.startsWith("postgres://")) {
+        String jdbcUrl = "jdbc:" + dbUrl;
+        if (!jdbcUrl.contains("sslmode=")) {
+          jdbcUrl += (jdbcUrl.contains("?") ? "&" : "?") + "sslmode=require";
+        }
+        System.setProperty("DB_URL", jdbcUrl);
+        System.out.println("⚙️ Auto-converted DB_URL to JDBC: " + jdbcUrl);
+      }
+    }
+    
     SpringApplication.run(ShareFareApplication.class, args);
   }
 
