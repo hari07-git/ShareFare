@@ -5,6 +5,7 @@ import com.sharefare.dto.AuthDtos.LoginResponse;
 import com.sharefare.dto.AuthDtos.EmailRequest;
 import com.sharefare.dto.AuthDtos.MessageResponse;
 import com.sharefare.dto.AuthDtos.RegisterRequest;
+import com.sharefare.dto.AuthDtos.RegisterResponse;
 import com.sharefare.dto.AuthDtos.ResetPasswordRequest;
 import com.sharefare.dto.AuthDtos.VerifyEmailRequest;
 import com.sharefare.dto.AuthDtos.VerifyOtpRequest;
@@ -26,9 +27,8 @@ public class AuthController {
   }
 
   @PostMapping("/register")
-  public ResponseEntity<MessageResponse> register(@Valid @RequestBody RegisterRequest request) {
-    authService.register(request);
-    return ResponseEntity.ok(new MessageResponse("Account created. We sent a 6-digit OTP to your email."));
+  public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
+    return ResponseEntity.ok(authService.register(request));
   }
 
   @PostMapping("/login")

@@ -24,6 +24,12 @@ public class AuthDtos {
 
   public record MessageResponse(String message) {}
 
+  public record RegisterResponse(
+      String message,
+      String otp,          // non-null only when MAIL_ENABLED=false
+      boolean emailVerified
+  ) {}
+
   public record EmailRequest(
       @NotBlank @Email String email
   ) {}

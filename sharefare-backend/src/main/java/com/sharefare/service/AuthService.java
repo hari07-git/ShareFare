@@ -3,6 +3,7 @@ package com.sharefare.service;
 import com.sharefare.dto.AuthDtos.LoginRequest;
 import com.sharefare.dto.AuthDtos.LoginResponse;
 import com.sharefare.dto.AuthDtos.RegisterRequest;
+import com.sharefare.dto.AuthDtos.RegisterResponse;
 import com.sharefare.exception.ApiException;
 import com.sharefare.model.AuthToken;
 import com.sharefare.model.AuthTokenPurpose;
@@ -58,7 +59,7 @@ public class AuthService {
   }
 
   @Transactional
-  public void register(RegisterRequest request) {
+  public RegisterResponse register(RegisterRequest request) {
     if (userRepository.existsByEmailIgnoreCase(request.email())) {
       throw new ApiException(HttpStatus.CONFLICT, "Email already registered");
     }
@@ -70,15 +71,34 @@ public class AuthService {
     user.setEmailVerified(!mailEnabled);  // auto-verify when mail is disabled
     user.setPasswordHash(passwordEncoder.encode(request.password()));
     userRepository.save(user);
-    if (mailEnabled) {
-      try {
-        sendVerification(user);
-      } catch (Exception e) {
-        // SMTP may be blocked on free hosting tiers — still allow registration
-        user.setEmailVerified(true);
-        userRepository.save(user);
-        System.err.println("⚠️ Email send failed, auto-verified user: " + e.getMessage());
-      }
+
+    if (!mailEnabled) {
+      // Mail disabled — create OTP token and return it directly in the response
+      String otp = createOtpToken(user, java.time.Instant.now().plusSeconds(30 * 60));
+      return new RegisterResponse(
+          "Account created! Use the OTP shown below to verify your account.",
+          otp,
+          false
+      );
+    }
+
+    try {
+      sendVerification(user);
+      return new RegisterResponse(
+          "Account created! We sent a 6-digit OTP to your email.",
+          null,
+          false
+      );
+    } catch (Exception e) {
+      // SMTP blocked — auto-verify and inform user they can login directly
+      user.setEmailVerified(true);
+      userRepository.save(user);
+      System.err.println("⚠️ Email send failed, auto-verified: " + e.getMessage());
+      return new RegisterResponse(
+          "Account created! You can log in directly — email verification skipped.",
+          null,
+          true
+      );
     }
   }
 
