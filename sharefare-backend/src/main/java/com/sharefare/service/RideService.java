@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -78,7 +78,7 @@ public class RideService {
       from = date.get().atStartOfDay().atOffset(ZoneOffset.UTC);
       to = date.get().plusDays(1).atStartOfDay().atOffset(ZoneOffset.UTC);
     }
-    var statuses = EnumSet.of(RideStatus.OPEN, RideStatus.FULL);
+    var statuses = List.of(RideStatus.OPEN.name(), RideStatus.FULL.name());
     return rideRepository.search(origin.orElse(null), destination.orElse(null), from, to, statuses, femaleOnly, verifiedOnly, pageable)
         .map(r -> new SearchRideResponse(
             r.getId(), r.getOrigin(), r.getDestination(), r.getDepartureTime(),
