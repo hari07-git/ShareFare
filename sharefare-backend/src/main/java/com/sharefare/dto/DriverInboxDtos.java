@@ -23,8 +23,10 @@ public class DriverInboxDtos {
       Long rideId,
       String passengerEmail,
       String passengerName,
+      String passengerPhone,
       int seatsBooked,
-      BookingStatus status
+      BookingStatus status,
+      OffsetDateTime createdAt
   ) {}
 }
 

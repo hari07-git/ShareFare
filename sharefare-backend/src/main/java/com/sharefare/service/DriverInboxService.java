@@ -68,8 +68,10 @@ public class DriverInboxService {
             b.getRide().getId(),
             b.getPassenger().getEmail(),
             b.getPassenger().getFullName(),
+            b.getPassenger().getPhone(),
             b.getSeatsBooked(),
-            b.getStatus()
+            b.getStatus(),
+            b.getCreatedAt() != null ? b.getCreatedAt().atOffset(java.time.ZoneOffset.UTC) : null
         )).toList();
   }
 
@@ -87,8 +89,12 @@ public class DriverInboxService {
     ride.setStatus(RideStatus.CANCELLED);
     rideRepository.save(ride);
 
-    var confirmedBookings = bookingByRideRepository.findRideBookingsByStatus(rideId, BookingStatus.CONFIRMED);
-    for (var b : confirmedBookings) {
+    var activeBookings = bookingByRideRepository.findRideBookingsByStatuses(
+        rideId,
+        List.of(BookingStatus.REQUESTED, BookingStatus.DRIVER_APPROVED, BookingStatus.CONFIRMED, BookingStatus.ONGOING)
+    );
+    for (var b : activeBookings) {
+      b.setStatus(BookingStatus.CANCELLED);
       notificationService.create(
           b.getPassenger(),
           "RIDE",

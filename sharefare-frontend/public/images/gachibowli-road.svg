@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Gachibowli road ride-sharing illustration">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eff6ff"/>
+      <stop offset=".52" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#ecfdf5"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <path d="M0 690 C245 610 430 610 640 545 C900 463 1110 480 1600 330 L1600 900 L0 900Z" fill="#1e293b"/>
+  <path d="M540 584 C700 548 892 502 1130 424" stroke="#f8fafc" stroke-width="16" opacity=".8"/>
+  <path d="M520 622 C730 570 960 535 1320 425" stroke="#f59e0b" stroke-width="8" stroke-dasharray="30 30" opacity=".9"/>
+  <rect x="165" y="255" width="145" height="330" rx="16" fill="#fff" opacity=".75"/>
+  <rect x="350" y="190" width="170" height="395" rx="16" fill="#fff" opacity=".82"/>
+  <rect x="570" y="310" width="130" height="275" rx="16" fill="#fff" opacity=".74"/>
+  <rect x="1180" y="245" width="160" height="310" rx="16" fill="#fff" opacity=".72"/>
+  <g transform="translate(730 610)">
+    <rect width="290" height="96" rx="38" fill="#10b981"/>
+    <circle cx="70" cy="97" r="26" fill="#020617"/>
+    <circle cx="222" cy="97" r="26" fill="#020617"/>
+    <rect x="50" y="26" width="88" height="34" rx="12" fill="#d1fae5"/>
+    <rect x="154" y="26" width="66" height="34" rx="12" fill="#d1fae5"/>
+  </g>
+  <circle cx="1065" cy="434" r="14" fill="#ef4444"/>
+  <circle cx="520" cy="617" r="14" fill="#22c55e"/>
+</svg>

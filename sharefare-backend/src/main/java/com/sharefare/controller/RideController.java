@@ -31,7 +31,7 @@ public class RideController {
     this.rideService = rideService;
   }
 
-  @PreAuthorize("hasAnyRole('DRIVER','ADMIN')")
+  @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
   @PostMapping
   public ResponseEntity<RideResponse> create(@Valid @RequestBody CreateRideRequest request, Authentication auth) {
     return ResponseEntity.ok(rideService.createRide(request, auth.getName()));
@@ -47,10 +47,12 @@ public class RideController {
       @RequestParam Optional<String> origin,
       @RequestParam Optional<String> destination,
       @RequestParam Optional<LocalDate> date,
+      @RequestParam(defaultValue = "false") boolean femaleOnly,
+      @RequestParam(defaultValue = "false") boolean verifiedOnly,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "20") int size) {
     return ResponseEntity.ok(
-        rideService.search(origin, destination, date,
+        rideService.search(origin, destination, date, femaleOnly, verifiedOnly,
             PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "departureTime"))));
   }
 }

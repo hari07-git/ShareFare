@@ -41,6 +41,12 @@ public class BookingService {
     var passenger = userRepository.findByEmailIgnoreCase(passengerEmail)
         .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "User not found"));
 
+    if (passenger.getAccountStatus() == com.sharefare.model.AccountStatus.PENDING_VERIFICATION ||
+        passenger.getAccountStatus() == com.sharefare.model.AccountStatus.REJECTED ||
+        passenger.getAccountStatus() == com.sharefare.model.AccountStatus.SUSPENDED) {
+      throw new ApiException(HttpStatus.FORBIDDEN, "Your student account is awaiting verification.");
+    }
+
     var ride = rideRepository.findForUpdate(rideId)
         .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Ride not found"));
 
@@ -58,29 +64,23 @@ public class BookingService {
     booking.setRide(ride);
     booking.setPassenger(passenger);
     booking.setSeatsBooked(request.seats());
-    booking.setStatus(BookingStatus.CONFIRMED);
+    booking.setStatus(BookingStatus.REQUESTED);
     bookingRepository.save(booking);
-
-    ride.setSeatsAvailable(ride.getSeatsAvailable() - request.seats());
-    if (ride.getSeatsAvailable() == 0) {
-      ride.setStatus(RideStatus.FULL);
-    }
-    rideRepository.save(ride);
 
     notificationService.create(
         passenger,
         "BOOKING",
-        "Booking confirmed",
-        "You booked " + booking.getSeatsBooked() + " seat(s) for ride #" + ride.getId() + " (" + ride.getOrigin() + " → " + ride.getDestination() + ")."
+        "Booking request sent",
+        "Your booking request was sent successfully."
     );
     notificationService.create(
         ride.getDriver(),
         "BOOKING",
-        "New booking received",
-        passenger.getFullName() + " booked " + booking.getSeatsBooked() + " seat(s) for your ride #" + ride.getId() + "."
+        "New booking request",
+        passenger.getFullName() + " requested to join your ride from " + ride.getOrigin() + " to " + ride.getDestination() + "."
     );
 
-    emailService.sendBookingConfirmedToPassenger(
+    emailService.sendBookingRequestToPassenger(
         passenger.getEmail(),
         passenger.getFullName(),
         ride.getId(),
@@ -92,7 +92,7 @@ public class BookingService {
         ride.getDriver().getEmail(),
         ride.getDriver().getPhone()
     );
-    emailService.sendNewBookingToDriver(
+    emailService.sendBookingRequestToDriver(
         ride.getDriver().getEmail(),
         ride.getDriver().getFullName(),
         ride.getId(),
@@ -107,6 +107,138 @@ public class BookingService {
 
     return new BookingResponse(booking.getId(), ride.getId(), booking.getSeatsBooked(), booking.getStatus(),
         booking.getCreatedAt());
+  }
+
+  @Transactional
+  public BookingResponse approveBooking(Long rideId, Long bookingId, String driverEmail) {
+    var booking = getDriverBookingForUpdate(rideId, bookingId, driverEmail);
+    if (booking.getStatus() != BookingStatus.REQUESTED) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, "Only requested bookings can be approved");
+    }
+
+    var ride = rideRepository.findForUpdate(rideId)
+        .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Ride not found"));
+    if (ride.getStatus() != RideStatus.OPEN && ride.getStatus() != RideStatus.FULL) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, "Ride is not open for approvals");
+    }
+    if (ride.getSeatsAvailable() < booking.getSeatsBooked()) {
+      throw new ApiException(HttpStatus.CONFLICT, "Not enough seats available");
+    }
+
+    booking.setStatus(BookingStatus.DRIVER_APPROVED);
+    bookingRepository.save(booking);
+
+    ride.setSeatsAvailable(ride.getSeatsAvailable() - booking.getSeatsBooked());
+    ride.setStatus(ride.getSeatsAvailable() == 0 ? RideStatus.FULL : RideStatus.OPEN);
+    rideRepository.save(ride);
+
+    notificationService.create(
+        booking.getPassenger(),
+        "BOOKING",
+        "Booking approved",
+        "Your ride request #" + booking.getId() + " was approved. Driver contact is now available in My Bookings."
+    );
+    emailService.sendBookingApprovedToPassenger(
+        booking.getPassenger().getEmail(),
+        booking.getPassenger().getFullName(),
+        ride.getId(),
+        ride.getOrigin(),
+        ride.getDestination(),
+        ride.getDepartureTime(),
+        booking.getSeatsBooked(),
+        ride.getDriver().getFullName(),
+        ride.getDriver().getEmail(),
+        ride.getDriver().getPhone()
+    );
+
+    return toResponse(booking);
+  }
+
+  @Transactional
+  public BookingResponse rejectBooking(Long rideId, Long bookingId, String driverEmail) {
+    var booking = getDriverBookingForUpdate(rideId, bookingId, driverEmail);
+    if (booking.getStatus() != BookingStatus.REQUESTED) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, "Only requested bookings can be rejected");
+    }
+    booking.setStatus(BookingStatus.REJECTED);
+    bookingRepository.save(booking);
+
+    var ride = booking.getRide();
+    notificationService.create(
+        booking.getPassenger(),
+        "BOOKING",
+        "Booking rejected",
+        "Your request for ride #" + ride.getId() + " (" + ride.getOrigin() + " → " + ride.getDestination() + ") was rejected by the driver."
+    );
+    emailService.sendBookingRejectedToPassenger(
+        booking.getPassenger().getEmail(),
+        booking.getPassenger().getFullName(),
+        ride.getId(),
+        ride.getOrigin(),
+        ride.getDestination(),
+        ride.getDepartureTime()
+    );
+
+    return toResponse(booking);
+  }
+
+  @Transactional
+  public BookingResponse startBooking(Long rideId, Long bookingId, String driverEmail) {
+    var booking = getDriverBookingForUpdate(rideId, bookingId, driverEmail);
+    if (booking.getStatus() != BookingStatus.CONFIRMED) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, "Only confirmed bookings can be started");
+    }
+    booking.setStatus(BookingStatus.ONGOING);
+    bookingRepository.save(booking);
+    notificationService.create(
+        booking.getPassenger(),
+        "RIDE",
+        "Ride started",
+        "Your ShareFare ride #" + rideId + " is now ongoing."
+    );
+    return toResponse(booking);
+  }
+
+  @Transactional
+  public BookingResponse confirmBooking(Long rideId, Long bookingId, String driverEmail) {
+    var booking = getDriverBookingForUpdate(rideId, bookingId, driverEmail);
+    if (booking.getStatus() != BookingStatus.DRIVER_APPROVED) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, "Only approved bookings can be confirmed");
+    }
+    booking.setStatus(BookingStatus.CONFIRMED);
+    bookingRepository.save(booking);
+    notificationService.create(
+        booking.getPassenger(),
+        "BOOKING",
+        "Booking confirmed",
+        "Your ride #" + rideId + " is confirmed. Please reach the pickup point on time."
+    );
+    return toResponse(booking);
+  }
+
+  @Transactional
+  public BookingResponse completeBooking(Long rideId, Long bookingId, String driverEmail) {
+    var booking = getDriverBookingForUpdate(rideId, bookingId, driverEmail);
+    if (booking.getStatus() != BookingStatus.ONGOING) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, "Only ongoing bookings can be completed");
+    }
+    booking.setStatus(BookingStatus.COMPLETED);
+    bookingRepository.save(booking);
+    var ride = booking.getRide();
+    notificationService.create(
+        booking.getPassenger(),
+        "RIDE",
+        "Ride completed",
+        "Ride #" + ride.getId() + " is completed. You can now rate your driver."
+    );
+    emailService.sendRideCompleted(
+        booking.getPassenger().getEmail(),
+        booking.getPassenger().getFullName(),
+        ride.getId(),
+        ride.getOrigin(),
+        ride.getDestination()
+    );
+    return toResponse(booking);
   }
 
   @Transactional(readOnly = true)
@@ -138,16 +270,22 @@ public class BookingService {
     if (booking.getStatus() == BookingStatus.CANCELLED) {
       return;
     }
+    if (booking.getStatus() == BookingStatus.REJECTED || booking.getStatus() == BookingStatus.COMPLETED) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, "Booking cannot be cancelled");
+    }
     var ride = rideRepository.findForUpdate(booking.getRide().getId())
         .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Ride not found"));
+    BookingStatus previousStatus = booking.getStatus();
     booking.setStatus(BookingStatus.CANCELLED);
     bookingRepository.save(booking);
 
-    ride.setSeatsAvailable(ride.getSeatsAvailable() + booking.getSeatsBooked());
-    if (ride.getStatus() == RideStatus.FULL) {
-      ride.setStatus(RideStatus.OPEN);
+    if (usesSeat(previousStatus)) {
+      ride.setSeatsAvailable(Math.min(ride.getSeatsTotal(), ride.getSeatsAvailable() + booking.getSeatsBooked()));
+      if (ride.getStatus() == RideStatus.FULL) {
+        ride.setStatus(RideStatus.OPEN);
+      }
+      rideRepository.save(ride);
     }
-    rideRepository.save(ride);
 
     notificationService.create(
         passenger,
@@ -160,6 +298,36 @@ public class BookingService {
         "BOOKING",
         "Booking cancelled",
         passenger.getFullName() + " cancelled booking #" + booking.getId() + " for your ride #" + ride.getId() + "."
+    );
+  }
+
+  private Booking getDriverBookingForUpdate(Long rideId, Long bookingId, String driverEmail) {
+    var driver = userRepository.findByEmailIgnoreCase(driverEmail)
+        .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "User not found"));
+    var booking = bookingRepository.findById(bookingId)
+        .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Booking not found"));
+    if (!booking.getRide().getId().equals(rideId)) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, "Booking does not belong to this ride");
+    }
+    if (!booking.getRide().getDriver().getId().equals(driver.getId())) {
+      throw new ApiException(HttpStatus.FORBIDDEN, "Not your ride");
+    }
+    return booking;
+  }
+
+  private static boolean usesSeat(BookingStatus status) {
+    return status == BookingStatus.DRIVER_APPROVED
+        || status == BookingStatus.CONFIRMED
+        || status == BookingStatus.ONGOING;
+  }
+
+  private static BookingResponse toResponse(Booking booking) {
+    return new BookingResponse(
+        booking.getId(),
+        booking.getRide().getId(),
+        booking.getSeatsBooked(),
+        booking.getStatus(),
+        booking.getCreatedAt()
     );
   }
 }

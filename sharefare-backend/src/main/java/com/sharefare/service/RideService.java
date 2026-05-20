@@ -34,6 +34,10 @@ public class RideService {
   public RideResponse createRide(CreateRideRequest request, String driverEmail) {
     var driver = userRepository.findByEmailIgnoreCase(driverEmail)
         .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "User not found"));
+    
+    if (driver.getAccountStatus() != com.sharefare.model.AccountStatus.VERIFIED_STUDENT) {
+      throw new ApiException(HttpStatus.FORBIDDEN, "Only verified students can publish rides.");
+    }
     Ride ride = new Ride();
     ride.setDriver(driver);
     ride.setOrigin(request.origin());
@@ -42,10 +46,15 @@ public class RideService {
     ride.setOriginLng(request.originLng());
     ride.setDestinationLat(request.destinationLat());
     ride.setDestinationLng(request.destinationLng());
+    ride.setVehicleType(request.vehicleType());
+    ride.setVehicleNumber(request.vehicleNumber());
+    ride.setPickupNote(request.pickupNote());
     ride.setDepartureTime(request.departureTime());
     ride.setSeatsTotal(request.seatsTotal());
     ride.setSeatsAvailable(request.seatsTotal());
     ride.setPricePerSeat(request.pricePerSeat());
+    ride.setFemalePreferred(request.femalePreferred());
+    ride.setVerifiedOnly(request.verifiedOnly());
     ride.setStatus(RideStatus.OPEN);
     return toRideResponse(rideRepository.save(ride));
   }
@@ -60,6 +69,8 @@ public class RideService {
   public Page<SearchRideResponse> search(Optional<String> origin,
                                         Optional<String> destination,
                                         Optional<LocalDate> date,
+                                        boolean femaleOnly,
+                                        boolean verifiedOnly,
                                         Pageable pageable) {
     OffsetDateTime from = null;
     OffsetDateTime to = null;
@@ -68,9 +79,13 @@ public class RideService {
       to = date.get().plusDays(1).atStartOfDay().atOffset(ZoneOffset.UTC);
     }
     var statuses = EnumSet.of(RideStatus.OPEN, RideStatus.FULL);
-    return rideRepository.search(origin.orElse(null), destination.orElse(null), from, to, statuses, pageable)
-        .map(r -> new SearchRideResponse(r.getId(), r.getOrigin(), r.getDestination(), r.getDepartureTime(),
-            r.getSeatsAvailable(), r.getPricePerSeat()));
+    return rideRepository.search(origin.orElse(null), destination.orElse(null), from, to, statuses, femaleOnly, verifiedOnly, pageable)
+        .map(r -> new SearchRideResponse(
+            r.getId(), r.getOrigin(), r.getDestination(), r.getDepartureTime(),
+            r.getSeatsAvailable(), r.getPricePerSeat(),
+            r.getDriver().getFullName(), r.getDriver().getGender(), r.getDriver().getTrustScore(),
+            r.isFemalePreferred(), r.isVerifiedOnly(), r.getSafetyLevel()
+        ));
   }
 
   private RideResponse toRideResponse(Ride r) {
@@ -89,7 +104,15 @@ public class RideService {
         r.getSeatsTotal(),
         r.getSeatsAvailable(),
         r.getPricePerSeat(),
-        r.getStatus()
+        r.getStatus(),
+        r.getVehicleType(),
+        r.getVehicleNumber(),
+        r.getPickupNote(),
+        r.getDriver().getGender(),
+        r.getDriver().getTrustScore(),
+        r.isFemalePreferred(),
+        r.isVerifiedOnly(),
+        r.getSafetyLevel()
     );
   }
 }

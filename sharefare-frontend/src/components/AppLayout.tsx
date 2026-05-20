@@ -2,16 +2,20 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Navbar } from "./Navbar";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { Footer } from "./Footer";
+import { MobileBottomNavigation, pageContainer } from "./design-system";
+import { useAuth } from "../state/auth";
+import { cn } from "../lib/cn";
+import { ToastHost } from "./Toast";
 
 export function AppLayout() {
   const location = useLocation();
+  const { token } = useAuth();
   return (
-    <div className="min-h-full text-slate-100">
+    <div className="min-h-full text-slate-900">
       <Navbar />
-      <main className="mx-auto max-w-6xl px-4 py-10">
+      <main className={cn("relative py-6 pb-24 md:pb-6", pageContainer)}>
+        <div className="pointer-events-none fixed inset-0 sf-grid-overlay opacity-30" />
         <div className="relative">
-          <div className="pointer-events-none absolute -top-16 left-0 h-56 w-56 rounded-full bg-blue-500/15 blur-3xl" />
-          <div className="pointer-events-none absolute -top-10 right-6 h-60 w-60 rounded-full bg-cyan-400/12 blur-3xl" />
           <ErrorBoundary>
             <div key={location.pathname} className="sf-animate-in">
               <Outlet />
@@ -20,6 +24,8 @@ export function AppLayout() {
         </div>
         <Footer className="pb-10" />
       </main>
+      <MobileBottomNavigation enabled={Boolean(token)} />
+      <ToastHost />
     </div>
   );
 }

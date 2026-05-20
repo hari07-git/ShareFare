@@ -33,7 +33,7 @@ Then press:
 ## Admin login (dev default)
 
 - Email: `admin@sharefare.com`
-- Password: `Admin@12345`
+- Password: *(set via `ADMIN_PASSWORD` in your `.env` file)*
 
 You can change defaults via backend env vars:
 - `ADMIN_EMAIL`

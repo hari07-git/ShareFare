@@ -1,11 +1,13 @@
 package com.sharefare.security;
 
+import com.sharefare.model.UserRole;
 import com.sharefare.repo.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,13 +20,24 @@ public class AppUserDetailsService implements UserDetailsService {
   }
 
   @Override
+  @Transactional
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     var user = userRepository.findByEmailIgnoreCase(username)
         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+    // Normalize legacy roles (STUDENT / DRIVER) created before the role refactor → USER
+    // This keeps old accounts working without requiring DB migrations.
+    UserRole role = user.getRole();
+    if (role == null || role.name().equals("STUDENT") || role.name().equals("DRIVER")) {
+      user.setRole(UserRole.USER);
+      userRepository.save(user);
+      role = UserRole.USER;
+    }
+
     return new org.springframework.security.core.userdetails.User(
         user.getEmail(),
         user.getPasswordHash(),
-        List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+        List.of(new SimpleGrantedAuthority("ROLE_" + role.name()))
     );
   }
 }

@@ -40,6 +40,7 @@ public class AdminSeeder implements ApplicationRunner {
       admin.setFullName("ShareFare Admin");
       admin.setPasswordHash(passwordEncoder.encode(adminPassword));
       admin.setCollegeVerified(true);
+      admin.setEmailVerified(true);
       userRepository.save(admin);
       return;
     }
@@ -50,6 +51,7 @@ public class AdminSeeder implements ApplicationRunner {
     admin.setRole(UserRole.ADMIN);
     admin.setPasswordHash(passwordEncoder.encode(adminPassword));
     admin.setCollegeVerified(true);
+    admin.setEmailVerified(true);
     userRepository.save(admin);
   }
 }

@@ -62,7 +62,7 @@ public class SecurityConfig {
             })
         )
         .authorizeHttpRequests(registry -> registry
-            .requestMatchers("/api/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+            .requestMatchers("/api/auth/**", "/api/debug/mail", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/uploads/**").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/rides/**").permitAll()
             .anyRequest().authenticated())
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

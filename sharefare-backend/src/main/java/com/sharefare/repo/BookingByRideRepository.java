@@ -14,4 +14,7 @@ public interface BookingByRideRepository extends JpaRepository<Booking, Long> {
 
   @Query("select b from Booking b join fetch b.passenger p where b.ride.id = :rideId and b.status = :status")
   List<Booking> findRideBookingsByStatus(@Param("rideId") Long rideId, @Param("status") BookingStatus status);
+
+  @Query("select b from Booking b join fetch b.passenger p where b.ride.id = :rideId and b.status in :statuses")
+  List<Booking> findRideBookingsByStatuses(@Param("rideId") Long rideId, @Param("statuses") Iterable<BookingStatus> statuses);
 }

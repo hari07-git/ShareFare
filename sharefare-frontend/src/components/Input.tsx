@@ -1,14 +1,16 @@
 import React from "react";
+import { cn } from "../lib/cn";
 
 export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
-  function Input(props, ref) {
+  function Input({ className, ...props }, ref) {
     return (
       <input
         ref={ref}
         {...props}
-        className={`w-full rounded-2xl border border-white/12 bg-white/6 px-4 py-3 text-sm text-white placeholder:text-slate-400 outline-none shadow-[0_18px_60px_-45px_rgba(2,6,23,0.6)] backdrop-blur focus:border-cyan-300/40 focus:ring-2 focus:ring-cyan-300/25 ${
-          props.className ?? ""
-        }`}
+        className={cn(
+          "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-950 outline-none shadow-sm transition placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:opacity-70",
+          className
+        )}
       />
     );
   }

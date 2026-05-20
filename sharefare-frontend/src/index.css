@@ -14,11 +14,10 @@ body {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans",
     "Apple Color Emoji", "Segoe UI Emoji";
   background:
-    radial-gradient(1200px 900px at 15% -10%, rgba(37, 99, 235, 0.30), transparent 55%),
-    radial-gradient(1100px 800px at 90% 10%, rgba(34, 211, 238, 0.18), transparent 55%),
-    radial-gradient(900px 700px at 35% 120%, rgba(99, 102, 241, 0.16), transparent 58%),
-    linear-gradient(180deg, #0b1220 0%, #0b1020 40%, #0b1020 100%);
-  color: #e2e8f0;
+    radial-gradient(780px 360px at 8% -8%, rgba(37, 99, 235, 0.08), transparent 58%),
+    radial-gradient(740px 340px at 96% 0%, rgba(124, 58, 237, 0.07), transparent 54%),
+    linear-gradient(180deg, #f8fafc 0%, #f8fafc 48%, #f1f5f9 100%);
+  color: #0f172a;
 }
 
 /* Premium, consistent text rendering */
@@ -42,27 +41,126 @@ body {
   animation: sf-fade-up 450ms ease-out both;
 }
 
-/* Utility: cinematic gradient text */
 .sf-gradient-text {
-  background: linear-gradient(90deg, #60a5fa 0%, #818cf8 35%, #22d3ee 100%);
+  background: linear-gradient(92deg, #2563eb 0%, #4f46e5 52%, #10b981 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-/* Leaflet on dark surfaces */
-.sf-map-dark .leaflet-control-container .leaflet-control a {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.10);
+.sf-surface {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.9)),
+    rgba(255, 255, 255, 0.92);
+  box-shadow: 0 20px 60px -42px rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(14px);
 }
-.sf-map-dark .leaflet-control-container .leaflet-control a:hover {
-  background: rgba(255, 255, 255, 0.14);
+
+.sf-cinematic-image {
+  background-image:
+    linear-gradient(105deg, rgba(2,6,23,0.82) 0%, rgba(2,6,23,0.55) 55%, rgba(2,6,23,0.30) 100%),
+    url("/images/hero-hyderabad.png");
+  background-size: cover;
+  background-position: center 40%;
 }
-.sf-map-dark .leaflet-control-attribution {
-  background: rgba(2, 6, 23, 0.55);
-  color: rgba(226, 232, 240, 0.8);
-  border-top-left-radius: 12px;
+
+/* Landing page hero — students in car */
+.sf-hero-carpool {
+  background-image:
+    linear-gradient(95deg, rgba(2,6,23,0.88) 0%, rgba(15,23,42,0.72) 50%, rgba(2,6,23,0.35) 100%),
+    url("/images/hero-carpool.png");
+  background-size: cover;
+  background-position: center 35%;
+}
+
+/* Dashboard hero — city at night */
+.sf-hero-city {
+  background-image:
+    linear-gradient(to right, rgba(2,6,23,0.93) 0%, rgba(15,23,42,0.78) 55%, rgba(2,6,23,0.55) 100%),
+    url("/images/hero-hyderabad.png");
+  background-size: cover;
+  background-position: center 45%;
+}
+
+.sf-grid-overlay {
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(to bottom, transparent, black 12%, black 82%, transparent);
+}
+
+.sf-route-line {
+  stroke-dasharray: 7 10;
+  animation: sf-route 1.5s linear infinite;
+}
+
+@keyframes sf-route {
+  to {
+    stroke-dashoffset: -34;
+  }
+}
+
+.sf-map-pin {
+  position: relative;
+  display: grid;
+  height: 26px;
+  width: 26px;
+  place-items: center;
+  border: 2px solid white;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.18), 0 4px 14px rgba(99, 102, 241, 0.4);
+}
+
+.sf-map-pin::after {
+  content: "";
+  height: 8px;
+  width: 8px;
+  border-radius: 999px;
+  background: white;
+}
+
+.sf-map-pin-drop {
+  background: linear-gradient(135deg, #9333ea, #a855f7);
+  box-shadow: 0 0 0 5px rgba(168, 85, 247, 0.18), 0 4px 14px rgba(168, 85, 247, 0.4);
+}
+
+/* Clean light map (CartoDB Voyager) */
+.sf-map-clean {
+  background: #f8fafc;
+}
+
+.sf-map-clean .leaflet-tile {
+  filter: saturate(1.05) contrast(1.02) brightness(1.01);
+}
+
+.sf-map-clean .leaflet-control-container .leaflet-control a {
+  background: rgba(255, 255, 255, 0.96);
+  color: #334155;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+}
+.sf-map-clean .leaflet-control-container .leaflet-control a:hover {
+  background: rgba(248, 250, 252, 1);
+  color: #1e293b;
+}
+.sf-map-clean .leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.88);
+  color: rgba(100, 116, 139, 0.9);
+  border-top-left-radius: 8px;
+  font-size: 10px;
+}
+
+/* Keep legacy alias working */
+.sf-map-dark {
+  background: #f8fafc;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.72;
 }
 
 @supports (-webkit-line-clamp: 2) {

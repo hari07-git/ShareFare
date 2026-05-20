@@ -27,8 +27,16 @@ public class ProfileService {
         user.getPhone(),
         user.getCollegeId(),
         user.isCollegeVerified(),
+        user.isEmailVerified(),
         user.getRole(),
-        user.getCreatedAt()
+        user.getCreatedAt(),
+        user.getVerificationStatus(),
+        user.getTrustScore(),
+        user.getAccountStatus(),
+        user.getGender(),
+        user.getSafetyScore(),
+        user.getTotalCompletedRides(),
+        user.getCancellationRate()
     );
   }
 

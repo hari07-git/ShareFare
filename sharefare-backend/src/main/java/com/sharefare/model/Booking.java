@@ -28,11 +28,13 @@ public class Booking {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 24)
-  private BookingStatus status = BookingStatus.CONFIRMED;
+  private BookingStatus status = BookingStatus.REQUESTED;
 
   @CreatedDate
   @Column(nullable = false, updatable = false)
   private Instant createdAt;
+
+  private Instant reminderSentAt;
 
   public Long getId() {
     return id;
@@ -80,5 +82,13 @@ public class Booking {
 
   public void setCreatedAt(Instant createdAt) {
     this.createdAt = createdAt;
+  }
+
+  public Instant getReminderSentAt() {
+    return reminderSentAt;
+  }
+
+  public void setReminderSentAt(Instant reminderSentAt) {
+    this.reminderSentAt = reminderSentAt;
   }
 }

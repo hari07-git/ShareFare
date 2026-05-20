@@ -11,7 +11,8 @@ public class AuthDtos {
       @NotBlank @Email String email,
       @NotBlank @Size(min = 8, max = 72) String password,
       @NotBlank String fullName,
-      @NotNull UserRole role
+      String phone,
+      @NotBlank String gender
   ) {}
 
   public record LoginRequest(
@@ -20,5 +21,24 @@ public class AuthDtos {
   ) {}
 
   public record LoginResponse(String token) {}
-}
 
+  public record MessageResponse(String message) {}
+
+  public record EmailRequest(
+      @NotBlank @Email String email
+  ) {}
+
+  public record VerifyEmailRequest(
+      @NotBlank String token
+  ) {}
+
+  public record VerifyOtpRequest(
+      @NotBlank @Email String email,
+      @NotBlank @Size(min = 6, max = 6) String otp
+  ) {}
+
+  public record ResetPasswordRequest(
+      @NotBlank String token,
+      @NotBlank @Size(min = 8, max = 72) String password
+  ) {}
+}

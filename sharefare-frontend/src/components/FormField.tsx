@@ -7,7 +7,7 @@ export function FormField({
 }) {
   return (
     <label className="block">
-      <div className="mb-1 text-sm font-medium text-slate-300">{label}</div>
+      <div className="mb-1 text-sm font-medium text-slate-600">{label}</div>
       {children}
     </label>
   );

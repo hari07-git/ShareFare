@@ -21,7 +21,12 @@ public class RideDtos {
       Double originLat,
       Double originLng,
       Double destinationLat,
-      Double destinationLng
+      Double destinationLng,
+      String vehicleType,
+      String vehicleNumber,
+      String pickupNote,
+      boolean femalePreferred,
+      boolean verifiedOnly
   ) {}
 
   public record RideResponse(
@@ -39,7 +44,15 @@ public class RideDtos {
       int seatsTotal,
       int seatsAvailable,
       BigDecimal pricePerSeat,
-      RideStatus status
+      RideStatus status,
+      String vehicleType,
+      String vehicleNumber,
+      String pickupNote,
+      String driverGender,
+      Double driverTrustScore,
+      boolean femalePreferred,
+      boolean verifiedOnly,
+      String safetyLevel
   ) {}
 
   public record SearchRideResponse(
@@ -48,6 +61,12 @@ public class RideDtos {
       String destination,
       OffsetDateTime departureTime,
       int seatsAvailable,
-      BigDecimal pricePerSeat
+      BigDecimal pricePerSeat,
+      String driverName,
+      String driverGender,
+      Double driverTrustScore,
+      boolean femalePreferred,
+      boolean verifiedOnly,
+      String safetyLevel
   ) {}
 }

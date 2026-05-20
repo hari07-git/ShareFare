@@ -10,7 +10,7 @@ import { PageHeader } from "../components/PageHeader";
 
 export function AdminLoginPage() {
   const [email, setEmail] = useState("admin@sharefare.com");
-  const [password, setPassword] = useState("Admin@12345");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const auth = useAuth();
@@ -43,7 +43,7 @@ export function AdminLoginPage() {
       <PageHeader
         title="Admin access"
         subtitle="Sign in to view platform metrics and revenue."
-        imageUrl="https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1600&q=80"
+        imageUrl="/images/hyderabad-hitec-city.jpg"
       />
       <Card title="Admin login">
         <form className="space-y-4" onSubmit={onSubmit}>

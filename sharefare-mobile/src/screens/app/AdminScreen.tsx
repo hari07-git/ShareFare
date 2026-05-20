@@ -10,7 +10,7 @@ import { useAuth } from "../../state/auth";
 export function AdminScreen() {
   const { setToken } = useAuth();
   const [email, setEmail] = useState("admin@sharefare.com");
-  const [password, setPassword] = useState("Admin@12345");
+  const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
   async function adminLogin() {
@@ -35,7 +35,7 @@ export function AdminScreen() {
     <ScreenShell title="Admin" subtitle="Admin login and dashboard.">
       <View style={{ backgroundColor: colors.card, borderRadius: 18, padding: 16, borderWidth: 1, borderColor: colors.border, gap: 12 }}>
         <Text style={{ color: colors.muted, fontSize: 12 }}>
-          Default admin (dev): admin@sharefare.com / Admin@12345
+          Default admin (dev): see your .env file
         </Text>
         <TextField label="Admin email" value={email} onChangeText={setEmail} placeholder="admin@sharefare.com" keyboardType="email-address" />
         <TextField label="Admin password" value={password} onChangeText={setPassword} placeholder="Admin password" secureTextEntry />

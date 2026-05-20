@@ -37,5 +37,10 @@ public class NotificationController {
     notificationService.markRead(id, auth.getName());
     return ResponseEntity.noContent().build();
   }
-}
 
+  @PostMapping("/read-all")
+  public ResponseEntity<Void> markAllRead(Authentication auth) {
+    notificationService.markAllRead(auth.getName());
+    return ResponseEntity.noContent().build();
+  }
+}

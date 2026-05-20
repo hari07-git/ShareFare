@@ -13,7 +13,7 @@ export function Glass({
   return (
     <As
       className={cn(
-        "rounded-3xl border border-white/15 bg-white/10 shadow-[0_30px_80px_-40px_rgba(2,6,23,0.65)] backdrop-blur-xl",
+        "rounded-2xl border border-slate-200 bg-white/85 shadow-sm backdrop-blur",
         className
       )}
     >
@@ -21,4 +21,3 @@ export function Glass({
     </As>
   );
 }
-

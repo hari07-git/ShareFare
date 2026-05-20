@@ -13,8 +13,16 @@ public class ProfileDtos {
       String phone,
       String collegeId,
       boolean collegeVerified,
+      boolean emailVerified,
       UserRole role,
-      Instant createdAt
+      Instant createdAt,
+      String verificationStatus,
+      Double trustScore,
+      com.sharefare.model.AccountStatus accountStatus,
+      String gender,
+      Double safetyScore,
+      Integer totalCompletedRides,
+      Double cancellationRate
   ) {}
 
   public record UpdateMeRequest(
@@ -23,4 +31,3 @@ public class ProfileDtos {
       String collegeId
   ) {}
 }
-

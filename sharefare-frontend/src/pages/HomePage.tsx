@@ -6,6 +6,7 @@ import { Card } from "../components/Card";
 import { GradientButton } from "../components/GradientButton";
 import { BadgeIndianRupee, Calendar, Leaf, ShieldCheck, Star, Users } from "lucide-react";
 
+
 type Booking = {
   bookingId: number;
   rideId: number;
@@ -48,19 +49,19 @@ function Stat({
 }) {
   const toneCls =
     tone === "green"
-      ? "from-emerald-500/25 to-emerald-400/5"
+      ? "bg-emerald-50 text-emerald-600"
       : tone === "amber"
-        ? "from-amber-500/25 to-amber-400/5"
+        ? "bg-amber-50 text-amber-600"
         : tone === "indigo"
-          ? "from-indigo-500/25 to-indigo-400/5"
-          : "from-blue-500/25 to-cyan-400/5";
+          ? "bg-indigo-50 text-indigo-600"
+          : "bg-sky-50 text-sky-600";
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[0_30px_90px_-65px_rgba(2,6,23,0.85)] backdrop-blur-xl transition hover:-translate-y-[2px] hover:bg-white/7">
-      <div className={`inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br ${toneCls} text-white`}>
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-[2px]">
+      <div className={`inline-flex h-10 w-10 items-center justify-center rounded-2xl ${toneCls}`}>
         <Icon className="h-5 w-5" />
       </div>
-      <div className="mt-4 text-xs font-semibold uppercase tracking-wide text-slate-300/80">{label}</div>
-      <div className="mt-2 text-3xl font-semibold text-white">{value}</div>
+      <div className="mt-4 text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</div>
+      <div className="mt-2 text-3xl font-semibold text-slate-950">{value}</div>
     </div>
   );
 }
@@ -72,7 +73,6 @@ export function HomePage() {
   const [driverRides, setDriverRides] = useState<Ride[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const isDriver = me?.role === "DRIVER" || me?.role === "ADMIN";
   const isAdmin = me?.role === "ADMIN";
 
   const upcomingBookings = useMemo(() => {
@@ -103,7 +103,6 @@ export function HomePage() {
 
   useEffect(() => {
     async function loadDriver() {
-      if (!isDriver) return;
       try {
         const res = await api.get<Ride[]>("/api/me/driver/rides");
         setDriverRides(res.data.slice(0, 5));
@@ -112,36 +111,88 @@ export function HomePage() {
       }
     }
     void loadDriver();
-  }, [isDriver]);
+  }, []);
 
   return (
     <div className="space-y-6">
-      <section className="overflow-hidden rounded-[28px] border border-white/10 bg-gradient-to-r from-blue-600/30 via-indigo-600/25 to-cyan-500/15 shadow-[0_60px_160px_-120px_rgba(2,6,23,0.9)]">
-        <div className="px-6 py-8 md:px-10">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="hidden h-12 w-12 rounded-2xl bg-white/10 ring-1 ring-white/10 sm:block" />
-              <div>
-                <div className="text-2xl font-semibold tracking-tight text-white md:text-3xl">
-                  Welcome back{me?.fullName ? `, ${me.fullName}` : ""}!
-                </div>
-                <div className="mt-1 text-sm text-slate-100/80">
-                  Your mobility dashboard — bookings, notifications, and driver tools.
-                </div>
-              </div>
-            </div>
 
-            <div className="flex flex-wrap gap-2">
-              <GradientButton onClick={() => (window.location.href = "/rides/find")}>Find a ride</GradientButton>
-              <GradientButton variant="ghost" onClick={() => (window.location.href = "/rides/offer")}>
-                Offer ride
-              </GradientButton>
+      {/* ═══════════════════════════════════════════════════
+          DASHBOARD HERO — city-at-night cinematic
+      ═══════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden rounded-3xl shadow-2xl">
+        {/* Background image — Hyderabad city at night */}
+        <div className="absolute inset-0 sf-hero-city" />
+
+        {/* Ambient glows */}
+        <div className="pointer-events-none absolute -right-20 top-0 h-64 w-64 rounded-full bg-indigo-600/20 blur-3xl" />
+        <div className="pointer-events-none absolute left-1/3 -bottom-16 h-48 w-48 rounded-full bg-violet-500/15 blur-3xl" />
+
+        {/* Bottom fade */}
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-slate-950/50 to-transparent" />
+
+        <div className="relative grid items-center gap-8 px-6 py-10 sm:px-10 md:min-h-[340px] md:py-12 lg:grid-cols-[1fr_auto] lg:px-14">
+
+          {/* LEFT — greeting + trust badges */}
+          <div>
+            {/* Verified badge */}
+            {me?.accountStatus === "VERIFIED_STUDENT" && (
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/20 px-3 py-1.5 text-xs font-bold text-emerald-300 backdrop-blur">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Verified Campus Member
+              </div>
+            )}
+
+            {/* Greeting */}
+            <h1 className="text-3xl font-black leading-tight tracking-tight text-white md:text-4xl lg:text-5xl">
+              {me?.fullName ? (
+                <>Good to see you,<br /><span className="bg-gradient-to-r from-indigo-300 to-cyan-300 bg-clip-text text-transparent">{me.fullName.split(" ")[0]}.</span></>
+              ) : (
+                "Your campus mobility hub."
+              )}
+            </h1>
+            <p className="mt-3 max-w-lg text-sm leading-6 text-white/65">
+              Verified rides for smarter student travel — bookings, alerts, and offered rides in one place.
+            </p>
+
+            {/* Trust indicators */}
+            <div className="mt-5 flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold text-white/80 backdrop-blur">
+                <ShieldCheck className="h-3 w-3 text-emerald-400" /> Verified Students Only
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold text-white/80 backdrop-blur">
+                <Star className="h-3 w-3 text-amber-400 fill-amber-400" /> 4.9 Community Rating
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold text-white/80 backdrop-blur">
+                <Leaf className="h-3 w-3 text-emerald-400" /> 85kg CO₂ Saved
+              </span>
             </div>
+          </div>
+
+          {/* RIGHT — quick action cards */}
+          <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col">
+            <GradientButton
+              onClick={() => (window.location.href = "/rides/find")}
+              className="justify-center px-6 py-3.5 text-sm font-bold shadow-xl shadow-indigo-500/25 md:w-48"
+            >
+              🔍 Find a ride
+            </GradientButton>
+            <button
+              onClick={() => (window.location.href = "/rides/offer")}
+              className="rounded-xl border border-white/25 bg-white/10 px-6 py-3.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20 md:w-48"
+            >
+              🚗 Offer a ride
+            </button>
+            <Link to="/me/bookings">
+              <button className="w-full rounded-xl border border-white/15 bg-white/8 px-6 py-3.5 text-sm font-semibold text-white/80 backdrop-blur transition hover:bg-white/15 md:w-48">
+                📋 My bookings
+              </button>
+            </Link>
           </div>
         </div>
       </section>
 
-      {error ? <div className="text-sm text-rose-300">{error}</div> : null}
+      {error ? <div className="text-sm text-rose-600">{error}</div> : null}
+
 
       <div className="grid gap-4 md:grid-cols-4">
         <Stat label="Total bookings" value={bookings.filter((b) => b.status !== "CANCELLED").length} icon={Calendar} tone="indigo" />
@@ -154,7 +205,7 @@ export function HomePage() {
         <div className="space-y-6 lg:col-span-8">
           <Card title="Upcoming rides" subtitle="Your scheduled journeys">
             {upcomingBookings.length === 0 ? (
-              <div className="text-sm text-slate-300/90">
+              <div className="text-sm text-slate-600">
                 No upcoming bookings. <Link className="underline" to="/rides/find">Find a ride</Link>.
               </div>
             ) : (
@@ -163,17 +214,17 @@ export function HomePage() {
                   <Link
                     key={b.bookingId}
                     to={`/rides/${b.rideId}`}
-                    className="block rounded-3xl border border-white/10 bg-white/5 p-4 transition hover:bg-white/8"
+                    className="block rounded-2xl border border-slate-200 bg-white p-4 transition hover:bg-slate-50"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="min-w-[220px]">
-                        <div className="text-sm font-semibold text-white">{b.origin} → {b.destination}</div>
-                        <div className="mt-1 text-xs text-slate-300/90">
+                        <div className="text-sm font-semibold text-slate-950">{b.origin} → {b.destination}</div>
+                        <div className="mt-1 text-xs text-slate-500">
                           {new Date(b.departureTime).toLocaleString()} • Seats: {b.seatsBooked}
                         </div>
                       </div>
-                      <div className="text-xs text-slate-300/80">
-                        Status: <span className="text-white">{b.status}</span>
+                      <div className="text-xs text-slate-500">
+                        Status: <span className="text-slate-900">{b.status}</span>
                       </div>
                       <GradientButton className="py-2" variant="primary">Details</GradientButton>
                     </div>
@@ -185,41 +236,40 @@ export function HomePage() {
 
           <Card title="Recent notifications" subtitle="Ride updates and booking alerts">
             {notifs.length === 0 ? (
-              <div className="text-sm text-slate-300/90">No notifications yet.</div>
+              <div className="text-sm text-slate-600">No notifications yet.</div>
             ) : (
               <div className="space-y-3">
                 {notifs.slice(0, 6).map((n) => (
                   <div
                     key={n.id}
-                    className={`rounded-3xl border p-4 transition ${
-                      n.read ? "border-white/10 bg-white/5" : "border-cyan-300/20 bg-cyan-400/10"
+                    className={`rounded-2xl border p-4 transition ${
+                      n.read ? "border-slate-200 bg-white" : "border-indigo-200 bg-indigo-50"
                     }`}
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="text-sm font-semibold text-white">{n.title}</div>
-                      <div className="text-xs text-slate-300/80">{new Date(n.createdAt).toLocaleString()}</div>
+                      <div className="text-sm font-semibold text-slate-950">{n.title}</div>
+                      <div className="text-xs text-slate-500">{new Date(n.createdAt).toLocaleString()}</div>
                     </div>
-                    <div className="mt-2 text-sm text-slate-200/90 line-clamp-2">{n.message}</div>
+                    <div className="mt-2 text-sm text-slate-600 line-clamp-2">{n.message}</div>
                   </div>
                 ))}
               </div>
             )}
           </Card>
 
-          {isDriver ? (
-            <Card title="Driver tools" subtitle="Manage rides you offered">
+          <Card title="My Offered Rides" subtitle="Manage rides you offered">
               <div className="flex flex-wrap items-center gap-2">
-                <GradientButton onClick={() => (window.location.href = "/me/driver/inbox")}>Open inbox</GradientButton>
+                <GradientButton onClick={() => (window.location.href = "/me/driver/inbox")}>Open ride inbox</GradientButton>
                 <GradientButton variant="ghost" onClick={() => (window.location.href = "/rides/offer")}>Offer another</GradientButton>
                 {isAdmin ? <GradientButton variant="ghost" onClick={() => (window.location.href = "/admin")}>Admin dashboard</GradientButton> : null}
               </div>
               {driverRides.length > 0 ? (
                 <div className="mt-5 grid gap-3 md:grid-cols-2">
                   {driverRides.map((r) => (
-                    <div key={r.id} className="rounded-3xl border border-white/10 bg-white/5 p-4">
-                      <div className="text-sm font-semibold text-white">{r.origin} → {r.destination}</div>
-                      <div className="mt-1 text-xs text-slate-300/90">{new Date(r.departureTime).toLocaleString()}</div>
-                      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-300/80">
+                    <div key={r.id} className="rounded-2xl border border-slate-200 bg-white p-4">
+                      <div className="text-sm font-semibold text-slate-950">{r.origin} → {r.destination}</div>
+                      <div className="mt-1 text-xs text-slate-500">{new Date(r.departureTime).toLocaleString()}</div>
+                      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
                         <span>Seats: {r.seatsAvailable}/{r.seatsTotal}</span>
                         <span className="inline-flex items-center gap-1"><BadgeIndianRupee className="h-3.5 w-3.5" /> {r.pricePerSeat}</span>
                         <span>Status: {r.status}</span>
@@ -228,23 +278,22 @@ export function HomePage() {
                   ))}
                 </div>
               ) : (
-                <div className="mt-4 text-sm text-slate-300/90">No rides offered yet.</div>
+                <div className="mt-4 text-sm text-slate-600">No rides offered yet.</div>
               )}
             </Card>
-          ) : null}
         </div>
 
         <div className="space-y-6 lg:col-span-4">
           <Card title="Profile status" subtitle="Complete your details for trust">
-            <div className="space-y-3 text-sm text-slate-200/90">
+            <div className="space-y-3 text-sm text-slate-600">
               <div className="flex items-center justify-between">
                 <div>Completeness</div>
-                <div className="font-semibold text-white">85%</div>
+                <div className="font-semibold text-slate-950">85%</div>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full w-[85%] rounded-full bg-gradient-to-r from-blue-500 to-cyan-400" />
+              <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                <div className="h-full w-[85%] rounded-full bg-gradient-to-r from-indigo-400 to-cyan-300" />
               </div>
-              <div className="grid gap-2 pt-2 text-xs text-slate-300/90">
+              <div className="grid gap-2 pt-2 text-xs text-slate-600">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="h-4 w-4 text-emerald-300" /> Email verified
                 </div>

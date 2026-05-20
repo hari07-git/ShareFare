@@ -43,7 +43,7 @@ public class ReviewService {
 
     boolean reviewerIsDriver = ride.getDriver().getId().equals(reviewer.getId());
     boolean reviewerIsPassenger = bookingRepository.findByPassengerOrderByCreatedAtDesc(reviewer).stream()
-        .anyMatch(b -> b.getRide().getId().equals(rideId) && b.getStatus() == BookingStatus.CONFIRMED);
+        .anyMatch(b -> b.getRide().getId().equals(rideId) && b.getStatus() == BookingStatus.COMPLETED);
 
     if (!reviewerIsDriver && !reviewerIsPassenger) {
       throw new ApiException(HttpStatus.FORBIDDEN, "Only ride participants can review");
@@ -51,7 +51,7 @@ public class ReviewService {
 
     boolean revieweeIsDriver = ride.getDriver().getId().equals(reviewee.getId());
     boolean revieweeIsPassenger = bookingRepository.findByPassengerOrderByCreatedAtDesc(reviewee).stream()
-        .anyMatch(b -> b.getRide().getId().equals(rideId) && b.getStatus() == BookingStatus.CONFIRMED);
+        .anyMatch(b -> b.getRide().getId().equals(rideId) && b.getStatus() == BookingStatus.COMPLETED);
 
     if (!revieweeIsDriver && !revieweeIsPassenger) {
       throw new ApiException(HttpStatus.BAD_REQUEST, "Reviewee must be a ride participant");

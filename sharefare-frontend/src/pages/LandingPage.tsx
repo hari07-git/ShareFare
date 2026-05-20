@@ -1,272 +1,270 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../state/auth";
-import { Glass } from "../components/Glass";
 import { GradientButton } from "../components/GradientButton";
-import { Input } from "../components/Input";
-import { Card } from "../components/Card";
 import { LocationAutocomplete } from "../components/LocationAutocomplete";
-import { ArrowRight, Leaf, ShieldCheck, Sparkles, Zap } from "lucide-react";
+import { DarkMap } from "../components/DarkMap";
+import {
+  ArrowRight, BadgeIndianRupee, Calendar, Clock3, MapPin,
+  Navigation, ShieldCheck, Sparkles, Star, Users, BadgeCheck, Zap
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { PlaceResult } from "../lib/geocode";
+import { distanceKm, estimateEtaMinutes } from "../lib/route";
+import { motion } from "framer-motion";
+
+const routes = [
+  { from: "IIIT Hyderabad", to: "Gachibowli", price: "₹59", seats: "3 seats", riders: "24 riders" },
+  { from: "JNTU College", to: "Kukatpally Metro", price: "₹40", seats: "2 seats", riders: "18 riders" },
+  { from: "HITEC City", to: "Financial District", price: "₹70", seats: "4 seats", riders: "31 riders" },
+  { from: "Secunderabad", to: "Ameerpet", price: "₹35", seats: "2 seats", riders: "19 riders" }
+];
+
+const defaultPickup = { lat: 17.4448, lng: 78.3498 };
+const defaultDrop = { lat: 17.4483, lng: 78.3915 };
+
+const STATS = [
+  { value: "50k+", label: "Campus riders", icon: Users },
+  { value: "4.9★", label: "Average rating", icon: Star },
+  { value: "₹35", label: "Avg fare saved", icon: BadgeIndianRupee },
+  { value: "Live", label: "Route tracking", icon: Navigation }
+];
+
+const TRUST_PILLS = [
+  { label: "Verified Students Only", icon: BadgeCheck, color: "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/30" },
+  { label: "Zero Commission", icon: Zap, color: "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/30" },
+  { label: "Safety First", icon: ShieldCheck, color: "bg-blue-500/20 text-blue-300 ring-1 ring-blue-500/30" },
+];
 
 export function LandingPage() {
   const { token } = useAuth();
   const navigate = useNavigate();
-
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [date, setDate] = useState("");
   const [fromPick, setFromPick] = useState<PlaceResult | null>(null);
   const [toPick, setToPick] = useState<PlaceResult | null>(null);
 
-  const heroBg = useMemo(
-    () =>
-      "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?auto=format&fit=crop&w=2200&q=80",
+  const pickup = fromPick ? { lat: fromPick.lat, lng: fromPick.lng } : defaultPickup;
+  const drop = toPick ? { lat: toPick.lat, lng: toPick.lng } : defaultDrop;
+  const distance = distanceKm(pickup, drop);
+  const eta = estimateEtaMinutes(distance);
+
+  const nearby = useMemo(
+    () => [
+      { lat: 17.437, lng: 78.366 },
+      { lat: 17.456, lng: 78.382 },
+      { lat: 17.432, lng: 78.392 }
+    ],
     []
   );
 
-  return (
-    <div className="space-y-10">
-      <section className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#060a12]/50 shadow-[0_60px_160px_-110px_rgba(2,6,23,0.95)]">
-        <div className="absolute inset-0">
-          <img src={heroBg} alt="" className="h-full w-full object-cover opacity-70" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#050913]/60 via-[#050913]/55 to-[#050913]/85" />
-          <div className="absolute inset-0 bg-[radial-gradient(60%_60%_at_18%_18%,rgba(34,211,238,0.22),transparent_60%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(55%_55%_at_72%_22%,rgba(99,102,241,0.25),transparent_60%)]" />
-        </div>
+  function search() {
+    const params = new URLSearchParams();
+    if (fromPick?.displayName || from.trim()) params.set("origin", (fromPick?.displayName ?? from).trim());
+    if (toPick?.displayName || to.trim()) params.set("destination", (toPick?.displayName ?? to).trim());
+    if (date) params.set("date", date);
+    navigate(`/rides/find?${params.toString()}`);
+  }
 
-        <div className="relative grid items-stretch gap-8 px-6 py-10 md:grid-cols-12 md:px-10 md:py-12">
-          <div className="md:col-span-7">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold text-slate-100">
-              <Sparkles className="h-4 w-4 text-cyan-300" />
-              Trusted by campus commuters in Hyderabad
+  return (
+    <div className="space-y-12 overflow-hidden">
+
+      {/* ═══════════════════════════════════════════════════
+          HERO SECTION — cinematic dark with carpool image
+      ═══════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden rounded-3xl shadow-2xl">
+        {/* Background image */}
+        <div className="absolute inset-0 sf-hero-carpool" />
+
+        {/* Bottom gradient fade */}
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-950/60 to-transparent" />
+
+        {/* Subtle purple glow top-right */}
+        <div className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-violet-600/20 blur-3xl" />
+        <div className="pointer-events-none absolute -left-16 top-10 h-64 w-64 rounded-full bg-indigo-600/15 blur-3xl" />
+
+        <div className="relative grid min-h-[540px] items-center gap-8 px-6 py-12 sm:px-10 md:py-16 lg:grid-cols-[1fr_400px] lg:px-14">
+
+          {/* LEFT — headline + trust pills + stats */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            {/* Eyebrow badge */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/90 backdrop-blur">
+              <Sparkles className="h-3.5 w-3.5 text-indigo-300" />
+              Hyderabad's #1 verified campus mobility network
             </div>
-            <h1 className="mt-5 text-4xl font-semibold leading-[1.05] tracking-tight text-white md:text-6xl">
-              Your Campus
-              <span className="block sf-gradient-text">Ride Network</span>
+
+            {/* Headline */}
+            <h1 className="mt-5 text-4xl font-black leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-[3.6rem]">
+              Move smarter.<br />
+              <span className="bg-gradient-to-r from-indigo-300 via-violet-300 to-cyan-300 bg-clip-text text-transparent">
+                Travel verified.
+              </span>
             </h1>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-slate-200/90 md:text-lg">
-              Connect with verified students. Share rides, split costs, and travel sustainably across Hyderabad.
+
+            <p className="mt-5 max-w-lg text-base leading-7 text-white/70">
+              ShareFare connects Hyderabad college students for affordable, safe carpools. Every rider is campus-verified. Every route is real.
             </p>
 
-            <div className="mt-7 flex flex-wrap gap-3">
-              {token ? (
-                <>
-                  <GradientButton onClick={() => navigate("/home")}>
-                    Open dashboard <ArrowRight className="h-4 w-4" />
-                  </GradientButton>
-                  <GradientButton variant="ghost" onClick={() => navigate("/rides/find")}>
-                    Find rides
-                  </GradientButton>
-                </>
-              ) : (
-                <>
-                  <GradientButton onClick={() => navigate("/rides/find")}>
-                    Find rides <ArrowRight className="h-4 w-4" />
-                  </GradientButton>
-                  <GradientButton variant="ghost" onClick={() => navigate("/auth/register")}>
-                    Create account
-                  </GradientButton>
-                </>
-              )}
+            {/* Trust pills */}
+            <div className="mt-6 flex flex-wrap gap-2">
+              {TRUST_PILLS.map((p) => (
+                <span key={p.label} className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold backdrop-blur ${p.color}`}>
+                  <p.icon className="h-3.5 w-3.5" />
+                  {p.label}
+                </span>
+              ))}
             </div>
 
-            <div className="mt-8 grid max-w-xl grid-cols-2 gap-3 sm:grid-cols-4">
-              <Glass className="p-4">
-                <div className="text-xs text-slate-300/90">Active students</div>
-                <div className="mt-1 text-2xl font-semibold text-white">50k+</div>
-              </Glass>
-              <Glass className="p-4">
-                <div className="text-xs text-slate-300/90">Universities</div>
-                <div className="mt-1 text-2xl font-semibold text-white">500+</div>
-              </Glass>
-              <Glass className="p-4">
-                <div className="text-xs text-slate-300/90">Rides completed</div>
-                <div className="mt-1 text-2xl font-semibold text-white">2M+</div>
-              </Glass>
-              <Glass className="p-4">
-                <div className="text-xs text-slate-300/90">Avg rating</div>
-                <div className="mt-1 text-2xl font-semibold text-white">4.9★</div>
-              </Glass>
+            {/* CTA buttons */}
+            <div className="mt-8 flex flex-wrap gap-3">
+              <GradientButton onClick={() => navigate(token ? "/home" : "/rides/find")} className="px-6 py-3 text-base font-bold shadow-lg shadow-indigo-500/25">
+                {token ? "Open dashboard" : "Find a ride"} <ArrowRight className="h-4 w-4" />
+              </GradientButton>
+              <button
+                onClick={() => navigate(token ? "/rides/offer" : "/auth/register")}
+                className="rounded-xl border border-white/25 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20"
+              >
+                {token ? "Offer a ride" : "Create account"}
+              </button>
             </div>
-          </div>
 
-          <div className="md:col-span-5">
-            <Glass className="p-6 md:p-7">
-              <div className="text-lg font-semibold text-white">Find your ride</div>
-              <div className="mt-4 space-y-3">
-                <LocationAutocomplete
-                  value={from}
-                  onValue={setFrom}
-                  placeholder="Leaving from… (area/college)"
-                  onSelect={(p) => setFromPick(p)}
-                />
-                <LocationAutocomplete
-                  value={to}
-                  onValue={setTo}
-                  placeholder="Going to… (area/college)"
-                  onSelect={(p) => setToPick(p)}
-                />
-                <Input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  placeholder="dd/mm/yyyy"
-                />
-                <GradientButton
-                  className="w-full"
-                  onClick={() => {
-                    const params = new URLSearchParams();
-                    if (fromPick?.displayName || from.trim()) params.set("origin", (fromPick?.displayName ?? from).trim());
-                    if (toPick?.displayName || to.trim()) params.set("destination", (toPick?.displayName ?? to).trim());
-                    if (date) params.set("date", date);
-                    navigate(`/rides/find?${params.toString()}`);
-                  }}
+            {/* Floating stats row */}
+            <div className="mt-10 grid max-w-lg grid-cols-2 gap-3 sm:grid-cols-4">
+              {STATS.map(({ value, label, icon: Icon }) => (
+                <motion.div
+                  key={label}
+                  whileHover={{ y: -3, scale: 1.03 }}
+                  className="rounded-2xl border border-white/15 bg-white/10 p-3 backdrop-blur transition"
                 >
-                  Search rides <ArrowRight className="h-4 w-4" />
-                </GradientButton>
-                <div className="text-center text-xs text-slate-300/80">
-                  Hyderabad-first • Suggestions while you type
+                  <Icon className="h-4 w-4 text-indigo-300" />
+                  <div className="mt-2 text-xl font-bold text-white">{value}</div>
+                  <div className="mt-0.5 text-[11px] font-medium text-white/60">{label}</div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* RIGHT — glass ride planner card */}
+          <motion.div
+            initial={{ opacity: 0, y: 24, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.65, delay: 0.12 }}
+          >
+            <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/10 p-5 shadow-2xl backdrop-blur-xl">
+              {/* Card glow */}
+              <div className="pointer-events-none absolute -top-10 -right-10 h-32 w-32 rounded-full bg-indigo-500/20 blur-2xl" />
+
+              <div className="relative">
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <div className="text-base font-bold text-white">Plan a ride</div>
+                    <div className="mt-0.5 text-xs text-white/60">Live suggestions · Route preview</div>
+                  </div>
+                  <div className="rounded-full border border-emerald-400/30 bg-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-300">
+                    {eta ?? 18} min ETA
+                  </div>
+                </div>
+
+                <div className="space-y-2.5">
+                  <LocationAutocomplete value={from} onValue={setFrom} placeholder="Pickup: Gachibowli, campus, metro..." onSelect={setFromPick} />
+                  <LocationAutocomplete value={to} onValue={setTo} placeholder="Drop: HITEC City, JNTU, Secunderabad..." onSelect={setToPick} />
+                  <div className="relative">
+                    <Calendar className="pointer-events-none absolute left-3.5 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-indigo-400" />
+                    <input
+                      type="date"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 pl-10 text-sm font-medium text-slate-950 outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+                    />
+                  </div>
+                  <GradientButton className="w-full py-3 font-bold shadow-lg shadow-indigo-500/20" onClick={search}>
+                    Search live rides <ArrowRight className="h-4 w-4" />
+                  </GradientButton>
+                </div>
+
+                {/* Map preview */}
+                <div className="mt-4 overflow-hidden rounded-2xl border border-white/20">
+                  <DarkMap pickup={pickup} drop={drop} nearby={nearby} height={200} />
+                </div>
+
+                {/* Route stats */}
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  {[
+                    { icon: MapPin, value: `${distance?.toFixed(1) ?? "–"} km`, label: "distance" },
+                    { icon: Clock3, value: `${eta ?? "–"} min`, label: "ETA" },
+                    { icon: ShieldCheck, value: "Verified", label: "students" },
+                  ].map(({ icon: Icon, value, label }) => (
+                    <div key={label} className="rounded-xl border border-white/15 bg-white/10 p-2.5 text-center">
+                      <Icon className="mx-auto h-3.5 w-3.5 text-indigo-300" />
+                      <div className="mt-1 text-xs font-bold text-white">{value}</div>
+                      <div className="text-[10px] text-white/50">{label}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </Glass>
-          </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      <section className="space-y-5">
-        <div className="text-center">
-          <div className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200/90">
-            Why ShareFare?
+      {/* ═══════════════════════════════════════════════════
+          POPULAR ROUTES SECTION
+      ═══════════════════════════════════════════════════ */}
+      <section className="grid gap-6 lg:grid-cols-[0.75fr_1.25fr]">
+        <div className="py-2">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-600 shadow-sm">
+            <Zap className="h-3.5 w-3.5" /> Live routes
           </div>
-          <div className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">
-            Built for Students
-          </div>
-          <div className="mt-2 text-sm text-slate-300/90">
-            Designed for real mobility on campus routes in Hyderabad.
-          </div>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card title="Verified students" subtitle="Safer rides via college community">
-            <div className="flex items-start gap-3 text-sm text-slate-200/90">
-              <ShieldCheck className="mt-0.5 h-5 w-5 text-cyan-300" />
-              <p>Build trust with profiles, ratings, and ride history.</p>
-            </div>
-          </Card>
-          <Card title="Save money" subtitle="Split costs, keep it fair">
-            <div className="flex items-start gap-3 text-sm text-slate-200/90">
-              <Zap className="mt-0.5 h-5 w-5 text-indigo-300" />
-              <p>Smart matching and clear pricing per seat.</p>
-            </div>
-          </Card>
-          <Card title="Eco-friendly" subtitle="Lower traffic, lower emissions">
-            <div className="flex items-start gap-3 text-sm text-slate-200/90">
-              <Leaf className="mt-0.5 h-5 w-5 text-emerald-300" />
-              <p>Share rides and reduce carbon footprint.</p>
-            </div>
-          </Card>
-          <Card title="Instant booking" subtitle="Book in seconds, get contact">
-            <div className="flex items-start gap-3 text-sm text-slate-200/90">
-              <Sparkles className="mt-0.5 h-5 w-5 text-sky-300" />
-              <p>After booking, see driver contact and get updates.</p>
-            </div>
-          </Card>
-        </div>
-      </section>
-
-      <section className="space-y-5">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200/90">
-              Trending routes
-            </div>
-            <div className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-4xl">
-              Popular destinations
-            </div>
-            <div className="mt-2 text-sm text-slate-300/90">Frequently travelled by students</div>
-          </div>
-          <Link to="/rides/find">
-            <GradientButton variant="secondary">
-              View all routes <ArrowRight className="h-4 w-4" />
-            </GradientButton>
+          <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+            Popular Hyderabad<br />campus corridors
+          </h2>
+          <p className="mt-3 max-w-sm text-sm leading-6 text-slate-600">
+            High-frequency verified routes connecting colleges, metro, and tech parks daily.
+          </p>
+          <Link to="/rides/find" className="mt-5 inline-flex">
+            <GradientButton variant="ghost">Explore all rides <ArrowRight className="h-4 w-4" /></GradientButton>
           </Link>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4">
-          {[
-            { from: "IIIT Hyderabad", to: "Gachibowli", price: "₹59", seats: "3 seats left", riders: "24 riders" },
-            { from: "JNTU College", to: "Kukatpally Metro", price: "₹40", seats: "2 seats left", riders: "18 riders" },
-            { from: "HITEC City", to: "Financial District", price: "₹70", seats: "4 seats left", riders: "31 riders" },
-            { from: "Secunderabad", to: "Ameerpet", price: "₹35", seats: "2 seats left", riders: "19 riders" }
-          ].map((r) => (
-            <div
-              key={`${r.from}-${r.to}`}
-              className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[0_30px_90px_-65px_rgba(2,6,23,0.85)] backdrop-blur-xl transition hover:-translate-y-[2px] hover:bg-white/7"
+        <div className="grid gap-3 sm:grid-cols-2">
+          {routes.map((route, i) => (
+            <motion.div
+              key={`${route.from}-${route.to}`}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08 }}
+              whileHover={{ y: -4, boxShadow: "0 20px 40px -16px rgba(99,102,241,0.18)" }}
+              className="group cursor-pointer rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all"
             >
               <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-white">
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-                  <span className="font-semibold">{r.from}</span>
+                <div className="flex items-center gap-2 font-semibold text-slate-950">
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-300" />
+                  {route.from}
                 </div>
-                <div className="flex items-center gap-2 text-slate-200/90">
-                  <span className="h-2.5 w-2.5 rounded-full bg-rose-400" />
-                  <span className="font-semibold">{r.to}</span>
-                </div>
-              </div>
-              <div className="mt-4 border-t border-white/10 pt-4">
-                <div className="flex items-end justify-between">
-                  <div>
-                    <div className="text-3xl font-semibold text-white">{r.price}</div>
-                    <div className="mt-1 text-xs text-slate-300/80">{r.seats}</div>
-                  </div>
-                  <div className="rounded-full border border-cyan-300/25 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-200">
-                    {r.riders}
-                  </div>
+                <div className="ml-1 h-4 border-l border-dashed border-slate-200" />
+                <div className="flex items-center gap-2 font-semibold text-slate-600">
+                  <span className="h-2.5 w-2.5 rounded-full bg-violet-400 shadow-sm shadow-violet-300" />
+                  {route.to}
                 </div>
               </div>
-            </div>
+              <div className="mt-4 flex items-end justify-between border-t border-slate-100 pt-3">
+                <div>
+                  <div className="text-2xl font-black text-slate-950">{route.price}</div>
+                  <div className="mt-0.5 text-xs text-slate-500">{route.seats} available</div>
+                </div>
+                <div className="rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600 transition group-hover:border-indigo-200 group-hover:bg-indigo-100">
+                  {route.riders}
+                </div>
+              </div>
+            </motion.div>
           ))}
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <Card title="Create account" subtitle="Student or Driver">
-          <p className="text-sm text-slate-200/90">
-            Sign up with your email and choose your role. Drivers can offer rides and manage bookings.
-          </p>
-        </Card>
-        <Card title="Find or offer rides" subtitle="Smart search + map pins">
-          <p className="text-sm text-slate-200/90">
-            Search by source, destination, and date — or offer rides with precise pickup/drop pins.
-          </p>
-        </Card>
-        <Card title="Travel together" subtitle="Contact + notifications">
-          <p className="text-sm text-slate-200/90">
-            Book rides and get updates. Driver contact shows after booking for easy coordination.
-          </p>
-        </Card>
-      </section>
-
-      <section className="relative overflow-hidden rounded-[28px] border border-white/10 bg-gradient-to-br from-blue-600/35 via-indigo-600/30 to-cyan-500/20">
-        <div className="absolute inset-0 bg-[radial-gradient(60%_60%_at_30%_20%,rgba(255,255,255,0.20),transparent_65%)]" />
-        <div className="relative px-6 py-10 md:px-10 md:py-12">
-          <div className="text-center">
-            <div className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
-              Ready to start sharing?
-            </div>
-            <div className="mt-2 text-sm text-slate-100/90">
-              Join students already saving money and travelling sustainably.
-            </div>
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <GradientButton onClick={() => navigate("/rides/find")}>Find a ride</GradientButton>
-              <GradientButton variant="ghost" onClick={() => navigate("/rides/offer")}>
-                Offer a ride
-              </GradientButton>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

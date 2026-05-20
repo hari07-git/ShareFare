@@ -2,6 +2,8 @@ package com.sharefare.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -26,6 +28,18 @@ public class ApiExceptionHandler {
   @ExceptionHandler(BadCredentialsException.class)
   public ResponseEntity<Map<String, Object>> handleBadCreds(BadCredentialsException ex) {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException ex) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        .body(error(HttpStatus.FORBIDDEN, "Access denied. Only verified students can perform this action."));
+  }
+
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<Map<String, Object>> handleUnreadable(HttpMessageNotReadableException ex) {
+    return ResponseEntity.badRequest()
+        .body(error(HttpStatus.BAD_REQUEST, "Invalid request format. Please check the date, time, and numeric fields."));
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)

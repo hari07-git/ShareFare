@@ -14,4 +14,4 @@ app:
     ttlSeconds: 86400
   admin:
     email: admin@sharefare.com
-    password: Admin@12345
+    password: ${ADMIN_PASSWORD:set-in-env}

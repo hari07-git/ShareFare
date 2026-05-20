@@ -52,14 +52,14 @@ public class SampleDataSeeder implements ApplicationRunner {
 
     OffsetDateTime base = OffsetDateTime.now(ZoneOffset.UTC).plusDays(1).withHour(8).withMinute(30).withSecond(0).withNano(0);
     var templates = List.of(
-        tpl("Gachibowli", "Hitech City", 17.4401, 78.3489, 17.4456, 78.3772, 59),
-        tpl("Kukatpally Metro", "JNTU College", 17.4940, 78.3990, 17.4936, 78.3912, 40),
-        tpl("Miyapur", "Kondapur", 17.4965, 78.3576, 17.4630, 78.3628, 55),
-        tpl("Secunderabad", "Ameerpet", 17.4399, 78.4983, 17.4375, 78.4483, 35),
-        tpl("LB Nagar", "Dilsukhnagar", 17.3457, 78.5522, 17.3684, 78.5247, 30),
-        tpl("Uppal", "Habsiguda", 17.4065, 78.5591, 17.4088, 78.5457, 25),
-        tpl("HITEC City", "Financial District", 17.4456, 78.3772, 17.4148, 78.3418, 70),
-        tpl("Mehdipatnam", "Golconda", 17.3953, 78.4400, 17.3833, 78.4011, 45)
+        tpl("JNTU College", "HITEC City", 17.4936, 78.3912, 17.4456, 78.3772, 3, 55, "Hyundai i20", "TS09 SF 2147", "Pickup outside JNTU metro gate"),
+        tpl("Gachibowli", "Madhapur", 17.4401, 78.3489, 17.4483, 78.3915, 2, 45, "Honda Activa", "TS08 SF 9132", "Near DLF Cyber City signal"),
+        tpl("Kukatpally Metro", "Financial District", 17.4940, 78.3990, 17.4148, 78.3418, 4, 85, "Maruti Swift", "TS10 SF 7781", "Metro pillar KPHB-2"),
+        tpl("LB Nagar", "Ameerpet", 17.3457, 78.5522, 17.4375, 78.4483, 3, 65, "Tata Nexon", "TS11 SF 4208", "LB Nagar metro entry B"),
+        tpl("Secunderabad", "Gachibowli", 17.4399, 78.4983, 17.4401, 78.3489, 2, 90, "Toyota Glanza", "TS07 SF 1066", "Secunderabad clock tower"),
+        tpl("Miyapur", "Kondapur", 17.4965, 78.3576, 17.4630, 78.3628, 3, 50, "Kia Sonet", "TS12 SF 5580", "Miyapur metro parking"),
+        tpl("Uppal", "Habsiguda", 17.4065, 78.5591, 17.4088, 78.5457, 2, 30, "TVS Jupiter", "TS13 SF 6201", "Uppal metro bus bay"),
+        tpl("University of Hyderabad", "Raheja Mindspace", 17.4584, 78.3301, 17.4416, 78.3818, 4, 60, "Mahindra XUV300", "TS09 SF 8824", "UoH main gate security point")
     );
 
     for (int i = 0; i < ridesToCreate; i++) {
@@ -72,10 +72,13 @@ public class SampleDataSeeder implements ApplicationRunner {
       r.setOriginLng(t.oLng);
       r.setDestinationLat(t.dLat);
       r.setDestinationLng(t.dLng);
-      r.setDepartureTime(base.plusHours(i));
-      r.setSeatsTotal(3);
-      r.setSeatsAvailable(3);
+      r.setDepartureTime(base.plusMinutes(i * 45L));
+      r.setSeatsTotal(t.seats);
+      r.setSeatsAvailable(Math.max(1, t.seats - (i % 2)));
       r.setPricePerSeat(BigDecimal.valueOf(t.price));
+      r.setVehicleType(t.vehicleType);
+      r.setVehicleNumber(t.vehicleNumber);
+      r.setPickupNote(t.pickupNote);
       r.setStatus(RideStatus.OPEN);
       rideRepository.save(r);
     }
@@ -102,8 +105,11 @@ public class SampleDataSeeder implements ApplicationRunner {
       User u = new User();
       u.setEmail(email);
       u.setFullName("ShareFare Driver");
-      u.setRole(UserRole.DRIVER);
+      u.setPhone("+91 98765 43210");
+      u.setRole(UserRole.USER);
+      u.setAccountStatus(com.sharefare.model.AccountStatus.VERIFIED_STUDENT);
       u.setCollegeVerified(true);
+      u.setEmailVerified(true);
       u.setPasswordHash(passwordEncoder.encode("Driver@12345"));
       return userRepository.save(u);
     });
@@ -115,8 +121,11 @@ public class SampleDataSeeder implements ApplicationRunner {
       User u = new User();
       u.setEmail(email);
       u.setFullName("ShareFare Student");
-      u.setRole(UserRole.STUDENT);
+      u.setPhone("+91 91234 56789");
+      u.setRole(UserRole.USER);
+      u.setAccountStatus(com.sharefare.model.AccountStatus.VERIFIED_STUDENT);
       u.setCollegeVerified(true);
+      u.setEmailVerified(true);
       u.setPasswordHash(passwordEncoder.encode("Student@12345"));
       return userRepository.save(u);
     });
@@ -126,12 +135,20 @@ public class SampleDataSeeder implements ApplicationRunner {
                                  String destination,
                                  double oLat, double oLng,
                                  double dLat, double dLng,
-                                 int price) {
-    return new RideTemplate(origin, destination, oLat, oLng, dLat, dLng, price);
+                                 int seats,
+                                 int price,
+                                 String vehicleType,
+                                 String vehicleNumber,
+                                 String pickupNote) {
+    return new RideTemplate(origin, destination, oLat, oLng, dLat, dLng, seats, price, vehicleType, vehicleNumber, pickupNote);
   }
 
   private record RideTemplate(String origin, String destination,
                               double oLat, double oLng,
                               double dLat, double dLng,
-                              int price) {}
+                              int seats,
+                              int price,
+                              String vehicleType,
+                              String vehicleNumber,
+                              String pickupNote) {}
 }

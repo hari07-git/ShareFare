@@ -1,23 +1,96 @@
-# OS / editor
+# ============================================================
+# ShareFare — Full-Stack Monorepo .gitignore
+# ============================================================
+
+# ─── OS ──────────────────────────────────────────────────────
 .DS_Store
-.idea
-.vscode
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
 
-# Logs
-*.log
+# ─── IDE / Editors ───────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+nbproject/
+*.swp
+*.swo
+*~
 
-# Backend (Maven/Spring)
-sharefare-backend/target/
-sharefare-backend/*.iml
-sharefare-backend/data/
-sharefare-backend/*.mv.db
-sharefare-backend/*.trace.db
+# ─── Environment & Secrets ───────────────────────────────────
+# NEVER commit real credentials
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+!*.env.example
 
-# Frontend (Node/Vite)
+# ─── Frontend (React / Vite) ─────────────────────────────────
 sharefare-frontend/node_modules/
 sharefare-frontend/dist/
-sharefare-frontend/.env
-sharefare-frontend/.env.*
+sharefare-frontend/build/
+sharefare-frontend/.cache/
+sharefare-frontend/.parcel-cache/
+sharefare-frontend/coverage/
+sharefare-frontend/.eslintcache
+sharefare-frontend/storybook-static/
 
-# Local dependency cache used by this workspace
+# ─── Backend (Spring Boot / Maven) ───────────────────────────
+sharefare-backend/target/
+sharefare-backend/.mvn/wrapper/maven-wrapper.jar
+
+# Database files (H2 local dev DB — never commit)
+sharefare-backend/data/*.mv.db
+sharefare-backend/data/*.trace.db
+sharefare-backend/data/*.lock.db
+sharefare-backend/data/
+
+# Logs
+sharefare-backend/startup.log
+sharefare-backend/logs/
+sharefare-backend/*.log
+*.log
+
+# Uploaded student ID files — private by law
+sharefare-backend/uploads/
+
+# Spring Boot local config overrides
+sharefare-backend/src/main/resources/application-local.properties
+sharefare-backend/src/main/resources/application-local.yml
+sharefare-backend/src/main/resources/application-secrets.yml
+
+# Maven local repo cache (if nested)
 .m2/
+
+# ─── Mobile (React Native / Expo) ────────────────────────────
+sharefare-mobile/node_modules/
+sharefare-mobile/.expo/
+sharefare-mobile/dist/
+sharefare-mobile/build/
+sharefare-mobile/android/
+sharefare-mobile/ios/
+sharefare-mobile/.cache/
+
+# ─── Docker ──────────────────────────────────────────────────
+# Keep docker-compose.yml but ignore overrides with secrets
+docker-compose.override.yml
+docker-compose.local.yml
+
+# ─── Misc ────────────────────────────────────────────────────
+*.bak
+*.tmp
+*.temp
+*.orig
+run-local.sh
+start-sharefare.sh

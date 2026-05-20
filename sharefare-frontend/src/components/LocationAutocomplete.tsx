@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { searchPlaces, PlaceResult } from "../lib/geocode";
 import { Input } from "./Input";
+import { LocateFixed, MapPin } from "lucide-react";
+import { cn } from "../lib/cn";
 
 function useDebouncedValue<T>(value: T, delayMs: number) {
   const [debounced, setDebounced] = useState(value);
@@ -72,41 +74,57 @@ export function LocationAutocomplete({
 
   return (
     <div ref={rootRef} className="relative">
-      <Input
-        value={value}
-        onChange={(e) => onValue(e.target.value)}
-        placeholder={placeholder}
-        disabled={disabled}
-        onFocus={() => {
-          if (results.length > 0) setOpen(true);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            if (results[0]) {
-              e.preventDefault();
-              select(results[0]);
+      <div className="relative">
+        <MapPin className="pointer-events-none absolute left-3.5 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-indigo-500" />
+        <Input
+          value={value}
+          onChange={(e) => onValue(e.target.value)}
+          placeholder={placeholder}
+          disabled={disabled}
+          className="pl-10 pr-24"
+          onFocus={() => {
+            if (results.length > 0) setOpen(true);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              if (results[0]) {
+                e.preventDefault();
+                select(results[0]);
+              }
             }
-          }
-          if (e.key === "Escape") {
-            setOpen(false);
-          }
-        }}
-      />
+            if (e.key === "Escape") {
+              setOpen(false);
+            }
+          }}
+        />
+        <div
+          className={cn(
+            "pointer-events-none absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1.5 text-[11px] font-semibold text-slate-400",
+            busy ? "text-indigo-600" : ""
+          )}
+        >
+          <LocateFixed className="h-3.5 w-3.5" />
+          {busy ? "Searching" : "GPS"}
+        </div>
+      </div>
       {busy ? (
-        <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500">
-          Searching…
+        <div className="absolute left-4 right-4 top-full z-30 mt-2 h-1 overflow-hidden rounded-full bg-white/10">
+          <div className="h-full w-1/2 animate-pulse rounded-full bg-cyan-300/70" />
         </div>
       ) : null}
       {open && results.length > 0 ? (
-        <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-2xl border border-white/60 bg-white/90 shadow-lg backdrop-blur">
+        <div className="absolute z-30 mt-2 max-h-72 w-full overflow-auto rounded-2xl border border-slate-200 bg-white p-1 shadow-xl shadow-slate-900/10">
           {results.map((r, idx) => (
             <button
               key={`${r.lat}-${r.lng}-${idx}`}
               type="button"
               onClick={() => select(r)}
-              className="block w-full border-b border-white/60 px-4 py-3 text-left text-sm text-slate-800 hover:bg-white last:border-b-0"
+              className="flex w-full gap-3 rounded-xl px-3 py-3 text-left text-sm text-slate-900 transition hover:bg-slate-50"
             >
-              {r.displayName}
+              <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                <MapPin className="h-4 w-4" />
+              </span>
+              <span className="line-clamp-2 leading-relaxed text-slate-700">{r.displayName}</span>
             </button>
           ))}
         </div>
@@ -114,4 +132,3 @@ export function LocationAutocomplete({
     </div>
   );
 }
-

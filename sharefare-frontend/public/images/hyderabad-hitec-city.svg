@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Hyderabad HITEC City mobility illustration">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#dbeafe"/>
+      <stop offset="0.5" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#e0f2fe"/>
+    </linearGradient>
+    <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#475569"/>
+      <stop offset="1" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <circle cx="1260" cy="190" r="180" fill="#bfdbfe" opacity=".45"/>
+  <path d="M0 625 C270 540 455 600 720 520 C985 440 1225 470 1600 380 L1600 900 L0 900 Z" fill="url(#road)"/>
+  <path d="M765 540 L565 900 M842 524 L1015 900" stroke="#f8fafc" stroke-width="14" opacity=".7"/>
+  <path d="M230 432 h104 v168 H230z M365 310 h128 v290H365z M535 380 h116v220H535z M700 260h142v340H700z M890 340h122v260H890z M1055 282h150v318h-150z M1246 405h118v195h-118z" fill="#ffffff" opacity=".78"/>
+  <path d="M250 465h60M250 510h60M385 350h78M385 395h78M385 440h78M555 420h70M720 310h92M720 360h92M720 410h92M915 380h70M1080 330h98M1080 380h98M1080 430h98M1270 450h70" stroke="#93c5fd" stroke-width="10" stroke-linecap="round" opacity=".75"/>
+  <g transform="translate(970 605)">
+    <rect x="0" y="0" width="250" height="92" rx="34" fill="#2563eb"/>
+    <circle cx="58" cy="94" r="25" fill="#020617"/>
+    <circle cx="194" cy="94" r="25" fill="#020617"/>
+    <rect x="42" y="24" width="82" height="34" rx="12" fill="#bfdbfe"/>
+    <rect x="139" y="24" width="62" height="34" rx="12" fill="#bfdbfe"/>
+  </g>
+  <path d="M190 700 C390 650 520 690 715 630 C915 570 1065 590 1370 505" stroke="#38bdf8" stroke-width="8" stroke-linecap="round" stroke-dasharray="18 24" opacity=".8"/>
+</svg>

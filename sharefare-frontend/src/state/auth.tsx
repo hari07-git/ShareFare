@@ -2,9 +2,18 @@ import React from "react";
 import { clearToken, getToken, setToken } from "./authStorage";
 import { api } from "../lib/api";
 
+type AuthUser = {
+  email: string;
+  role: string;
+  fullName: string;
+  emailVerified?: boolean;
+  accountStatus?: string;
+  collegeVerified?: boolean;
+};
+
 type AuthState = {
   token: string | null;
-  me: { email: string; role: string; fullName: string } | null;
+  me: AuthUser | null;
   login: (token: string) => void;
   logout: () => void;
   refreshMe: () => Promise<void>;
@@ -26,9 +35,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setMe({
         email: res.data.email,
         role: res.data.role,
-        fullName: res.data.fullName
+        fullName: res.data.fullName,
+        emailVerified: res.data.emailVerified,
+        accountStatus: res.data.accountStatus,
+        collegeVerified: res.data.collegeVerified,
       });
     } catch {
+      clearToken();
+      setTokenState(null);
       setMe(null);
     }
   }, [tokenState]);
@@ -48,8 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearToken();
       setTokenState(null);
       setMe(null);
-    }
-    ,
+    },
     refreshMe
   };
 

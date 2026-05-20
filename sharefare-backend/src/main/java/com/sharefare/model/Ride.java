@@ -22,10 +22,10 @@ public class Ride {
   @JoinColumn(name = "driver_id", nullable = false, foreignKey = @ForeignKey(name = "fk_ride_driver"))
   private User driver;
 
-  @Column(nullable = false, length = 200)
+  @Column(nullable = false, length = 500)
   private String origin;
 
-  @Column(nullable = false, length = 200)
+  @Column(nullable = false, length = 500)
   private String destination;
 
   @Column
@@ -52,9 +52,27 @@ public class Ride {
   @Column(nullable = false, precision = 10, scale = 2)
   private BigDecimal pricePerSeat;
 
+  @Column(length = 80)
+  private String vehicleType;
+
+  @Column(length = 40)
+  private String vehicleNumber;
+
+  @Column(length = 240)
+  private String pickupNote;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 24)
   private RideStatus status = RideStatus.OPEN;
+
+  @Column(nullable = false, columnDefinition = "boolean default false")
+  private boolean femalePreferred = false;
+
+  @Column(nullable = false, columnDefinition = "boolean default false")
+  private boolean verifiedOnly = false;
+
+  @Column(length = 50)
+  private String safetyLevel;
 
   public Long getId() {
     return id;
@@ -152,6 +170,30 @@ public class Ride {
     this.pricePerSeat = pricePerSeat;
   }
 
+  public String getVehicleType() {
+    return vehicleType;
+  }
+
+  public void setVehicleType(String vehicleType) {
+    this.vehicleType = vehicleType;
+  }
+
+  public String getVehicleNumber() {
+    return vehicleNumber;
+  }
+
+  public void setVehicleNumber(String vehicleNumber) {
+    this.vehicleNumber = vehicleNumber;
+  }
+
+  public String getPickupNote() {
+    return pickupNote;
+  }
+
+  public void setPickupNote(String pickupNote) {
+    this.pickupNote = pickupNote;
+  }
+
   public RideStatus getStatus() {
     return status;
   }
@@ -159,4 +201,13 @@ public class Ride {
   public void setStatus(RideStatus status) {
     this.status = status;
   }
+
+  public boolean isFemalePreferred() { return femalePreferred; }
+  public void setFemalePreferred(boolean femalePreferred) { this.femalePreferred = femalePreferred; }
+
+  public boolean isVerifiedOnly() { return verifiedOnly; }
+  public void setVerifiedOnly(boolean verifiedOnly) { this.verifiedOnly = verifiedOnly; }
+
+  public String getSafetyLevel() { return safetyLevel; }
+  public void setSafetyLevel(String safetyLevel) { this.safetyLevel = safetyLevel; }
 }

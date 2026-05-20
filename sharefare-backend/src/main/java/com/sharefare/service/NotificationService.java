@@ -48,6 +48,17 @@ public class NotificationService {
   }
 
   @Transactional
+  public void markAllRead(String email) {
+    var user = userRepository.findByEmailIgnoreCase(email)
+        .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "User not found"));
+    var unread = notificationRepository.findByUserAndReadFlagFalse(user);
+    for (var notification : unread) {
+      notification.setReadFlag(true);
+    }
+    notificationRepository.saveAll(unread);
+  }
+
+  @Transactional
   public void create(User target, String type, String title, String message) {
     Notification n = new Notification();
     n.setUser(target);
