@@ -19,6 +19,7 @@ type PendingVerification = {
 };
 
 export function AdminVerificationQueuePage() {
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
   const [items, setItems] = useState<PendingVerification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -141,14 +142,14 @@ export function AdminVerificationQueuePage() {
                     className="flex-1 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 flex items-center justify-center relative cursor-pointer group min-h-[250px]"
                     onClick={() => {
                       if (item.idCardUrl) {
-                        setSelectedImage(`http://localhost:8080/uploads/student-ids/${item.idCardUrl}`);
+                        setSelectedImage(`${API_BASE_URL}/uploads/student-ids/${item.idCardUrl}`);
                       }
                     }}
                   >
                     {item.idCardUrl ? (
                       <>
                         <img 
-                          src={`http://localhost:8080/uploads/student-ids/${item.idCardUrl}`} 
+                          src={`${API_BASE_URL}/uploads/student-ids/${item.idCardUrl}`} 
                           alt="Student ID" 
                           className="w-full h-full object-contain absolute inset-0 p-2"
                           onError={(e) => {
