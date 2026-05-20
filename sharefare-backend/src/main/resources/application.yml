@@ -17,7 +17,6 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC
-        dialect: org.hibernate.dialect.H2Dialect
     open-in-view: false
   servlet:
     multipart:
