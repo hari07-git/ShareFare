@@ -35,6 +35,7 @@ public class AuthService {
   private final JwtService jwtService;
   private final EmailService emailService;
   private final String frontendBaseUrl;
+  private final boolean mailEnabled;
 
   public AuthService(UserRepository userRepository,
                      AuthTokenRepository authTokenRepository,
@@ -42,7 +43,8 @@ public class AuthService {
                      AuthenticationManager authenticationManager,
                      JwtService jwtService,
                      EmailService emailService,
-                     @Value("${app.frontendBaseUrl:http://localhost:5173}") String frontendBaseUrl) {
+                     @Value("${app.frontendBaseUrl:http://localhost:5173}") String frontendBaseUrl,
+                     @Value("${app.mail.enabled:true}") boolean mailEnabled) {
     this.userRepository = userRepository;
     this.authTokenRepository = authTokenRepository;
     this.passwordEncoder = passwordEncoder;
@@ -52,6 +54,7 @@ public class AuthService {
     this.frontendBaseUrl = frontendBaseUrl == null || frontendBaseUrl.isBlank()
         ? "http://localhost:5173"
         : frontendBaseUrl.replaceAll("/+$", "");
+    this.mailEnabled = mailEnabled;
   }
 
   @Transactional
@@ -64,10 +67,19 @@ public class AuthService {
     user.setFullName(request.fullName());
     user.setPhone(request.phone());
     user.setGender(request.gender());
-    user.setEmailVerified(false);
+    user.setEmailVerified(!mailEnabled);  // auto-verify when mail is disabled
     user.setPasswordHash(passwordEncoder.encode(request.password()));
     userRepository.save(user);
-    sendVerification(user);
+    if (mailEnabled) {
+      try {
+        sendVerification(user);
+      } catch (Exception e) {
+        // SMTP may be blocked on free hosting tiers — still allow registration
+        user.setEmailVerified(true);
+        userRepository.save(user);
+        System.err.println("⚠️ Email send failed, auto-verified user: " + e.getMessage());
+      }
+    }
   }
 
   @Transactional
@@ -77,7 +89,9 @@ public class AuthService {
     var user = userRepository.findByEmailIgnoreCase(request.email())
         .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "User not found"));
     if (!user.isEmailVerified()) {
-      sendVerification(user);
+      try {
+        sendVerification(user);
+      } catch (Exception ignored) { }
       throw new ApiException(HttpStatus.FORBIDDEN, "Please verify your email with the OTP we sent to your Gmail.");
     }
     return new LoginResponse(jwtService.issueToken(user.getEmail().toLowerCase()));
