@@ -68,8 +68,10 @@ public class ApiExceptionHandler {
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Map<String, Object>> handleOther(Exception ex) {
     log.error("Unhandled server error", ex);
+    String detail = ex.getMessage();
+    if (ex.getCause() != null) detail += " | Caused by: " + ex.getCause().getMessage();
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(error(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"));
+        .body(error(HttpStatus.INTERNAL_SERVER_ERROR, detail));
   }
 
   private static Map<String, Object> error(HttpStatus status, String message) {
