@@ -7,7 +7,6 @@ import com.sharefare.service.RideService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -53,6 +52,6 @@ public class RideController {
       @RequestParam(defaultValue = "20") int size) {
     return ResponseEntity.ok(
         rideService.search(origin, destination, date, femaleOnly, verifiedOnly,
-            PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "departureTime"))));
+            PageRequest.of(page, size)));
   }
 }
