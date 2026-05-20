@@ -16,19 +16,51 @@ public class ShareFareApplication {
   public static void main(String[] args) {
     loadDotenv();
     
-    // Auto-fix raw postgresql:// URLs from Render
+    // Auto-fix raw postgresql:// URLs from Render (handles credential parsing)
     String dbUrl = System.getenv("DB_URL");
     if (dbUrl == null || dbUrl.isBlank()) {
       dbUrl = System.getProperty("DB_URL");
     }
     if (dbUrl != null && !dbUrl.isBlank()) {
       if (dbUrl.startsWith("postgresql://") || dbUrl.startsWith("postgres://")) {
-        String jdbcUrl = "jdbc:" + dbUrl;
-        if (!jdbcUrl.contains("sslmode=")) {
-          jdbcUrl += (jdbcUrl.contains("?") ? "&" : "?") + "sslmode=require";
+        if (dbUrl.contains("@")) {
+          try {
+            int protocolIdx = dbUrl.indexOf("://");
+            String rest = dbUrl.substring(protocolIdx + 3);
+            int atIdx = rest.lastIndexOf("@");
+            
+            String credentialsSection = rest.substring(0, atIdx);
+            String hostSection = rest.substring(atIdx + 1);
+            
+            String username = credentialsSection;
+            String password = "";
+            if (credentialsSection.contains(":")) {
+              int colonIdx = credentialsSection.indexOf(":");
+              username = credentialsSection.substring(0, colonIdx);
+              password = credentialsSection.substring(colonIdx + 1);
+            }
+            
+            String jdbcUrl = "jdbc:postgresql://" + hostSection;
+            if (!jdbcUrl.contains("sslmode=")) {
+              jdbcUrl += (jdbcUrl.contains("?") ? "&" : "?") + "sslmode=require";
+            }
+            
+            System.setProperty("DB_URL", jdbcUrl);
+            System.setProperty("DB_USER", username);
+            System.setProperty("DB_PASSWORD", password);
+            
+            System.out.println("⚙️ Parsed database credentials from URL successfully!");
+          } catch (Exception e) {
+            System.err.println("❌ Failed to parse DB_URL: " + e.getMessage());
+          }
+        } else {
+          String jdbcUrl = "jdbc:" + dbUrl;
+          if (!jdbcUrl.contains("sslmode=")) {
+            jdbcUrl += (jdbcUrl.contains("?") ? "&" : "?") + "sslmode=require";
+          }
+          System.setProperty("DB_URL", jdbcUrl);
+          System.out.println("⚙️ Auto-converted DB_URL to JDBC: " + jdbcUrl);
         }
-        System.setProperty("DB_URL", jdbcUrl);
-        System.out.println("⚙️ Auto-converted DB_URL to JDBC: " + jdbcUrl);
       }
     }
     
