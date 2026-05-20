@@ -21,14 +21,14 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
   Optional<Ride> findForUpdate(@Param("id") Long id);
 
   @Query("""
-      select r from Ride r
+      select r from Ride r join r.driver d
       where r.status in :statuses
-        and (:origin is null or lower(r.origin) like lower(concat('%', :origin, '%')))
-        and (:destination is null or lower(r.destination) like lower(concat('%', :destination, '%')))
-        and (:from is null or r.departureTime >= :from)
-        and (:to is null or r.departureTime < :to)
-        and (:femaleOnly = false or r.driver.gender = 'FEMALE')
-        and (:verifiedOnly = false or r.driver.verifiedStudent = true)
+        and (:origin is null or lower(r.origin) like lower(concat('%', cast(:origin as string), '%')))
+        and (:destination is null or lower(r.destination) like lower(concat('%', cast(:destination as string), '%')))
+        and (cast(:from as timestamp) is null or r.departureTime >= :from)
+        and (cast(:to as timestamp) is null or r.departureTime < :to)
+        and (:femaleOnly = false or d.gender = 'FEMALE')
+        and (:verifiedOnly = false or d.verifiedStudent = true)
         order by r.departureTime asc""")
   Page<Ride> search(@Param("origin") String origin,
                     @Param("destination") String destination,

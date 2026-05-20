@@ -294,9 +294,13 @@ export function ProfilePage() {
                 <TrustBadge icon={Award} label="Gold Commuter" active={(me?.trustScore ?? 0) >= 7 && (me?.trustScore ?? 0) < 9} color="bg-yellow-50 text-yellow-700 ring-1 ring-yellow-200" />
                 <TrustBadge icon={HeartHandshake} label="Female Friendly" active={me?.gender === "FEMALE"} color="bg-purple-50 text-purple-700 ring-1 ring-purple-200" />
                 {!isVerified && !me?.collegeVerified && (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-500">
-                    Verify your ID to unlock badges
-                  </span>
+                  <button
+                    onClick={() => setTab("settings")}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white shadow hover:bg-indigo-700 transition-colors"
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    Get Verified → Upload ID
+                  </button>
                 )}
               </div>
             </div>

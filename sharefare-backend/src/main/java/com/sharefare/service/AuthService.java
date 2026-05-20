@@ -89,10 +89,16 @@ public class AuthService {
     var user = userRepository.findByEmailIgnoreCase(request.email())
         .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "User not found"));
     if (!user.isEmailVerified()) {
-      try {
-        sendVerification(user);
-      } catch (Exception ignored) { }
-      throw new ApiException(HttpStatus.FORBIDDEN, "Please verify your email with the OTP we sent to your Gmail.");
+      if (!mailEnabled) {
+        // Mail is disabled — auto-verify so user can log in immediately
+        user.setEmailVerified(true);
+        userRepository.save(user);
+      } else {
+        try {
+          sendVerification(user);
+        } catch (Exception ignored) { }
+        throw new ApiException(HttpStatus.FORBIDDEN, "Please verify your email with the OTP we sent to your Gmail.");
+      }
     }
     return new LoginResponse(jwtService.issueToken(user.getEmail().toLowerCase()));
   }
