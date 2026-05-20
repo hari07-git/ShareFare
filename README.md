@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="sharefare-frontend/public/images/logo.png" alt="ShareFare Logo" width="100" />
+<img src="docs/logo.png" alt="ShareFare Logo" width="220" />
 
 # ShareFare
 

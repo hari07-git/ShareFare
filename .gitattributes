@@ -1,0 +1,13 @@
+# ============================================================
+# GitHub Linguist overrides — controls language stats display
+# ============================================================
+
+# Mark all frontend files as vendored so GitHub Linguist
+# ignores them in the language breakdown.
+# This makes Java (Spring Boot backend) show as the primary language.
+
+sharefare-frontend/** linguist-vendored
+sharefare-mobile/** linguist-vendored
+
+# Explicitly keep Java as detected language for backend
+sharefare-backend/src/main/java/** linguist-language=Java
