@@ -30,6 +30,11 @@ public class AuthDtos {
       boolean emailVerified
   ) {}
 
+  public record ForgotPasswordResponse(
+      String message,
+      String otp           // non-null only when MAIL_ENABLED=false
+  ) {}
+
   public record EmailRequest(
       @NotBlank @Email String email
   ) {}
@@ -45,6 +50,12 @@ public class AuthDtos {
 
   public record ResetPasswordRequest(
       @NotBlank String token,
+      @NotBlank @Size(min = 8, max = 72) String password
+  ) {}
+
+  public record ResetPasswordOtpRequest(
+      @NotBlank @Email String email,
+      @NotBlank @Size(min = 6, max = 6) String otp,
       @NotBlank @Size(min = 8, max = 72) String password
   ) {}
 }

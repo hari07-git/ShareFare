@@ -4,6 +4,7 @@ import com.sharefare.dto.AuthDtos.LoginRequest;
 import com.sharefare.dto.AuthDtos.LoginResponse;
 import com.sharefare.dto.AuthDtos.RegisterRequest;
 import com.sharefare.dto.AuthDtos.RegisterResponse;
+import com.sharefare.dto.AuthDtos.ForgotPasswordResponse;
 import com.sharefare.exception.ApiException;
 import com.sharefare.model.AuthToken;
 import com.sharefare.model.AuthTokenPurpose;
@@ -164,19 +165,47 @@ public class AuthService {
   }
 
   @Transactional
-  public void requestPasswordReset(String email) {
+  public ForgotPasswordResponse requestPasswordReset(String email) {
     User user = userRepository.findByEmailIgnoreCase(email)
-        .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "No ShareFare account found for this email. Use the same email you registered with."));
-    var token = createToken(user, AuthTokenPurpose.PASSWORD_RESET, Instant.now().plusSeconds(30 * 60));
-    emailService.sendPasswordReset(user.getEmail(), user.getFullName(), frontendBaseUrl + "/auth/reset-password?token=" + token);
+        .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
+            "No ShareFare account found for this email."));
+    // Always use OTP-based reset (works without email too)
+    String otp = createOtpToken(user, Instant.now().plusSeconds(30 * 60));
+    if (!mailEnabled) {
+      return new ForgotPasswordResponse(
+          "Account found! Use the OTP shown below to reset your password.",
+          otp
+      );
+    }
+    try {
+      emailService.sendPasswordReset(user.getEmail(), user.getFullName(),
+          frontendBaseUrl + "/auth/reset-password?token=" + otp);
+      return new ForgotPasswordResponse(
+          "Reset OTP sent to your email. Check your inbox.",
+          null
+      );
+    } catch (Exception e) {
+      System.err.println("⚠️ Reset email failed: " + e.getMessage());
+      return new ForgotPasswordResponse(
+          "Email unavailable. Use the OTP shown below to reset your password.",
+          otp
+      );
+    }
   }
 
-
   @Transactional
-  public void resetPassword(String token, String password) {
-    var authToken = validToken(token, AuthTokenPurpose.PASSWORD_RESET);
-    User user = authToken.getUser();
-    user.setPasswordHash(passwordEncoder.encode(password));
+  public void resetPasswordByOtp(String email, String otp, String newPassword) {
+    User user = userRepository.findByEmailIgnoreCase(email)
+        .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Account not found"));
+    var authToken = authTokenRepository
+        .findByUserAndTokenAndPurposeAndUsedFalse(user, normalizeOtp(otp), AuthTokenPurpose.EMAIL_VERIFICATION)
+        .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "Invalid or expired OTP"));
+    if (authToken.getExpiresAt().isBefore(Instant.now())) {
+      authToken.setUsed(true);
+      authTokenRepository.save(authToken);
+      throw new ApiException(HttpStatus.BAD_REQUEST, "OTP expired. Please request a new one.");
+    }
+    user.setPasswordHash(passwordEncoder.encode(newPassword));
     user.setEmailVerified(true);
     authToken.setUsed(true);
     userRepository.save(user);

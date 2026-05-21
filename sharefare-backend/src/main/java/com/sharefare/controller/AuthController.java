@@ -3,10 +3,12 @@ package com.sharefare.controller;
 import com.sharefare.dto.AuthDtos.LoginRequest;
 import com.sharefare.dto.AuthDtos.LoginResponse;
 import com.sharefare.dto.AuthDtos.EmailRequest;
+import com.sharefare.dto.AuthDtos.ForgotPasswordResponse;
 import com.sharefare.dto.AuthDtos.MessageResponse;
 import com.sharefare.dto.AuthDtos.RegisterRequest;
 import com.sharefare.dto.AuthDtos.RegisterResponse;
 import com.sharefare.dto.AuthDtos.ResetPasswordRequest;
+import com.sharefare.dto.AuthDtos.ResetPasswordOtpRequest;
 import com.sharefare.dto.AuthDtos.VerifyEmailRequest;
 import com.sharefare.dto.AuthDtos.VerifyOtpRequest;
 import com.sharefare.service.AuthService;
@@ -55,14 +57,20 @@ public class AuthController {
   }
 
   @PostMapping("/forgot-password")
-  public ResponseEntity<MessageResponse> forgotPassword(@Valid @RequestBody EmailRequest request) {
-    authService.requestPasswordReset(request.email());
-    return ResponseEntity.ok(new MessageResponse("Password reset email sent. Please check Gmail and spam."));
+  public ResponseEntity<ForgotPasswordResponse> forgotPassword(@Valid @RequestBody EmailRequest request) {
+    return ResponseEntity.ok(authService.requestPasswordReset(request.email()));
+  }
+
+  @PostMapping("/reset-password-otp")
+  public ResponseEntity<MessageResponse> resetPasswordOtp(
+      @Valid @RequestBody ResetPasswordOtpRequest request) {
+    authService.resetPasswordByOtp(request.email(), request.otp(), request.password());
+    return ResponseEntity.ok(new MessageResponse("Password updated! You can now login."));
   }
 
   @PostMapping("/reset-password")
   public ResponseEntity<MessageResponse> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
-    authService.resetPassword(request.token(), request.password());
+    authService.resetPasswordByOtp("", request.token(), request.password());
     return ResponseEntity.ok(new MessageResponse("Password updated. You can now login."));
   }
 }
