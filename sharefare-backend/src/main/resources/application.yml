@@ -49,9 +49,12 @@ app:
   sampleData:
     enabled: ${SAMPLE_DATA_ENABLED:true}
     rides: ${SAMPLE_DATA_RIDES:8}
+  brevo:
+    apiKey: ${BREVO_API_KEY:}
   mail:
     enabled: ${MAIL_ENABLED:true}
-    from: ${MAIL_FROM:ShareFare <no-reply@sharefare.com>}
+    fromEmail: ${MAIL_FROM_EMAIL:sharefaree@gmail.com}
+    fromName: ${MAIL_FROM_NAME:ShareFare}
     supportEmail: ${MAIL_SUPPORT_EMAIL:sharefaree@gmail.com}
   frontendBaseUrl: ${FRONTEND_BASE_URL:http://localhost:5173}
   reminders:
