@@ -28,6 +28,21 @@ public class AdminSeeder implements ApplicationRunner {
 
   @Override
   public void run(ApplicationArguments args) {
+    // Also ensure sharefaree@gmail.com is fully verified and is ADMIN
+    var sharefareeOpt = userRepository.findByEmailIgnoreCase("sharefaree@gmail.com");
+    if (sharefareeOpt.isPresent()) {
+      User admin = sharefareeOpt.get();
+      if (admin.getRole() != UserRole.ADMIN || !admin.isCollegeVerified() || !admin.isEmailVerified() || admin.getAccountStatus() != com.sharefare.model.AccountStatus.VERIFIED_STUDENT) {
+        admin.setRole(UserRole.ADMIN);
+        admin.setCollegeVerified(true);
+        admin.setEmailVerified(true);
+        admin.setVerifiedStudent(true);
+        admin.setAccountStatus(com.sharefare.model.AccountStatus.VERIFIED_STUDENT);
+        admin.setVerificationStatus("ADMIN_VERIFIED");
+        userRepository.save(admin);
+      }
+    }
+
     if (adminEmail.isBlank() || adminPassword.isBlank()) {
       return;
     }

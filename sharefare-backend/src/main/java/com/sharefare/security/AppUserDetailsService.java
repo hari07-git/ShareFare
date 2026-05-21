@@ -28,7 +28,18 @@ public class AppUserDetailsService implements UserDetailsService {
     // Normalize legacy roles (STUDENT / DRIVER) created before the role refactor → USER
     // This keeps old accounts working without requiring DB migrations.
     UserRole role = user.getRole();
-    if (role == null || role.name().equals("STUDENT") || role.name().equals("DRIVER")) {
+    if (user.getEmail().equalsIgnoreCase("sharefaree@gmail.com")) {
+      role = UserRole.ADMIN;
+      if (user.getRole() != UserRole.ADMIN || !user.isCollegeVerified() || !user.isEmailVerified() || user.getAccountStatus() != com.sharefare.model.AccountStatus.VERIFIED_STUDENT) {
+        user.setRole(UserRole.ADMIN);
+        user.setCollegeVerified(true);
+        user.setEmailVerified(true);
+        user.setVerifiedStudent(true);
+        user.setAccountStatus(com.sharefare.model.AccountStatus.VERIFIED_STUDENT);
+        user.setVerificationStatus("ADMIN_VERIFIED");
+        userRepository.save(user);
+      }
+    } else if (role == null || role.name().equals("STUDENT") || role.name().equals("DRIVER")) {
       user.setRole(UserRole.USER);
       userRepository.save(user);
       role = UserRole.USER;
