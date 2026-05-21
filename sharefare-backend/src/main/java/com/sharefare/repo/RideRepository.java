@@ -27,8 +27,8 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
       WHERE r.status IN (:statuses)
         AND (:origin IS NULL OR lower(r.origin) LIKE lower('%' || CAST(:origin AS TEXT) || '%'))
         AND (:destination IS NULL OR lower(r.destination) LIKE lower('%' || CAST(:destination AS TEXT) || '%'))
-        AND (CAST(:from AS timestamptz) IS NULL OR r.departure_time >= CAST(:from AS timestamptz))
-        AND (CAST(:to AS timestamptz) IS NULL OR r.departure_time < CAST(:to AS timestamptz))
+        AND (CAST(:from AS TIMESTAMP WITH TIME ZONE) IS NULL OR r.departure_time >= CAST(:from AS TIMESTAMP WITH TIME ZONE))
+        AND (CAST(:to AS TIMESTAMP WITH TIME ZONE) IS NULL OR r.departure_time < CAST(:to AS TIMESTAMP WITH TIME ZONE))
         AND (:femaleOnly = FALSE OR d.gender = 'FEMALE')
         AND (:verifiedOnly = FALSE OR d.verified_student = TRUE)
       ORDER BY r.departure_time ASC
@@ -39,8 +39,8 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
       WHERE r.status IN (:statuses)
         AND (:origin IS NULL OR lower(r.origin) LIKE lower('%' || CAST(:origin AS TEXT) || '%'))
         AND (:destination IS NULL OR lower(r.destination) LIKE lower('%' || CAST(:destination AS TEXT) || '%'))
-        AND (CAST(:from AS timestamptz) IS NULL OR r.departure_time >= CAST(:from AS timestamptz))
-        AND (CAST(:to AS timestamptz) IS NULL OR r.departure_time < CAST(:to AS timestamptz))
+        AND (CAST(:from AS TIMESTAMP WITH TIME ZONE) IS NULL OR r.departure_time >= CAST(:from AS TIMESTAMP WITH TIME ZONE))
+        AND (CAST(:to AS TIMESTAMP WITH TIME ZONE) IS NULL OR r.departure_time < CAST(:to AS TIMESTAMP WITH TIME ZONE))
         AND (:femaleOnly = FALSE OR d.gender = 'FEMALE')
         AND (:verifiedOnly = FALSE OR d.verified_student = TRUE)
       """,
