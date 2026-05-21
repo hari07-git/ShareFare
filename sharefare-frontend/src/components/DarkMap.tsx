@@ -99,6 +99,18 @@ function ClickToSet({ enabled, onClick }: { enabled: boolean; onClick: (p: LatLn
   return null;
 }
 
+function MapResizer() {
+  const map = useMap();
+  useEffect(() => {
+    map.invalidateSize();
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+}
+
 export function DarkMap({
   pickup,
   drop,
@@ -159,9 +171,10 @@ export function DarkMap({
       <MapContainer
         center={[center.lat, center.lng]}
         zoom={13}
-        style={{ height }}
+        style={{ height, width: "100%" }}
         className="sf-map-clean"
       >
+        <MapResizer />
         <TileLayer attribution={TILE_ATTR} url={TILE_URL} />
 
         {pickup && <Marker icon={pickupIcon} position={[pickup.lat, pickup.lng]} />}

@@ -22,6 +22,9 @@ const AdminDashboardPage = lazy(() => import("./pages/AdminDashboardPage").then(
 const AdminVerificationQueuePage = lazy(() => import("./pages/AdminVerificationQueuePage").then((m) => ({ default: m.AdminVerificationQueuePage })));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage").then((m) => ({ default: m.NotificationsPage })));
 const DriverInboxPage = lazy(() => import("./pages/DriverInboxPage").then((m) => ({ default: m.DriverInboxPage })));
+const TermsPage = lazy(() => import("./pages/TermsPage").then((m) => ({ default: m.TermsPage })));
+const PrivacyPage = lazy(() => import("./pages/PrivacyPage").then((m) => ({ default: m.PrivacyPage })));
+const CookiePolicyPage = lazy(() => import("./pages/CookiePolicyPage").then((m) => ({ default: m.CookiePolicyPage })));
 
 function PageLoader() {
   return (
@@ -55,6 +58,10 @@ export default function App() {
           <Route path="/auth/verify-otp" element={<VerifyOtpPage />} />
           <Route path="/auth/register" element={<RegisterPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
+
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/cookies" element={<CookiePolicyPage />} />
 
           <Route path="/rides/find" element={<FindRidePage />} />
           <Route path="/rides/:rideId" element={<RideDetailsPage />} />

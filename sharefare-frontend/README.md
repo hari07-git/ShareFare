@@ -33,7 +33,10 @@ npm run dev
 - Auth: register/login (JWT stored in localStorage)
 - Rides: search, details, offer (driver only)
 - Bookings: create + cancel + history
+- Booking lifecycle: request, driver approve/reject, confirm, start, complete
 - Profile: view + update
 - Reviews: list + create
-- Admin: login + income/booking metrics dashboard
-- Map pins: click-to-pin pickup/drop on OpenStreetMap
+- Notifications: grouped unread history with mark-as-read actions
+- Admin: users, rides, bookings, activity, and income dashboard
+- Maps: OpenStreetMap + Leaflet pins and OSRM road-following route previews
+- Live ride tracking simulation with moving driver marker

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "../lib/api";
 import { FormField } from "../components/FormField";
 import { Input } from "../components/Input";
@@ -6,11 +6,12 @@ import { Button } from "../components/Button";
 import { CollegeVerificationComponent } from "../components/CollegeVerificationComponent";
 import { EmergencyContactForm } from "../components/SafetyActions";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   Shield, ShieldCheck, Star, Clock, Users, Leaf, BadgeCheck,
   Edit3, Bell, Lock, Eye, Phone, ChevronRight, HeartHandshake,
   Music, Wind, Dog, Cigarette, MapPin, Zap, Award, Activity,
-  User, CheckCircle2, AlertCircle
+  User, CheckCircle2, AlertCircle, Camera, Upload
 } from "lucide-react";
 
 type Me = {
@@ -126,6 +127,36 @@ export function ProfilePage() {
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<Tab>("about");
 
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (me?.id) {
+      const stored = localStorage.getItem(`profile_avatar_${me.id}`);
+      if (stored) {
+        setAvatar(stored);
+      }
+    }
+  }, [me?.id]);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && me?.id) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        localStorage.setItem(`profile_avatar_${me.id}`, base64);
+        setAvatar(base64);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const triggerPhotoUpload = () => {
+    fileInputRef.current?.click();
+  };
+
   async function load() {
     setError(null);
     try {
@@ -189,18 +220,37 @@ export function ProfilePage() {
         <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-5">
             {/* Avatar + trust ring */}
-            <div className="relative">
+            <div className="relative group cursor-pointer" onClick={triggerPhotoUpload} title="Click to upload profile photo">
               <TrustRing score={trustScore} />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 text-xl font-black backdrop-blur ring-2 ring-white/40">
-                  {initials}
+                {avatar ? (
+                  <img
+                    src={avatar}
+                    alt="Profile Avatar"
+                    className="h-14 w-14 rounded-full object-cover ring-2 ring-white/40 transition duration-300 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 text-xl font-black backdrop-blur ring-2 ring-white/40 transition duration-300 group-hover:scale-105">
+                    {initials}
+                  </div>
+                )}
+                {/* Premium hover camera overlay */}
+                <div className="absolute inset-[15px] flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition duration-200">
+                  <Camera className="h-4 w-4 text-white" />
                 </div>
               </div>
               {isVerified && (
-                <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-white shadow-sm">
+                <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 ring-2 ring-white shadow-sm z-10">
                   <ShieldCheck className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
                 </div>
               )}
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleAvatarChange}
+              />
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight">{me?.fullName ?? "Loading..."}</h1>
@@ -372,6 +422,32 @@ export function ProfilePage() {
                     <Input value={collegeId} onChange={(e) => setCollegeId(e.target.value)} />
                   </FormField>
                 </div>
+                <FormField label="Profile photo">
+                  <div className="flex items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={triggerPhotoUpload}
+                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-slate-900"
+                    >
+                      <Upload className="h-4 w-4" />
+                      {avatar ? "Change photo" : "Upload photo"}
+                    </button>
+                    {avatar && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (me?.id) {
+                            localStorage.removeItem(`profile_avatar_${me.id}`);
+                            setAvatar(null);
+                          }
+                        }}
+                        className="text-xs font-semibold text-rose-600 hover:text-rose-700"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </FormField>
                 {error && <div className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-700">{error}</div>}
                 {saveMsg && <div className="rounded-xl bg-emerald-50 px-4 py-2 text-sm text-emerald-700">{saveMsg}</div>}
                 <Button disabled={busy} type="submit">
@@ -446,6 +522,15 @@ export function ProfilePage() {
               <div className="space-y-2">
                 <SettingsCard icon={User} title="Support Center" subtitle="Get help with rides and accounts" />
                 <SettingsCard icon={Activity} title="Report an Issue" subtitle="Report safety or technical problems" />
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500">Legal & Policies</div>
+              <div className="space-y-2">
+                <SettingsCard icon={ShieldCheck} title="Terms of Service" subtitle="Read our campus ride-sharing terms" onClick={() => navigate("/terms")} />
+                <SettingsCard icon={Shield} title="Privacy Policy" subtitle="How we protect your student data" onClick={() => navigate("/privacy")} />
+                <SettingsCard icon={Eye} title="Cookie Policy" subtitle="Manage your cookie preferences" onClick={() => navigate("/cookies")} />
               </div>
             </div>
 

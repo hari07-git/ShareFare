@@ -48,7 +48,7 @@ app:
     password: ${ADMIN_PASSWORD:set-this-in-your-env-file}
   sampleData:
     enabled: ${SAMPLE_DATA_ENABLED:true}
-    rides: ${SAMPLE_DATA_RIDES:8}
+    rides: ${SAMPLE_DATA_RIDES:9}
   brevo:
     apiKey: ${BREVO_API_KEY:}
   mail:

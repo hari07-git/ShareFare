@@ -34,7 +34,7 @@ public class SampleDataSeeder implements ApplicationRunner {
                           UserRepository userRepository,
                           PasswordEncoder passwordEncoder,
                           @Value("${app.sampleData.enabled:true}") boolean enabled,
-                          @Value("${app.sampleData.rides:8}") int ridesToCreate) {
+                          @Value("${app.sampleData.rides:9}") int ridesToCreate) {
     this.rideRepository = rideRepository;
     this.bookingRepository = bookingRepository;
     this.userRepository = userRepository;
@@ -46,9 +46,19 @@ public class SampleDataSeeder implements ApplicationRunner {
   @Override
   public void run(ApplicationArguments args) {
     if (!enabled || ridesToCreate <= 0) return;
-    if (rideRepository.count() > 0) return;
 
     User driver = ensureDriver();
+
+    // Ensure all existing rides have driver set to sharefaree@gmail.com
+    List<Ride> existingRides = rideRepository.findAll();
+    for (Ride r : existingRides) {
+      if (r.getDriver() == null || !r.getDriver().getEmail().equalsIgnoreCase("sharefaree@gmail.com")) {
+        r.setDriver(driver);
+        rideRepository.save(r);
+      }
+    }
+
+    if (rideRepository.count() > 0) return;
 
     OffsetDateTime base = OffsetDateTime.now(ZoneOffset.UTC).plusDays(1).withHour(8).withMinute(30).withSecond(0).withNano(0);
     var templates = List.of(
@@ -100,17 +110,17 @@ public class SampleDataSeeder implements ApplicationRunner {
   }
 
   private User ensureDriver() {
-    String email = "driver@sharefare.com";
+    String email = "sharefaree@gmail.com";
     return userRepository.findByEmailIgnoreCase(email).orElseGet(() -> {
       User u = new User();
       u.setEmail(email);
-      u.setFullName("ShareFare Driver");
+      u.setFullName("ShareFare Admin");
       u.setPhone("+91 98765 43210");
-      u.setRole(UserRole.USER);
+      u.setRole(UserRole.ADMIN);
       u.setAccountStatus(com.sharefare.model.AccountStatus.VERIFIED_STUDENT);
       u.setCollegeVerified(true);
       u.setEmailVerified(true);
-      u.setPasswordHash(passwordEncoder.encode("Driver@12345"));
+      u.setPasswordHash(passwordEncoder.encode("Admin@12345"));
       return userRepository.save(u);
     });
   }

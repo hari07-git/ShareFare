@@ -5,8 +5,7 @@ import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 const links = [
   { label: "Find a ride", to: "/rides/find" },
   { label: "Offer a ride", to: "/rides/offer" },
-  { label: "Dashboard", to: "/home" },
-  { label: "Admin", to: "/admin/login" }
+  { label: "Dashboard", to: "/home" }
 ];
 
 export function Footer({ className }: { className?: string }) {
@@ -57,9 +56,9 @@ export function Footer({ className }: { className?: string }) {
           <div>
             <div className="text-sm font-semibold text-slate-950">Legal</div>
             <div className="mt-4 grid gap-2 text-sm text-slate-600">
-              <span className="opacity-70">Terms of service</span>
-              <span className="opacity-70">Privacy policy</span>
-              <span className="opacity-70">Cookie policy</span>
+              <Link to="/terms" className="hover:text-slate-950 transition-colors">Terms of service</Link>
+              <Link to="/privacy" className="hover:text-slate-950 transition-colors">Privacy policy</Link>
+              <Link to="/cookies" className="hover:text-slate-950 transition-colors">Cookie policy</Link>
             </div>
           </div>
 
