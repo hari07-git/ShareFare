@@ -28,6 +28,7 @@ public class EmailService {
   private final String fromEmail;
   private final String fromName;
   private final String supportEmail;
+  private final String frontendBaseUrl;
   private final RestTemplate rest = new RestTemplate();
 
   public EmailService(
@@ -35,12 +36,16 @@ public class EmailService {
       @Value("${app.mail.enabled:true}") boolean enabled,
       @Value("${app.mail.fromEmail:sharefaree@gmail.com}") String fromEmail,
       @Value("${app.mail.fromName:ShareFare}") String fromName,
-      @Value("${app.mail.supportEmail:sharefaree@gmail.com}") String supportEmail) {
+      @Value("${app.mail.supportEmail:sharefaree@gmail.com}") String supportEmail,
+      @Value("${app.frontendBaseUrl:http://localhost:5173}") String frontendBaseUrl) {
     this.apiKey = apiKey;
     this.enabled = enabled;
     this.fromEmail = fromEmail;
     this.fromName = fromName;
     this.supportEmail = supportEmail;
+    this.frontendBaseUrl = frontendBaseUrl == null || frontendBaseUrl.isBlank()
+        ? "http://localhost:5173"
+        : frontendBaseUrl.replaceAll("/+$", "");
   }
 
   // ── Public send methods ──────────────────────────────────────────────────
@@ -233,13 +238,16 @@ public class EmailService {
     send(to, "ShareFare ride completed (Ride #" + rideId + ")", """
         Hi %s,
 
-        Your ride #%d is marked completed.
+        🎉 Your ShareFare ride #%d is marked completed!
 
         Route: %s → %s
 
-        Please rate your experience on ShareFare!
+        Please take a moment to rate and review your driver on ShareFare:
+        ⭐ %s/rides/%d?review=true
+
+        Thank you for choosing ShareFare!
         Support: %s
-        """.formatted(safe(name), rideId, safe(origin), safe(destination), supportEmail));
+        """.formatted(safe(name), rideId, safe(origin), safe(destination), frontendBaseUrl, rideId, supportEmail));
   }
 
   public void sendAdminVerified(String to, String name) {
