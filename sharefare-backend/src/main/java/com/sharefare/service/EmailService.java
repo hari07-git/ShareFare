@@ -355,7 +355,8 @@ public class EmailService {
 
   private static String fmt(OffsetDateTime dt) {
     if (dt == null) return "";
-    return dt.format(DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a z"));
+    return dt.atZoneSameInstant(java.time.ZoneId.systemDefault())
+             .format(DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a z"));
   }
 
   private static String safe(String s) {
