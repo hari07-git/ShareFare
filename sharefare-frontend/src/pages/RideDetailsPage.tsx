@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../lib/api";
 import { useAuth } from "../state/auth";
 import { toast } from "../components/Toast";
@@ -73,6 +73,9 @@ function RideDetailsSkeleton() {
 
 export function RideDetailsPage() {
   const { rideId } = useParams();
+  const [searchParams] = useSearchParams();
+  const isReviewQuery = searchParams.get("review") === "true";
+
   const [ride, setRide] = useState<Ride | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,6 +85,7 @@ export function RideDetailsPage() {
   const [comment, setComment] = useState("");
   const [revieweeEmail, setRevieweeEmail] = useState("");
   const [booking, setBooking] = useState(false);
+  const [userBookings, setUserBookings] = useState<any[]>([]);
   const auth = useAuth();
   const navigate = useNavigate();
 
@@ -96,6 +100,10 @@ export function RideDetailsPage() {
       ]);
       setRide(rideRes.data);
       setReviews(reviewRes.data);
+      if (auth.token) {
+        const bookingsRes = await api.get<any[]>("/api/me/bookings");
+        setUserBookings(bookingsRes.data);
+      }
     } catch (err: any) {
       setError(err?.response?.data?.message ?? "Failed to load ride");
     } finally {
@@ -104,6 +112,27 @@ export function RideDetailsPage() {
   }
 
   useEffect(() => { void load(); }, [rideId]);
+
+  useEffect(() => {
+    if (ride && auth.me) {
+      const isDriver = auth.me.email.toLowerCase() === ride.driverEmail.toLowerCase();
+      if (!isDriver) {
+        setRevieweeEmail(ride.driverEmail);
+      }
+    }
+  }, [ride, auth.me]);
+
+  useEffect(() => {
+    if (ride && isReviewQuery) {
+      const timer = setTimeout(() => {
+        const element = document.getElementById("review-section");
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [ride, isReviewQuery]);
 
   async function book() {
     if (!rideId) return;
@@ -120,10 +149,16 @@ export function RideDetailsPage() {
   }
 
   async function submitReview() {
-    if (!rideId) return;
+    if (!rideId || !ride) return;
+    const isDriver = auth.me?.email?.toLowerCase() === ride.driverEmail.toLowerCase();
+    const targetEmail = isDriver ? revieweeEmail : ride.driverEmail;
+    if (!targetEmail) {
+      toast("Please specify a reviewee email", "error");
+      return;
+    }
     try {
       await api.post(`/api/rides/${rideId}/reviews`, {
-        revieweeEmail,
+        revieweeEmail: targetEmail,
         rating,
         comment: comment.trim() || null,
       });
@@ -176,6 +211,10 @@ export function RideDetailsPage() {
   const isFull = ride.seatsAvailable <= 0;
   const isCancelled = ride.status === "CANCELLED";
   const canBook = !isFull && !isCancelled && auth.token;
+
+  const isDriver = auth.me?.email?.toLowerCase() === ride.driverEmail.toLowerCase();
+  const hasCompletedBooking = userBookings.some((b) => b.rideId === ride.id && b.status === "COMPLETED");
+  const alreadyReviewed = reviews.some((r) => r.reviewerEmail.toLowerCase() === auth.me?.email?.toLowerCase());
 
   return (
     <div className="mx-auto max-w-4xl pb-32">
@@ -352,36 +391,56 @@ export function RideDetailsPage() {
           </div>
         )}
 
-        {auth.token && (
-          <div className="mt-5 border-t border-slate-100 pt-5">
-            <div className="text-sm font-bold text-slate-900 mb-3">Leave a review</div>
-            <div className="space-y-3">
-              <input
-                type="email"
-                value={revieweeEmail}
-                onChange={(e) => setRevieweeEmail(e.target.value)}
-                placeholder="Reviewee email (driver or passenger)"
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
-              />
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-slate-700">Rating:</span>
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <button key={i} type="button" onClick={() => setRating(i)}>
-                      <Star className={`h-6 w-6 transition ${i <= rating ? "fill-amber-400 text-amber-400" : "text-slate-300 hover:text-amber-200"}`} />
-                    </button>
-                  ))}
+        {auth.token && (hasCompletedBooking || isDriver) && (
+          <div id="review-section" className="mt-5 border-t border-slate-100 pt-5">
+            {alreadyReviewed ? (
+              <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 text-emerald-800 flex items-center gap-3">
+                <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" strokeWidth={2.5} />
+                <span className="text-sm font-medium">You have already submitted a review for this ride. Thank you!</span>
+              </div>
+            ) : (
+              <div>
+                <div className="text-sm font-bold text-slate-900 mb-3">Leave a review</div>
+                <div className="space-y-3">
+                  {isDriver ? (
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-500 mb-1">Passenger Email to Review</label>
+                      <input
+                        type="email"
+                        value={revieweeEmail}
+                        onChange={(e) => setRevieweeEmail(e.target.value)}
+                        placeholder="Passenger email (reviewee)"
+                        className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
+                      />
+                    </div>
+                  ) : (
+                    <div className="rounded-xl bg-slate-50 px-4 py-3 border border-slate-200 flex items-center gap-2">
+                      <span className="text-sm font-semibold text-slate-600">Reviewing driver:</span>
+                      <span className="text-sm font-bold text-slate-950">{ride.driverName}</span>
+                      <span className="text-xs font-medium text-slate-400">({ride.driverEmail})</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium text-slate-700">Rating:</span>
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <button key={i} type="button" onClick={() => setRating(i)}>
+                          <Star className={`h-6 w-6 transition ${i <= rating ? "fill-amber-400 text-amber-400" : "text-slate-300 hover:text-amber-200"}`} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="Share your experience (optional)"
+                    rows={3}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 resize-none"
+                  />
+                  <GradientButton onClick={submitReview} className="w-full">Submit Review</GradientButton>
                 </div>
               </div>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Share your experience (optional)"
-                rows={3}
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 resize-none"
-              />
-              <GradientButton onClick={submitReview} className="w-full">Submit Review</GradientButton>
-            </div>
+            )}
           </div>
         )}
       </motion.div>

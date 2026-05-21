@@ -127,13 +127,23 @@ export function MyBookingsPage() {
                   <MessageSquare className="w-4 h-4" />
                   Message driver
                 </Button>
-                <Button
-                  variant="danger"
-                  disabled={busyId === b.bookingId || !canCancel(b.status)}
-                  onClick={() => cancel(b.bookingId)}
-                >
-                  {!canCancel(b.status) ? b.status.replace("_", " ") : busyId === b.bookingId ? "Cancelling..." : "Cancel booking"}
-                </Button>
+                {b.status === "COMPLETED" ? (
+                  <Button
+                    variant="primary"
+                    onClick={() => navigate(`/rides/${b.rideId}?review=true`)}
+                    className="flex items-center gap-2 border-emerald-600 bg-emerald-600 hover:bg-emerald-700 hover:border-emerald-700 focus:ring-emerald-500/10"
+                  >
+                    ⭐ Review driver
+                  </Button>
+                ) : (
+                  <Button
+                    variant="danger"
+                    disabled={busyId === b.bookingId || !canCancel(b.status)}
+                    onClick={() => cancel(b.bookingId)}
+                  >
+                    {!canCancel(b.status) ? b.status.replace("_", " ") : busyId === b.bookingId ? "Cancelling..." : "Cancel booking"}
+                  </Button>
+                )}
               </div>
             </div>
           ))}
