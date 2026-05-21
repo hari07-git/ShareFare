@@ -24,6 +24,11 @@ public class PortCustomizer implements WebServerFactoryCustomizer<ConfigurableWe
     int port = environment.getProperty("server.port", Integer.class, 8080);
     if (port == 0) return; // Random port already requested
     
+    if (System.getenv("RENDER") != null) {
+      log.info("Running on Render. Bypassing PortCustomizer and binding strictly to server.port={}", port);
+      return;
+    }
+    
     int originalPort = port;
     while (!isPortAvailable(port) && port < originalPort + 10) {
       log.warn("Port {} is already in use. Trying next port...", port);
