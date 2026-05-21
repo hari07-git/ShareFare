@@ -34,7 +34,7 @@ export function ForgotPasswordPage() {
     try {
       const res = await api.post<ForgotPasswordResponse>("/api/auth/forgot-password", { email });
       setOtpResult(res.data);
-      // If OTP shown on screen, pre-fill it for convenience
+      // Pre-fill OTP only if shown on screen (MAIL_ENABLED=false fallback)
       if (res.data.otp) setOtp(res.data.otp);
       setStep("otp");
     } catch (err: any) {
@@ -92,7 +92,21 @@ export function ForgotPasswordPage() {
       <AuthShell title="Reset your password" subtitle={otpResult?.message ?? ""}
         sideTitle="Almost done" sideBody="Enter the OTP and choose a new secure password for your ShareFare account.">
         <div className="space-y-5">
-          {/* OTP shown on screen */}
+          {/* Email sent confirmation (normal Brevo flow) */}
+          {!otpResult?.otp && (
+            <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 text-center">
+              <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
+                <Mail className="h-6 w-6 text-indigo-600" />
+              </div>
+              <p className="font-semibold text-indigo-900">Check your email!</p>
+              <p className="mt-1 text-sm text-indigo-700">
+                We sent a 6-digit reset OTP to <strong>{email}</strong>
+              </p>
+              <p className="mt-1 text-xs text-indigo-500">Also check your spam folder.</p>
+            </div>
+          )}
+
+          {/* Fallback: OTP on screen (only when MAIL_ENABLED=false) */}
           {otpResult?.otp && (
             <div className="rounded-2xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 to-blue-50 p-5 text-center">
               <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-indigo-500">
