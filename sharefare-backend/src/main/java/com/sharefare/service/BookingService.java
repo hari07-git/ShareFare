@@ -71,13 +71,13 @@ public class BookingService {
         passenger,
         "BOOKING",
         "Booking request sent",
-        "Your booking request was sent successfully."
+        "Your booking request for ride #" + ride.getId() + " was sent successfully."
     );
     notificationService.create(
         ride.getDriver(),
         "BOOKING",
         "New booking request",
-        passenger.getFullName() + " requested to join your ride from " + ride.getOrigin() + " to " + ride.getDestination() + "."
+        passenger.getFullName() + " requested to join your ride #" + ride.getId() + " from " + ride.getOrigin() + " to " + ride.getDestination() + "."
     );
 
     emailService.sendBookingRequestToPassenger(

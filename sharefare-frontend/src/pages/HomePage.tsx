@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { useAuth } from "../state/auth";
 import { Card } from "../components/Card";
@@ -19,6 +19,7 @@ type Booking = {
 
 type Notification = {
   id: number;
+  type?: string;
   title: string;
   message: string;
   read: boolean;
@@ -72,6 +73,45 @@ export function HomePage() {
   const [notifs, setNotifs] = useState<Notification[]>([]);
   const [driverRides, setDriverRides] = useState<Ride[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const handleNotificationClick = async (n: Notification) => {
+    if (!n.read) {
+      try {
+        await api.post(`/api/me/notifications/${n.id}/read`);
+        setNotifs((prev) => prev.map((item) => item.id === n.id ? { ...item, read: true } : item));
+      } catch (e) {
+        console.error("Failed to mark notification as read", e);
+      }
+    }
+
+    const rideMatch = n.message.match(/ride #(\d+)/i);
+    const rideId = rideMatch ? rideMatch[1] : null;
+
+    let targetUrl = "/home";
+
+    const title = n.title.toLowerCase();
+    const msg = n.message.toLowerCase();
+    const type = (n.type || "").toLowerCase();
+
+    if (
+      title.includes("new booking request") ||
+      title.includes("booking cancelled") ||
+      msg.includes("requested to join your ride") ||
+      msg.includes("cancelled booking") ||
+      msg.includes("passenger pickup")
+    ) {
+      targetUrl = rideId ? `/me/driver/inbox?rideId=${rideId}` : "/me/driver/inbox";
+    } else if (type === "booking" || type === "ride" || title.includes("booking") || title.includes("ride")) {
+      targetUrl = "/me/bookings";
+    } else if (type === "message" || title.includes("message") || title.includes("new message")) {
+      targetUrl = "/me/bookings";
+    } else if (type === "system" || type === "verification" || title.includes("verif") || title.includes("approved")) {
+      targetUrl = "/me/profile";
+    }
+
+    navigate(targetUrl);
+  };
 
   const isAdmin = me?.role === "ADMIN";
 
@@ -242,8 +282,9 @@ export function HomePage() {
                 {notifs.slice(0, 6).map((n) => (
                   <div
                     key={n.id}
-                    className={`rounded-2xl border p-4 transition ${
-                      n.read ? "border-slate-200 bg-white" : "border-indigo-200 bg-indigo-50"
+                    onClick={() => void handleNotificationClick(n)}
+                    className={`rounded-2xl border p-4 transition cursor-pointer hover:bg-slate-50/60 ${
+                      n.read ? "border-slate-200 bg-white hover:border-slate-300" : "border-indigo-200 bg-indigo-50/30 hover:border-indigo-300"
                     }`}
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">

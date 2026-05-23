@@ -3,6 +3,7 @@ import { api } from "../lib/api";
 import { Button } from "../components/Button";
 import { toast } from "../components/Toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   Bell, Car, ShieldCheck, Calendar, AlertTriangle, CheckCircle2,
   RefreshCw, MailOpen, Inbox, ChevronRight
@@ -64,6 +65,45 @@ export function NotificationsPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [busyId, setBusyId] = useState<number | null>(null);
   const [tab, setTab] = useState<Tab>("all");
+  const navigate = useNavigate();
+
+  const handleNotificationClick = async (n: Notification) => {
+    if (!n.read) {
+      try {
+        await api.post(`/api/me/notifications/${n.id}/read`);
+        setItems((prev) => prev.map((item) => item.id === n.id ? { ...item, read: true } : item));
+      } catch (e) {
+        console.error("Failed to mark notification as read", e);
+      }
+    }
+
+    const rideMatch = n.message.match(/ride #(\d+)/i);
+    const rideId = rideMatch ? rideMatch[1] : null;
+
+    let targetUrl = "/home";
+
+    const title = n.title.toLowerCase();
+    const msg = n.message.toLowerCase();
+    const type = n.type.toLowerCase();
+
+    if (
+      title.includes("new booking request") ||
+      title.includes("booking cancelled") ||
+      msg.includes("requested to join your ride") ||
+      msg.includes("cancelled booking") ||
+      msg.includes("passenger pickup")
+    ) {
+      targetUrl = rideId ? `/me/driver/inbox?rideId=${rideId}` : "/me/driver/inbox";
+    } else if (type === "booking" || type === "ride" || title.includes("booking") || title.includes("ride")) {
+      targetUrl = "/me/bookings";
+    } else if (type === "message" || title.includes("message") || title.includes("new message")) {
+      targetUrl = "/me/bookings";
+    } else if (type === "system" || type === "verification" || title.includes("verif") || title.includes("approved")) {
+      targetUrl = "/me/profile";
+    }
+
+    navigate(targetUrl);
+  };
 
   const isBooking = (t: string) => /booking/i.test(t);
   const isRide = (t: string) => /ride|reminder|departure/i.test(t);
@@ -198,8 +238,9 @@ export function NotificationsPage() {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.03 }}
-                  className={`group relative overflow-hidden rounded-2xl border bg-white p-4 shadow-sm transition hover:shadow-md ${
-                    n.read ? "border-slate-200" : "border-indigo-200 bg-indigo-50/30"
+                  onClick={() => void handleNotificationClick(n)}
+                  className={`group relative overflow-hidden rounded-2xl border bg-white p-4 shadow-sm transition hover:shadow-md cursor-pointer hover:bg-slate-50/60 ${
+                    n.read ? "border-slate-200 hover:border-slate-300" : "border-indigo-200 bg-indigo-50/30 hover:border-indigo-300"
                   }`}
                 >
                   {/* Unread indicator */}
@@ -218,7 +259,10 @@ export function NotificationsPage() {
                       <div className="mt-1 text-sm text-slate-600 leading-relaxed">{n.message}</div>
                       {!n.read && (
                         <button
-                          onClick={() => markRead(n.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            void markRead(n.id);
+                          }}
                           disabled={busyId === n.id}
                           className="mt-2 flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition"
                         >

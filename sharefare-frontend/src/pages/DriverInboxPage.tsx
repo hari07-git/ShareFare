@@ -6,6 +6,7 @@ import { Button } from "../components/Button";
 import { PageHeader } from "../components/PageHeader";
 import { toast } from "../components/Toast";
 import { ChatModal } from "../components/ChatModal";
+import { useSearchParams } from "react-router-dom";
 
 type Ride = {
   id: number;
@@ -37,14 +38,20 @@ export function DriverInboxPage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [chatBookingId, setChatBookingId] = useState<number | null>(null);
-
+  const [searchParams] = useSearchParams();
+  const queryRideId = searchParams.get("rideId");
 
   async function loadRides() {
     setError(null);
     try {
       const res = await api.get<Ride[]>("/api/me/driver/rides");
       setRides(res.data);
-      if (!selectedRideId && res.data.length > 0) setSelectedRideId(res.data[0].id);
+      const targetRideId = queryRideId ? Number(queryRideId) : null;
+      if (targetRideId && res.data.some((r) => r.id === targetRideId)) {
+        setSelectedRideId(targetRideId);
+      } else if (!selectedRideId && res.data.length > 0) {
+        setSelectedRideId(res.data[0].id);
+      }
     } catch (err: any) {
       setError(err?.response?.data?.message ?? "Failed to load rides");
     }
@@ -123,10 +130,9 @@ export function DriverInboxPage() {
   }
 
   useEffect(() => {
-
     void loadRides();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [queryRideId]);
 
   useEffect(() => {
 
