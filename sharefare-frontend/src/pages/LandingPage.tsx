@@ -7,7 +7,7 @@ import { DarkMap } from "../components/DarkMap";
 import {
   ArrowRight, BadgeIndianRupee, Calendar, Clock3, MapPin,
   Navigation, ShieldCheck, Sparkles, Star, Users, BadgeCheck, Zap, Search,
-  ChevronDown, ChevronUp, Shield, Lock, Car
+  ChevronDown, ChevronUp, Shield, Lock, Car, Heart
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PlaceResult } from "../lib/geocode";
