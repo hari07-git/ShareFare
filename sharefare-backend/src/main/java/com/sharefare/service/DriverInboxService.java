@@ -3,6 +3,7 @@ package com.sharefare.service;
 import com.sharefare.dto.DriverInboxDtos.MyRideBookingsResponse;
 import com.sharefare.dto.DriverInboxDtos.MyRidesResponse;
 import com.sharefare.exception.ApiException;
+import com.sharefare.model.Booking;
 import com.sharefare.model.BookingStatus;
 import com.sharefare.model.RideStatus;
 import com.sharefare.repo.BookingByRideRepository;
@@ -40,16 +41,31 @@ public class DriverInboxService {
     var driver = userRepository.findByEmailIgnoreCase(driverEmail)
         .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "User not found"));
     return rideByDriverRepository.findByDriverOrderByDepartureTimeDesc(driver).stream()
-        .map(r -> new MyRidesResponse(
-            r.getId(),
-            r.getOrigin(),
-            r.getDestination(),
-            r.getDepartureTime(),
-            r.getSeatsTotal(),
-            r.getSeatsAvailable(),
-            r.getPricePerSeat(),
-            r.getStatus()
-        ))
+        .map(r -> {
+            var bookings = bookingByRideRepository.findRideBookings(r.getId());
+            int passengerCount = bookings.stream()
+                .filter(b -> b.getStatus() == BookingStatus.DRIVER_APPROVED || b.getStatus() == BookingStatus.CONFIRMED || b.getStatus() == BookingStatus.ONGOING || b.getStatus() == BookingStatus.COMPLETED)
+                .mapToInt(Booking::getSeatsBooked)
+                .sum();
+            java.math.BigDecimal earningsPreview = r.getPricePerSeat().multiply(java.math.BigDecimal.valueOf(passengerCount));
+            int bookingRequestCount = (int) bookings.stream()
+                .filter(b -> b.getStatus() == BookingStatus.REQUESTED)
+                .count();
+
+            return new MyRidesResponse(
+                r.getId(),
+                r.getOrigin(),
+                r.getDestination(),
+                r.getDepartureTime(),
+                r.getSeatsTotal(),
+                r.getSeatsAvailable(),
+                r.getPricePerSeat(),
+                r.getStatus(),
+                passengerCount,
+                earningsPreview,
+                bookingRequestCount
+            );
+        })
         .toList();
   }
 
@@ -63,16 +79,26 @@ public class DriverInboxService {
       throw new ApiException(HttpStatus.FORBIDDEN, "Not your ride");
     }
     return bookingByRideRepository.findRideBookings(rideId).stream()
-        .map(b -> new MyRideBookingsResponse(
-            b.getId(),
-            b.getRide().getId(),
-            b.getPassenger().getEmail(),
-            b.getPassenger().getFullName(),
-            b.getPassenger().getPhone(),
-            b.getSeatsBooked(),
-            b.getStatus(),
-            b.getCreatedAt() != null ? b.getCreatedAt().atOffset(java.time.ZoneOffset.UTC) : null
-        )).toList();
+        .map(b -> {
+            var passenger = b.getPassenger();
+            return new MyRideBookingsResponse(
+                b.getId(),
+                b.getRide().getId(),
+                passenger.getEmail(),
+                passenger.getFullName(),
+                passenger.getPhone(),
+                b.getSeatsBooked(),
+                b.getStatus(),
+                b.getCreatedAt() != null ? b.getCreatedAt().atOffset(java.time.ZoneOffset.UTC) : null,
+                passenger.getGender(),
+                passenger.getTrustScore(),
+                passenger.getSafetyScore(),
+                passenger.getTotalCompletedRides(),
+                passenger.getCancellationRate(),
+                passenger.isVerifiedStudent(),
+                passenger.getCollegeName()
+            );
+        }).toList();
   }
 
   @Transactional

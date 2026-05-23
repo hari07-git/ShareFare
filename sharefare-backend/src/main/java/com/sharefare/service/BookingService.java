@@ -245,20 +245,31 @@ public class BookingService {
   public List<MyBookingsResponse> listMyBookings(String passengerEmail) {
     var passenger = userRepository.findByEmailIgnoreCase(passengerEmail)
         .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "User not found"));
-    return bookingRepository.findByPassengerOrderByCreatedAtDesc(passenger).stream().map(b ->
-        new MyBookingsResponse(
+    return bookingRepository.findByPassengerOrderByCreatedAtDesc(passenger).stream().map(b -> {
+        var ride = b.getRide();
+        var driver = ride.getDriver();
+        String otp = "SF-" + String.format("%04d", (b.getId() * 37) % 9000 + 1000);
+        return new MyBookingsResponse(
             b.getId(),
-            b.getRide().getId(),
-            b.getRide().getOrigin(),
-            b.getRide().getDestination(),
-            b.getRide().getDepartureTime(),
-            b.getRide().getDriver().getFullName(),
-            b.getRide().getDriver().getEmail(),
-            b.getRide().getDriver().getPhone(),
+            ride.getId(),
+            ride.getOrigin(),
+            ride.getDestination(),
+            ride.getDepartureTime(),
+            driver.getFullName(),
+            driver.getEmail(),
+            driver.getPhone(),
             b.getSeatsBooked(),
-            b.getStatus()
-        )
-    ).toList();
+            b.getStatus(),
+            ride.getVehicleType(),
+            ride.getVehicleNumber(),
+            driver.getGender(),
+            driver.getTrustScore(),
+            driver.getSafetyScore(),
+            driver.isVerifiedStudent(),
+            otp,
+            ride.getPricePerSeat()
+        );
+    }).toList();
   }
 
   @Transactional

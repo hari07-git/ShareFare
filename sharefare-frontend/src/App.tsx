@@ -22,6 +22,9 @@ const AdminDashboardPage = lazy(() => import("./pages/AdminDashboardPage").then(
 const AdminVerificationQueuePage = lazy(() => import("./pages/AdminVerificationQueuePage").then((m) => ({ default: m.AdminVerificationQueuePage })));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage").then((m) => ({ default: m.NotificationsPage })));
 const DriverInboxPage = lazy(() => import("./pages/DriverInboxPage").then((m) => ({ default: m.DriverInboxPage })));
+const BookingRequestsPage = lazy(() => import("./pages/BookingRequestsPage").then((m) => ({ default: m.BookingRequestsPage })));
+const BookedRidesPage = lazy(() => import("./pages/BookedRidesPage").then((m) => ({ default: m.BookedRidesPage })));
+const MyOfferedRidesPage = lazy(() => import("./pages/MyOfferedRidesPage").then((m) => ({ default: m.MyOfferedRidesPage })));
 const TermsPage = lazy(() => import("./pages/TermsPage").then((m) => ({ default: m.TermsPage })));
 const PrivacyPage = lazy(() => import("./pages/PrivacyPage").then((m) => ({ default: m.PrivacyPage })));
 const CookiePolicyPage = lazy(() => import("./pages/CookiePolicyPage").then((m) => ({ default: m.CookiePolicyPage })));
@@ -164,6 +167,30 @@ export default function App() {
             element={
               <RequireAuth>
                 <NotificationsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/driver/booking-requests"
+            element={
+              <RequireAuth>
+                <BookingRequestsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/my-booked-rides"
+            element={
+              <RequireAuth>
+                <BookedRidesPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/my-offered-rides"
+            element={
+              <RequireAuth>
+                <MyOfferedRidesPage />
               </RequireAuth>
             }
           />

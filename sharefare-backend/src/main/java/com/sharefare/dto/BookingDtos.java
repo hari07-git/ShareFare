@@ -31,6 +31,14 @@ public class BookingDtos {
       String driverEmail,
       String driverPhone,
       int seatsBooked,
-      BookingStatus status
+      BookingStatus status,
+      String vehicleType,
+      String vehicleNumber,
+      String driverGender,
+      Double driverTrustScore,
+      Double driverSafetyScore,
+      boolean driverVerified,
+      String rideOtp,
+      java.math.BigDecimal pricePerSeat
   ) {}
 }

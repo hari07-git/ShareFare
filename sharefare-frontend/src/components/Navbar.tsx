@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "../lib/api";
 import { cn } from "../lib/cn";
 import { GradientButton } from "./GradientButton";
-import { Bell, LayoutDashboard, LogIn, LogOut, MapPinned, Menu, Plus, Search, Shield, ShieldCheck, X } from "lucide-react";
+import { Bell, LayoutDashboard, LogIn, LogOut, MapPinned, Menu, Plus, Search, Shield, ShieldCheck, X, Users, TrendingUp } from "lucide-react";
 
 function NavItem({ to, children }: { to: string; children: React.ReactNode }) {
   return (
@@ -148,8 +148,14 @@ export function Navbar() {
                 <NavItem to="/rides/offer">
                   <span className="inline-flex items-center gap-1.5"><Plus className="h-3.5 w-3.5" /> Offer a ride</span>
                 </NavItem>
-                <NavItem to="/me/bookings">
+                <NavItem to="/my-booked-rides">
                   <span className="inline-flex items-center gap-1.5"><MapPinned className="h-3.5 w-3.5" /> My bookings</span>
+                </NavItem>
+                <NavItem to="/driver/booking-requests">
+                  <span className="inline-flex items-center gap-1.5"><Users className="h-3.5 w-3.5" /> Booking Requests</span>
+                </NavItem>
+                <NavItem to="/my-offered-rides">
+                  <span className="inline-flex items-center gap-1.5"><TrendingUp className="h-3.5 w-3.5" /> Offered Rides</span>
                 </NavItem>
                 <NavLink
                   to="/me/notifications"
@@ -241,7 +247,9 @@ export function Navbar() {
                 <MobileNavItem to="/home" onClick={() => setOpen(false)}>Home</MobileNavItem>
                 <MobileNavItem to="/rides/find" onClick={() => setOpen(false)}>Find a ride</MobileNavItem>
                 <MobileNavItem to="/rides/offer" onClick={() => setOpen(false)}>Offer a ride</MobileNavItem>
-                <MobileNavItem to="/me/bookings" onClick={() => setOpen(false)}>My bookings</MobileNavItem>
+                <MobileNavItem to="/my-booked-rides" onClick={() => setOpen(false)}>My bookings</MobileNavItem>
+                <MobileNavItem to="/driver/booking-requests" onClick={() => setOpen(false)}>Booking Requests</MobileNavItem>
+                <MobileNavItem to="/my-offered-rides" onClick={() => setOpen(false)}>Offered Rides</MobileNavItem>
                 <MobileNavItem to="/me/notifications" onClick={() => setOpen(false)}>
                   Notifications {unread > 0 && <span className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[11px] font-bold text-white">{unread}</span>}
                 </MobileNavItem>

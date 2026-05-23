@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { Bell, Home, MapPinned, Plus, Search } from "lucide-react";
+import { Bell, Home, MapPinned, Plus, Search, Users, LayoutDashboard } from "lucide-react";
 import { cn } from "../lib/cn";
 
 export const pageContainer = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
@@ -144,9 +144,9 @@ import { useAuth } from "../state/auth";
 const mobileItems = [
   { to: "/home", label: "Home", icon: Home },
   { to: "/rides/find", label: "Find", icon: Search },
-  { to: "/rides/offer", label: "Offer", icon: Plus },
-  { to: "/me/bookings", label: "Trips", icon: MapPinned },
-  { to: "/me/notifications", label: "Alerts", icon: Bell },
+  { to: "/my-booked-rides", label: "Trips", icon: MapPinned },
+  { to: "/driver/booking-requests", label: "Requests", icon: Users },
+  { to: "/my-offered-rides", label: "Offered", icon: LayoutDashboard },
 ];
 
 export function MobileBottomNavigation({ enabled }: { enabled: boolean }) {

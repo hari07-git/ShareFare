@@ -15,7 +15,10 @@ public class DriverInboxDtos {
       int seatsTotal,
       int seatsAvailable,
       BigDecimal pricePerSeat,
-      RideStatus status
+      RideStatus status,
+      int passengerCount,
+      BigDecimal earningsPreview,
+      int bookingRequestCount
   ) {}
 
   public record MyRideBookingsResponse(
@@ -26,7 +29,14 @@ public class DriverInboxDtos {
       String passengerPhone,
       int seatsBooked,
       BookingStatus status,
-      OffsetDateTime createdAt
+      OffsetDateTime createdAt,
+      String passengerGender,
+      Double passengerTrustScore,
+      Double passengerSafetyScore,
+      int passengerTotalCompletedRides,
+      Double passengerCancellationRate,
+      boolean passengerVerified,
+      String passengerCollegeName
   ) {}
 }
 
