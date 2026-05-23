@@ -174,7 +174,7 @@ export function AdminVerificationQueuePage() {
                   </div>
                   
                   {/* Actions */}
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <Button 
                       variant="primary" 
                       disabled={busyId === item.userId}

@@ -13,6 +13,7 @@ import {
   BadgeIndianRupee, Leaf, CheckCircle2
 } from "lucide-react";
 import { GradientButton } from "../components/GradientButton";
+import { cn } from "../lib/cn";
 
 type Ride = {
   id: number;
@@ -414,10 +415,10 @@ export function RideDetailsPage() {
                       />
                     </div>
                   ) : (
-                    <div className="rounded-xl bg-slate-50 px-4 py-3 border border-slate-200 flex items-center gap-2">
+                    <div className="rounded-xl bg-slate-50 px-4 py-3 border border-slate-200 flex flex-wrap items-center gap-2 min-w-0">
                       <span className="text-sm font-semibold text-slate-600">Reviewing driver:</span>
-                      <span className="text-sm font-bold text-slate-950">{ride.driverName}</span>
-                      <span className="text-xs font-medium text-slate-400">({ride.driverEmail})</span>
+                      <span className="text-sm font-bold text-slate-950 truncate">{ride.driverName}</span>
+                      <span className="text-xs font-medium text-slate-400 truncate">({ride.driverEmail})</span>
                     </div>
                   )}
                   <div className="flex items-center gap-3">
@@ -446,7 +447,10 @@ export function RideDetailsPage() {
       </motion.div>
 
       {/* Sticky Booking CTA */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-xl shadow-2xl shadow-slate-900/10 px-4 py-4 md:px-8">
+      <div className={cn(
+        "fixed left-0 right-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-xl shadow-2xl shadow-slate-900/10 px-4 py-4 md:px-8 pb-[calc(1rem+env(safe-area-inset-bottom))] md:pb-4",
+        auth.token ? "bottom-[57px] md:bottom-0" : "bottom-0"
+      )}>
         <div className="mx-auto flex max-w-4xl items-center gap-4">
           <div className="flex-1">
             <div className="text-xs text-slate-500">Price per seat</div>

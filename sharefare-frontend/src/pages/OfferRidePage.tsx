@@ -55,6 +55,16 @@ export function OfferRidePage() {
   const [pinTarget, setPinTarget] = useState<"pickup" | "drop" | null>("pickup");
   const [luggage, setLuggage] = useState<"small" | "medium" | "large">("small");
   const [manualPrice, setManualPrice] = useState(false);
+  const [mapHeight, setMapHeight] = useState(500);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setMapHeight(window.innerWidth < 640 ? 300 : 500);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const pickup = originPin ?? (originPlace ? { lat: originPlace.lat, lng: originPlace.lng } : null);
   const drop = destinationPin ?? (destinationPlace ? { lat: destinationPlace.lat, lng: destinationPlace.lng } : null);
@@ -164,7 +174,7 @@ export function OfferRidePage() {
   );
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(340px,460px)_1fr]">
+    <div className="grid gap-5 lg:grid-cols-[minmax(0,460px)_1fr]">
       <form onSubmit={submit} className="space-y-5">
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <div className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600">
@@ -280,13 +290,13 @@ export function OfferRidePage() {
           <div className="mb-5 text-base font-semibold text-slate-950">Ride settings</div>
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField label="Seats">
-              <div className="flex rounded-xl border border-slate-200 bg-slate-50 p-1">
+              <div className="grid grid-cols-6 rounded-xl border border-slate-200 bg-slate-50 p-1">
                 {[1, 2, 3, 4, 5, 6].map((seat) => (
                   <button
                     key={seat}
                     type="button"
                     onClick={() => setSeatsTotal(seat)}
-                    className={`h-10 flex-1 rounded-lg text-sm font-semibold transition ${seat === seatsTotal ? "bg-white text-slate-950 shadow-sm" : "text-slate-600 hover:bg-white"}`}
+                    className={`h-10 rounded-lg text-sm font-semibold transition ${seat === seatsTotal ? "bg-white text-slate-950 shadow-sm" : "text-slate-600 hover:bg-white"}`}
                   >
                     {seat}
                   </button>
@@ -379,7 +389,7 @@ export function OfferRidePage() {
             pickup={pickup}
             drop={drop}
             nearby={nearby}
-            height={520}
+            height={mapHeight}
             clickTarget={pinTarget}
             onPick={async (point) => {
               if (pinTarget === "pickup") {
@@ -394,17 +404,17 @@ export function OfferRidePage() {
               }
             }}
           />
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Button variant={pinTarget === "pickup" ? "primary" : "secondary"} type="button" onClick={() => setPinTarget("pickup")}>Pickup pin</Button>
-            <Button variant={pinTarget === "drop" ? "primary" : "secondary"} type="button" onClick={() => setPinTarget("drop")}>Drop pin</Button>
-            <Button variant="secondary" type="button" disabled={geoBusy !== null} onClick={() => useMyLocation("o")}>
-              {geoBusy === "o" ? "Locating..." : "Use my location"}
+          <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <Button variant={pinTarget === "pickup" ? "primary" : "secondary"} type="button" className="py-2.5 text-xs px-2" onClick={() => setPinTarget("pickup")}>Pickup pin</Button>
+            <Button variant={pinTarget === "drop" ? "primary" : "secondary"} type="button" className="py-2.5 text-xs px-2" onClick={() => setPinTarget("drop")}>Drop pin</Button>
+            <Button variant="secondary" type="button" className="py-2.5 text-xs px-2" disabled={geoBusy !== null} onClick={() => useMyLocation("o")}>
+              {geoBusy === "o" ? "Locating..." : "My location"}
             </Button>
-            <Button variant="secondary" type="button" onClick={() => { setOriginPin(null); setDestinationPin(null); setOriginPlace(null); setDestinationPlace(null); }}>Clear</Button>
+            <Button variant="secondary" type="button" className="py-2.5 text-xs px-2" onClick={() => { setOriginPin(null); setDestinationPin(null); setOriginPlace(null); setDestinationPlace(null); }}>Clear</Button>
           </div>
         </section>
-
-        <section className="grid gap-3 sm:grid-cols-4">
+ 
+        <section className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { label: "Distance", value: distance ? `${distance.toFixed(1)} km` : "Set pins", icon: MapPin },
             { label: "ETA", value: eta ? `${eta} min` : "Set pins", icon: Clock3 },

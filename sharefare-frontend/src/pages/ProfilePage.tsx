@@ -218,7 +218,7 @@ export function ProfilePage() {
       <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-indigo-600 via-violet-600 to-cyan-500 p-6 text-white shadow-xl md:p-8">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_60%)]" />
         <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-center gap-5">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 text-center sm:text-left">
             {/* Avatar + trust ring */}
             <div className="relative group cursor-pointer" onClick={triggerPhotoUpload} title="Click to upload profile photo">
               <TrustRing score={trustScore} />
@@ -252,10 +252,10 @@ export function ProfilePage() {
                 onChange={handleAvatarChange}
               />
             </div>
-            <div>
+            <div className="flex-1 min-w-0">
               <h1 className="text-2xl font-bold tracking-tight">{me?.fullName ?? "Loading..."}</h1>
-              <div className="mt-1 text-sm font-medium text-white/70">{me?.email}</div>
-              <div className="mt-2 flex flex-wrap gap-2">
+              <div className="mt-1 text-sm font-medium text-white/70 truncate">{me?.email}</div>
+              <div className="mt-2 flex flex-wrap gap-2 justify-center sm:justify-start">
                 {isVerified && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-semibold backdrop-blur">
                     <BadgeCheck className="h-3.5 w-3.5 text-emerald-300" /> Verified Student
@@ -268,7 +268,7 @@ export function ProfilePage() {
             </div>
           </div>
           {/* Trust score */}
-          <div className="flex flex-col items-start rounded-2xl bg-white/10 px-4 py-3 backdrop-blur sm:items-center">
+          <div className="flex flex-col items-center justify-center rounded-2xl bg-white/10 px-4 py-3 backdrop-blur w-full sm:w-auto text-center">
             <div className="text-xs font-semibold uppercase tracking-wider text-white/60">Trust Score</div>
             <div className="mt-1 text-3xl font-black">{trustScore}<span className="text-base font-medium text-white/70">/100</span></div>
             <div className="mt-1 text-xs text-white/60">{trustScore >= 80 ? "Excellent" : trustScore >= 50 ? "Good" : "Building"}</div>
@@ -326,7 +326,7 @@ export function ProfilePage() {
             className="mt-6 space-y-6"
           >
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <StatCard icon={Activity} label="Completed rides" value={me?.totalCompletedRides ?? 0} color="bg-indigo-50 text-indigo-600" />
               <StatCard icon={Star} label="Avg rating" value="4.9" color="bg-amber-50 text-amber-600" />
               <StatCard icon={Leaf} label="CO₂ saved" value="85kg" color="bg-emerald-50 text-emerald-600" />
@@ -358,7 +358,7 @@ export function ProfilePage() {
             {/* Reliability */}
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500">Reliability</div>
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
                   { label: "Cancellation rate", value: `${((me?.cancellationRate ?? 0) * 100).toFixed(0)}%`, color: "text-emerald-600" },
                   { label: "Completion rate", value: `${100 - Math.round((me?.cancellationRate ?? 0) * 100)}%`, color: "text-indigo-600" },
@@ -375,7 +375,7 @@ export function ProfilePage() {
             {/* Travel Preferences */}
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500">Travel Preferences</div>
-              <div className="grid gap-2 sm:grid-cols-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <PrefToggle label="Music during ride" icon={Music} defaultOn={true} />
                 <PrefToggle label="Chat friendly" icon={HeartHandshake} defaultOn={true} />
                 <PrefToggle label="AC preferred" icon={Wind} defaultOn={false} />
@@ -414,7 +414,7 @@ export function ProfilePage() {
                 <FormField label="Full name">
                   <Input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
                 </FormField>
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField label="Phone (optional)">
                     <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 9XXXXXXXXX" />
                   </FormField>

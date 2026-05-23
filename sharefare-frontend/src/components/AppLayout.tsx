@@ -11,9 +11,9 @@ export function AppLayout() {
   const location = useLocation();
   const { token } = useAuth();
   return (
-    <div className="min-h-full text-slate-900">
+    <div className="min-h-full text-slate-900 w-full max-w-full overflow-x-hidden">
       <Navbar />
-      <main className={cn("relative py-6 pb-24 md:pb-6", pageContainer)}>
+      <main className={cn("relative py-6 pb-24 md:pb-6 w-full max-w-full overflow-x-hidden", pageContainer)}>
         <div className="pointer-events-none fixed inset-0 sf-grid-overlay opacity-30" />
         <div className="relative">
           <ErrorBoundary>

@@ -23,6 +23,24 @@ function NavItem({ to, children }: { to: string; children: React.ReactNode }) {
   );
 }
 
+function MobileNavItem({ to, children, onClick }: { to: string; children: React.ReactNode; onClick?: () => void }) {
+  return (
+    <NavLink
+      to={to}
+      onClick={onClick}
+      className={({ isActive }) =>
+        `block rounded-xl px-4 py-3 text-sm font-semibold transition ${
+          isActive
+            ? "bg-indigo-50 text-indigo-700 font-bold"
+            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+        }`
+      }
+    >
+      {children}
+    </NavLink>
+  );
+}
+
 function ProfileAvatar({ name, verified, size = "sm" }: { name: string; verified?: boolean; size?: "sm" | "md" }) {
   const initials = name
     .split(" ")
@@ -76,7 +94,7 @@ export function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-0 group select-none">
             {/* Orange S with car cutout */}
-            <span className="relative inline-flex items-center justify-center" style={{ width: 44, height: 52 }}>
+            <span className="relative inline-flex items-center justify-center shrink-0 scale-90 sm:scale-100 origin-left" style={{ width: 44, height: 52 }}>
               <svg viewBox="0 0 44 52" width="44" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
                 {/* Orange S letter */}
                 <text
@@ -220,13 +238,15 @@ export function Navbar() {
                     <div className="text-xs text-slate-500">{isVerified ? "✓ Verified Student" : "Pending verification"}</div>
                   </div>
                 </Link>
-                <NavItem to="/home"><span onClick={() => setOpen(false)}>Home</span></NavItem>
-                <NavItem to="/rides/find"><span onClick={() => setOpen(false)}>Find a ride</span></NavItem>
-                <NavItem to="/rides/offer"><span onClick={() => setOpen(false)}>Offer a ride</span></NavItem>
-                <NavItem to="/me/bookings"><span onClick={() => setOpen(false)}>My bookings</span></NavItem>
-                <NavItem to="/me/notifications"><span onClick={() => setOpen(false)}>Notifications {unread > 0 && <span className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[11px] font-bold text-white">{unread}</span>}</span></NavItem>
-                <NavItem to="/me/profile"><span onClick={() => setOpen(false)}>My Profile</span></NavItem>
-                {me?.role === "ADMIN" && <NavItem to="/admin"><span onClick={() => setOpen(false)}>Admin</span></NavItem>}
+                <MobileNavItem to="/home" onClick={() => setOpen(false)}>Home</MobileNavItem>
+                <MobileNavItem to="/rides/find" onClick={() => setOpen(false)}>Find a ride</MobileNavItem>
+                <MobileNavItem to="/rides/offer" onClick={() => setOpen(false)}>Offer a ride</MobileNavItem>
+                <MobileNavItem to="/me/bookings" onClick={() => setOpen(false)}>My bookings</MobileNavItem>
+                <MobileNavItem to="/me/notifications" onClick={() => setOpen(false)}>
+                  Notifications {unread > 0 && <span className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[11px] font-bold text-white">{unread}</span>}
+                </MobileNavItem>
+                <MobileNavItem to="/me/profile" onClick={() => setOpen(false)}>My Profile</MobileNavItem>
+                {me?.role === "ADMIN" && <MobileNavItem to="/admin" onClick={() => setOpen(false)}>Admin</MobileNavItem>}
                 <div className="pt-2">
                   <GradientButton
                     variant="ghost"
@@ -238,8 +258,8 @@ export function Navbar() {
               </>
             ) : (
               <>
-                <NavItem to="/rides/find">Find a ride</NavItem>
-                <NavItem to="/rides/offer">Offer a ride</NavItem>
+                <MobileNavItem to="/rides/find" onClick={() => setOpen(false)}>Find a ride</MobileNavItem>
+                <MobileNavItem to="/rides/offer" onClick={() => setOpen(false)}>Offer a ride</MobileNavItem>
                 <div className="pt-2 grid gap-2">
                   <GradientButton onClick={() => { navigate("/auth/register"); setOpen(false); }}>Sign up</GradientButton>
                   <GradientButton variant="ghost" onClick={() => { navigate("/auth/login"); setOpen(false); }}>Login</GradientButton>

@@ -209,21 +209,21 @@ export function HomePage() {
           </div>
 
           {/* RIGHT — quick action cards */}
-          <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col">
+          <div className="flex shrink-0 flex-col gap-3 sm:flex-row lg:flex-col w-full lg:w-auto">
             <GradientButton
               onClick={() => (window.location.href = "/rides/find")}
-              className="justify-center px-6 py-3.5 text-sm font-bold shadow-xl shadow-indigo-500/25 md:w-48"
+              className="justify-center px-6 py-3.5 text-sm font-bold shadow-xl shadow-indigo-500/25 w-full md:w-48"
             >
               🔍 Find a ride
             </GradientButton>
             <button
               onClick={() => (window.location.href = "/rides/offer")}
-              className="rounded-xl border border-white/25 bg-white/10 px-6 py-3.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20 md:w-48"
+              className="w-full md:w-48 rounded-xl border border-white/25 bg-white/10 px-6 py-3.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
             >
               🚗 Offer a ride
             </button>
-            <Link to="/me/bookings">
-              <button className="w-full rounded-xl border border-white/15 bg-white/8 px-6 py-3.5 text-sm font-semibold text-white/80 backdrop-blur transition hover:bg-white/15 md:w-48">
+            <Link to="/me/bookings" className="w-full md:w-48">
+              <button className="w-full rounded-xl border border-white/15 bg-white/8 px-6 py-3.5 text-sm font-semibold text-white/80 backdrop-blur transition hover:bg-white/15">
                 📋 My bookings
               </button>
             </Link>
@@ -234,7 +234,7 @@ export function HomePage() {
       {error ? <div className="text-sm text-rose-600">{error}</div> : null}
 
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <Stat label="Total bookings" value={bookings.filter((b) => b.status !== "CANCELLED").length} icon={Calendar} tone="indigo" />
         <Stat label="Unread notifications" value={unreadCount} icon={Users} tone="blue" />
         <Stat label="Rating" value={"4.9"} icon={Star} tone="amber" />

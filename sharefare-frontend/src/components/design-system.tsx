@@ -160,7 +160,7 @@ export function MobileBottomNavigation({ enabled }: { enabled: boolean }) {
 
   if (!enabled) return null;
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-2 py-1.5 shadow-[0_-12px_35px_-28px_rgba(15,23,42,0.5)] backdrop-blur md:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] shadow-[0_-12px_35px_-28px_rgba(15,23,42,0.5)] backdrop-blur md:hidden">
       <div className="mx-auto grid max-w-md grid-cols-6 gap-0.5">
         {mobileItems.map(({ to, label, icon: Icon }) => (
           <NavLink

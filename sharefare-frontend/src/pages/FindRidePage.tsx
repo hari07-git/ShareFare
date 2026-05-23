@@ -76,6 +76,16 @@ export function FindRidePage() {
   const [manualPickup, setManualPickup] = useState<{ lat: number; lng: number } | null>(null);
   const [manualDrop, setManualDrop] = useState<{ lat: number; lng: number } | null>(null);
   const [pinTarget, setPinTarget] = useState<"pickup" | "drop" | null>(null);
+  const [mapHeight, setMapHeight] = useState(500);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setMapHeight(window.innerWidth < 640 ? 300 : Math.min(620, Math.max(380, window.innerHeight - 250)));
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const params = useMemo(() => {
     const p: Record<string, string | number | boolean> = { page: appliedPage, size: 20 };
@@ -172,7 +182,7 @@ export function FindRidePage() {
 
   return (
     <div>
-      <section className="mb-5 grid gap-5 lg:grid-cols-[minmax(340px,460px)_1fr]">
+      <section className="mb-5 grid gap-5 lg:grid-cols-[minmax(0,460px)_1fr]">
         <div className="space-y-5">
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="flex items-start justify-between gap-4">
@@ -217,21 +227,21 @@ export function FindRidePage() {
                   setDestination(place.displayName);
                 }}
               />
-                <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+                <div className="grid gap-3 grid-cols-1 sm:grid-cols-[1fr_auto]">
                   <div className="relative">
                     <Calendar className="pointer-events-none absolute left-3.5 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-indigo-500" />
                     <Input type="date" value={date} onChange={(event) => setDate(event.target.value)} className="pl-10" />
                   </div>
-                  <GradientButton onClick={applySearch} className="min-w-32">
+                  <GradientButton onClick={applySearch} className="w-full sm:w-auto sm:min-w-32">
                     Search <Search className="h-4 w-4" />
                   </GradientButton>
                 </div>
               </div>
               
-              <div className="pt-4 border-t border-slate-100 flex flex-wrap gap-4 text-sm text-slate-700">
+              <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 text-sm text-slate-700">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={verifiedOnly} onChange={e => setVerifiedOnly(e.target.checked)} className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
-                  <span className="font-medium">Verified Students Only</span>
+                  <span className="font-medium text-slate-700">Verified Students Only</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={femaleOnly} onChange={e => setFemaleOnly(e.target.checked)} className="rounded border-slate-300 text-purple-600 focus:ring-purple-500" />
@@ -289,43 +299,50 @@ export function FindRidePage() {
                     activeId === ride.id ? "border-indigo-200 bg-indigo-50" : "border-slate-200 bg-white hover:bg-slate-50"
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex min-w-0 gap-3">
-                      <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-blue-600 text-sm font-bold text-white shadow-sm overflow-hidden">
-                        {ride.driverGender === 'FEMALE' ? '👩‍🎓' : 'SF'}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-bold text-slate-900">{ride.driverName}</span>
-                          {ride.driverGender === 'FEMALE' && <span className="inline-flex items-center rounded-md bg-purple-50 px-1.5 py-0.5 text-[10px] font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10">Female</span>}
-                          {ride.driverTrustScore > 5 && <span className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Trusted</span>}
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-indigo-600 text-sm font-bold text-white shadow-sm overflow-hidden">
+                          {ride.driverGender === 'FEMALE' ? '👩‍🎓' : 'SF'}
                         </div>
-                        <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
-                          <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                          <span className="truncate">{ride.origin}</span>
-                        </div>
-                        <div className="ml-1.5 h-5 border-l border-dashed border-slate-200" />
-                        <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                          <span className="h-2.5 w-2.5 rounded-full bg-blue-600" />
-                          <span className="truncate">{ride.destination}</span>
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="text-sm font-bold text-slate-900 truncate">{ride.driverName}</span>
+                            {ride.driverGender === 'FEMALE' && <span className="inline-flex items-center rounded-md bg-purple-50 px-1.5 py-0.5 text-[9px] font-semibold text-purple-700 ring-1 ring-inset ring-purple-700/10">Female</span>}
+                            {ride.driverTrustScore > 5 && <span className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Trusted</span>}
+                          </div>
                         </div>
                       </div>
+                      <div className="text-right shrink-0">
+                        <div className="text-xl font-bold text-indigo-600">₹{ride.pricePerSeat}</div>
+                        <div className="text-[10px] font-medium text-slate-500">per seat</div>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-semibold text-slate-950">₹{ride.pricePerSeat}</div>
-                      <div className="text-xs text-slate-500">per seat</div>
+
+                    <div className="space-y-1 pl-1">
+                      <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
+                        <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
+                        <span className="truncate">{ride.origin}</span>
+                      </div>
+                      <div className="ml-1 h-3 border-l border-dashed border-slate-200" />
+                      <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                        <span className="h-2 w-2 shrink-0 rounded-full bg-blue-600" />
+                        <span className="truncate">{ride.destination}</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500">
-                    <span className="inline-flex items-center gap-1.5"><Clock3 className="h-3.5 w-3.5" /> {new Date(ride.departureTime).toLocaleString()}</span>
-                    <span className="inline-flex items-center gap-1.5"><Users className="h-3.5 w-3.5" /> {ride.seatsAvailable} seats left</span>
-                    <span className="inline-flex items-center gap-1.5"><Star className="h-3.5 w-3.5 text-amber-300" /> 4.9</span>
-                  </div>
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-xs text-indigo-600">Tap to focus route</span>
-                    <Link to={`/rides/${ride.id}`}>
-                      <GradientButton className="py-2" variant="primary">Details</GradientButton>
-                    </Link>
+
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-slate-100 pt-3 text-[11px] font-medium text-slate-500">
+                      <span className="inline-flex items-center gap-1"><Clock3 className="h-3.5 w-3.5 text-slate-400" /> {new Date(ride.departureTime).toLocaleString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+                      <span className="inline-flex items-center gap-1"><Users className="h-3.5 w-3.5 text-slate-400" /> {ride.seatsAvailable} seats left</span>
+                      <span className="inline-flex items-center gap-1"><Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400" /> 4.9</span>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-4 mt-2">
+                      <span className="text-[11px] text-indigo-600 font-medium">Tap to focus route</span>
+                      <Link to={`/rides/${ride.id}`} className="shrink-0">
+                        <GradientButton className="py-2.5 px-4 text-xs" variant="primary">Details</GradientButton>
+                      </Link>
+                    </div>
                   </div>
                 </motion.div>
               ))}
@@ -347,7 +364,7 @@ export function FindRidePage() {
             pickup={pickup}
             drop={drop}
             nearby={nearby}
-            height={typeof window === "undefined" ? 560 : Math.min(620, Math.max(380, window.innerHeight - 250))}
+            height={mapHeight}
             clickTarget={pinTarget}
             onPick={(point) => {
               if (pinTarget === "pickup") {
@@ -360,31 +377,40 @@ export function FindRidePage() {
               }
             }}
           />
-          <div className="mt-3 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl bg-slate-50 p-4">
-              <MapPin className="h-4 w-4 text-indigo-500" />
-              <div className="mt-2 text-xl font-semibold text-slate-950">{distance?.toFixed(1)} km</div>
-              <div className="text-xs text-slate-500">route distance</div>
+          <div className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
+            <div className="rounded-2xl bg-slate-50 p-2.5 sm:p-4 text-center sm:text-left">
+              <MapPin className="mx-auto sm:mx-0 h-4 w-4 text-indigo-500" />
+              <div className="mt-1.5 text-sm sm:text-xl font-bold text-slate-950">{distance?.toFixed(1)} km</div>
+              <div className="text-[9px] sm:text-xs text-slate-500">distance</div>
             </div>
-            <div className="rounded-2xl bg-slate-50 p-4">
-              <Clock3 className="h-4 w-4 text-indigo-500" />
-              <div className="mt-2 text-xl font-semibold text-slate-950">{eta} min</div>
-              <div className="text-xs text-slate-500">estimated ETA</div>
+            <div className="rounded-2xl bg-slate-50 p-2.5 sm:p-4 text-center sm:text-left">
+              <Clock3 className="mx-auto sm:mx-0 h-4 w-4 text-indigo-500" />
+              <div className="mt-1.5 text-sm sm:text-xl font-bold text-slate-950">{eta} min</div>
+              <div className="text-[9px] sm:text-xs text-slate-500">ETA</div>
             </div>
-            <div className="rounded-2xl bg-slate-50 p-4">
-              <CarFront className="h-4 w-4 text-indigo-500" />
-              <div className="mt-2 text-xl font-semibold text-slate-950">{data?.totalElements ?? 0}</div>
-              <div className="text-xs text-slate-500">rides found</div>
+            <div className="rounded-2xl bg-slate-50 p-2.5 sm:p-4 text-center sm:text-left">
+              <CarFront className="mx-auto sm:mx-0 h-4 w-4 text-indigo-500" />
+              <div className="mt-1.5 text-sm sm:text-xl font-bold text-slate-950">{data?.totalElements ?? 0}</div>
+              <div className="text-[9px] sm:text-xs text-slate-500">rides</div>
             </div>
           </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Button variant={pinTarget === "pickup" ? "primary" : "secondary"} onClick={() => setPinTarget((value) => (value === "pickup" ? null : "pickup"))}>
-              Pickup pin
-            </Button>
-            <Button variant={pinTarget === "drop" ? "primary" : "secondary"} onClick={() => setPinTarget((value) => (value === "drop" ? null : "drop"))}>
-              Drop pin
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            <Button
+              className="py-2.5 text-xs px-2"
+              variant={pinTarget === "pickup" ? "primary" : "secondary"}
+              onClick={() => setPinTarget((value) => (value === "pickup" ? null : "pickup"))}
+            >
+              Pickup
             </Button>
             <Button
+              className="py-2.5 text-xs px-2"
+              variant={pinTarget === "drop" ? "primary" : "secondary"}
+              onClick={() => setPinTarget((value) => (value === "drop" ? null : "drop"))}
+            >
+              Drop
+            </Button>
+            <Button
+              className="py-2.5 text-xs px-2"
               variant="secondary"
               onClick={() => {
                 setManualPickup(null);
@@ -395,7 +421,7 @@ export function FindRidePage() {
                 setActiveId(null);
               }}
             >
-              Clear pins
+              Clear
             </Button>
           </div>
         </div>
