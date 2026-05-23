@@ -39,14 +39,16 @@
 | 🎓 **Verified Campus Network** | Only students with verified campus IDs can publish or book rides |
 | 🔐 **JWT Authentication** | Secure sign-up, login, and session management with role-based access |
 | 🗺️ **Interactive Live Maps** | Leaflet.js maps with real road routing via OSRM, pickup/drop pin placement |
-| 🚗 **Offer & Book Rides** | Complete ride lifecycle — publish, search, request, approve, confirm, complete |
+| 🚗 **Offer & Edit/Delete Rides** | Full ride CRUD operations — publish, search, update details, delete, request, confirm |
 | 👩‍💼 **Admin Dashboard** | Verify student IDs, moderate content, manage users and ride data |
+| 🤖 **AI Support Assistant** | Built-in conversational support widget answering registration, booking, and safety questions |
 | 📋 **Booking Lifecycle** | REQUESTED → DRIVER_APPROVED → CONFIRMED → ONGOING → COMPLETED |
 | 🔔 **In-App Notifications** | Ride updates, booking approvals, verification status changes |
 | 📧 **Transactional Email** | Gmail SMTP-powered emails for ride reminders and verification updates |
 | 🚺 **Gender Safety Preferences** | Female-commuter-only filter for safer travel options |
 | 🛡️ **Trust Score System** | Dynamic trust badges and scores based on ride history and verification |
 | 📊 **Profile Ecosystem** | Profile completeness, trust rings, CO₂ saved tracker, reliability score |
+| 🩹 **Crash Recovery screen** | High-fidelity Error Boundary to diagnose frontend failures and resume with one click |
 | 📱 **Responsive Premium UI** | Glassmorphism, dark mode hero sections, Framer Motion micro-animations |
 
 ---
@@ -222,6 +224,8 @@ The backend exposes a full REST API documented via **Swagger UI** at `/swagger-u
 | Profile | `GET /api/me` | Get current user profile |
 | Rides | `POST /api/rides` | Publish a new ride |
 | Rides | `GET /api/rides/search` | Search available rides |
+| Rides | `PUT /api/rides/{id}` | Update ride details (seats, vehicle, price, departure) |
+| Rides | `DELETE /api/rides/{id}` | Delete / cancel a ride |
 | Bookings | `POST /api/bookings` | Book a ride |
 | Bookings | `PATCH /api/bookings/{id}/confirm` | Confirm a booking |
 | Admin | `GET /api/admin/verifications` | View pending verifications |
@@ -351,6 +355,8 @@ sharefare/
 - [x] Trust score and profile ecosystem
 - [x] Gender safety preferences
 - [x] Admin moderation dashboard
+- [x] AI support assistant chat widget
+- [x] Ride CRUD updates (editing and deleting published rides)
 - [ ] Real-time WebSocket ride tracking
 - [ ] Rating and review system post-ride
 - [ ] Push notifications (Firebase)
