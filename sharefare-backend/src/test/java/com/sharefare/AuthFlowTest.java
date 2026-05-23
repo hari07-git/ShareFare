@@ -2,16 +2,15 @@ package com.sharefare;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sharefare.model.AuthTokenPurpose;
-import com.sharefare.model.UserRole;
 import com.sharefare.repo.AuthTokenRepository;
 import com.sharefare.repo.UserRepository;
+import com.sharefare.service.EmailService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,7 +28,7 @@ class AuthFlowTest {
   @Autowired ObjectMapper om;
   @Autowired AuthTokenRepository authTokenRepository;
   @Autowired UserRepository userRepository;
-  @MockBean JavaMailSender mailSender;
+  @MockBean EmailService emailService;
 
   @Test
   void registerThenLogin() throws Exception {
@@ -37,7 +36,9 @@ class AuthFlowTest {
         "email", "alice@example.edu",
         "password", "Password123!",
         "fullName", "Alice",
-        "role", UserRole.USER.name()
+        "phone", "9876543210",
+        "gender", "Male",
+        "collegeName", "Malla Reddy University"
     );
     mvc.perform(post("/api/auth/register")
             .contentType(MediaType.APPLICATION_JSON)
@@ -80,7 +81,9 @@ class AuthFlowTest {
         "email", "reset@example.edu",
         "password", "Password123!",
         "fullName", "Reset User",
-        "role", UserRole.USER.name()
+        "phone", "9876543211",
+        "gender", "Female",
+        "collegeName", "Malla Reddy University"
     );
     mvc.perform(post("/api/auth/register")
             .contentType(MediaType.APPLICATION_JSON)
@@ -97,7 +100,7 @@ class AuthFlowTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(om.writeValueAsString(Map.of("email", "missing@example.edu"))))
         .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.message").value("No ShareFare account found for this email. Use the same email you registered with."));
+        .andExpect(jsonPath("$.message").value("No ShareFare account found for this email."));
   }
 
   @Test
@@ -106,7 +109,9 @@ class AuthFlowTest {
         "email", "otp@example.edu",
         "password", "Password123!",
         "fullName", "Otp User",
-        "role", UserRole.USER.name()
+        "phone", "9876543212",
+        "gender", "Male",
+        "collegeName", "Malla Reddy University"
     );
     mvc.perform(post("/api/auth/register")
             .contentType(MediaType.APPLICATION_JSON)

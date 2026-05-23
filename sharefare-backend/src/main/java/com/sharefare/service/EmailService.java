@@ -1,5 +1,6 @@
 package com.sharefare.service;
 
+import com.sharefare.exception.ApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,24 +25,18 @@ public class EmailService {
   private static final String BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 
   private final String apiKey;
-  private final boolean enabled;
-  private final String fromEmail;
-  private final String fromName;
+  private final String sender;
   private final String supportEmail;
   private final String frontendBaseUrl;
   private final RestTemplate rest = new RestTemplate();
 
   public EmailService(
       @Value("${app.brevo.apiKey:}") String apiKey,
-      @Value("${app.mail.enabled:true}") boolean enabled,
-      @Value("${app.mail.fromEmail:sharefaree@gmail.com}") String fromEmail,
-      @Value("${app.mail.fromName:ShareFare}") String fromName,
+      @Value("${app.brevo.sender:ShareFare <no-reply@sharefare.local>}") String sender,
       @Value("${app.mail.supportEmail:sharefaree@gmail.com}") String supportEmail,
       @Value("${app.frontendBaseUrl:http://localhost:5173}") String frontendBaseUrl) {
     this.apiKey = apiKey;
-    this.enabled = enabled;
-    this.fromEmail = fromEmail;
-    this.fromName = fromName;
+    this.sender = sender;
     this.supportEmail = supportEmail;
     this.frontendBaseUrl = frontendBaseUrl == null || frontendBaseUrl.isBlank()
         ? "http://localhost:5173"
@@ -312,25 +307,27 @@ public class EmailService {
   // ── Core HTTP send via Brevo API ─────────────────────────────────────────
 
   private void send(String to, String subject, String textBody) {
-    if (to == null || to.isBlank()) return;
-
-    if (!enabled) {
-      log.warn("Mail disabled — skipping email to={} subject={}", to, subject);
-      return;  // silently skip, don't throw
+    if (to == null || to.isBlank()) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, "Email recipient is required.");
     }
 
+    log.info("Brevo email send requested to={} subject={} apiKeyPresent={}", to, subject, apiKey != null && !apiKey.isBlank());
+
     if (apiKey == null || apiKey.isBlank()) {
-      log.error("BREVO_API_KEY not configured — cannot send email to={}", to);
-      return;
+      log.error("BREVO_API_KEY not configured — cannot send email to={} subject={}", to, subject);
+      throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE,
+          "Email delivery is not configured. Please set BREVO_API_KEY and BREVO_SENDER.");
     }
 
     try {
+      String parsedEmail = senderEmail(sender);
+      String parsedName = senderName(sender);
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
       headers.set("api-key", apiKey);
 
       Map<String, Object> body = Map.of(
-          "sender", Map.of("name", fromName, "email", fromEmail),
+          "sender", Map.of("name", parsedName, "email", parsedEmail),
           "to", List.of(Map.of("email", to)),
           "subject", subject,
           "textContent", textBody
@@ -340,14 +337,20 @@ public class EmailService {
       ResponseEntity<String> response = rest.postForEntity(BREVO_API_URL, request, String.class);
 
       if (response.getStatusCode().is2xxSuccessful()) {
-        log.info("✅ Email sent via Brevo to={} subject={}", to, subject);
-      } else {
-        log.error("Brevo rejected email to={} status={} body={}", to,
-            response.getStatusCode(), response.getBody());
+        log.info("Email sent successfully via Brevo to={} subject={}", to, subject);
+        return;
       }
+      log.error("Brevo rejected email to={} status={} body={}", to,
+          response.getStatusCode(), response.getBody());
+      throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE,
+          "Email delivery failed. Brevo rejected the message.");
     } catch (Exception ex) {
-      log.error("Failed to send email via Brevo to={} subject={}: {}", to, subject, ex.getMessage());
-      // Don't throw — email failure should NOT block the main operation
+      if (ex instanceof ApiException apiException) {
+        throw apiException;
+      }
+      log.error("Failed to send email via Brevo to={} subject={}", to, subject, ex);
+      throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE,
+          "Email delivery failed. Please check Brevo configuration and backend logs.");
     }
   }
 
@@ -361,5 +364,24 @@ public class EmailService {
 
   private static String safe(String s) {
     return s == null ? "" : s;
+  }
+
+  private static String senderEmail(String sender) {
+    String value = safe(sender).trim();
+    int start = value.indexOf('<');
+    int end = value.indexOf('>');
+    if (start >= 0 && end > start) {
+      return value.substring(start + 1, end).trim();
+    }
+    return value;
+  }
+
+  private static String senderName(String sender) {
+    String value = safe(sender).trim();
+    int start = value.indexOf('<');
+    if (start > 0) {
+      return value.substring(0, start).trim();
+    }
+    return "ShareFare";
   }
 }

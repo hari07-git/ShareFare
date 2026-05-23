@@ -37,7 +37,6 @@ public class AuthService {
   private final JwtService jwtService;
   private final EmailService emailService;
   private final String frontendBaseUrl;
-  private final boolean mailEnabled;
 
   public AuthService(UserRepository userRepository,
                      AuthTokenRepository authTokenRepository,
@@ -45,8 +44,7 @@ public class AuthService {
                      AuthenticationManager authenticationManager,
                      JwtService jwtService,
                      EmailService emailService,
-                     @Value("${app.frontendBaseUrl:http://localhost:5173}") String frontendBaseUrl,
-                     @Value("${app.mail.enabled:true}") boolean mailEnabled) {
+                     @Value("${app.frontendBaseUrl:http://localhost:5173}") String frontendBaseUrl) {
     this.userRepository = userRepository;
     this.authTokenRepository = authTokenRepository;
     this.passwordEncoder = passwordEncoder;
@@ -56,7 +54,6 @@ public class AuthService {
     this.frontendBaseUrl = frontendBaseUrl == null || frontendBaseUrl.isBlank()
         ? "http://localhost:5173"
         : frontendBaseUrl.replaceAll("/+$", "");
-    this.mailEnabled = mailEnabled;
   }
 
   @Transactional
@@ -81,39 +78,17 @@ public class AuthService {
       user.setAccountStatus(com.sharefare.model.AccountStatus.VERIFIED_STUDENT);
       user.setVerificationStatus("ADMIN_VERIFIED");
     } else {
-      user.setEmailVerified(!mailEnabled);  // auto-verify when mail is disabled
+      user.setEmailVerified(false);
     }
     user.setPasswordHash(passwordEncoder.encode(request.password()));
     userRepository.save(user);
 
-    if (!mailEnabled) {
-      // Mail disabled — create OTP token and return it directly in the response
-      String otp = createOtpToken(user, java.time.Instant.now().plusSeconds(30 * 60));
-      return new RegisterResponse(
-          "Account created! Use the OTP shown below to verify your account.",
-          otp,
-          false
-      );
-    }
-
-    try {
-      sendVerification(user);
-      return new RegisterResponse(
-          "Account created! We sent a 6-digit OTP to your email.",
-          null,
-          false
-      );
-    } catch (Exception e) {
-      // SMTP blocked — auto-verify and inform user they can login directly
-      user.setEmailVerified(true);
-      userRepository.save(user);
-      System.err.println("⚠️ Email send failed, auto-verified: " + e.getMessage());
-      return new RegisterResponse(
-          "Account created! You can log in directly — email verification skipped.",
-          null,
-          true
-      );
-    }
+    sendVerification(user);
+    return new RegisterResponse(
+        "Account created! We sent a 6-digit OTP to your email.",
+        null,
+        false
+    );
   }
 
   @Transactional
@@ -137,16 +112,8 @@ public class AuthService {
     var user = userRepository.findByEmailIgnoreCase(request.email())
         .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "User not found"));
     if (!user.isEmailVerified()) {
-      if (!mailEnabled) {
-        // Mail is disabled — auto-verify so user can log in immediately
-        user.setEmailVerified(true);
-        userRepository.save(user);
-      } else {
-        try {
-          sendVerification(user);
-        } catch (Exception ignored) { }
-        throw new ApiException(HttpStatus.FORBIDDEN, "Please verify your email with the OTP we sent to your Gmail.");
-      }
+      sendVerification(user);
+      throw new ApiException(HttpStatus.FORBIDDEN, "Please verify your email with the OTP we sent to your email.");
     }
     return new LoginResponse(jwtService.issueToken(user.getEmail().toLowerCase()));
   }
@@ -196,28 +163,23 @@ public class AuthService {
     User user = userRepository.findByEmailIgnoreCase(email)
         .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
             "No ShareFare account found for this email."));
-    // Always use OTP-based reset (works without email too)
-    String otp = createOtpToken(user, Instant.now().plusSeconds(30 * 60));
-    if (!mailEnabled) {
-      return new ForgotPasswordResponse(
-          "Account found! Use the OTP shown below to reset your password.",
-          otp
-      );
-    }
-    try {
-      emailService.sendPasswordReset(user.getEmail(), user.getFullName(),
-          frontendBaseUrl + "/auth/reset-password?token=" + otp);
-      return new ForgotPasswordResponse(
-          "Reset OTP sent to your email. Check your inbox.",
-          null
-      );
-    } catch (Exception e) {
-      System.err.println("⚠️ Reset email failed: " + e.getMessage());
-      return new ForgotPasswordResponse(
-          "Email unavailable. Use the OTP shown below to reset your password.",
-          otp
-      );
-    }
+    String token = createToken(user, AuthTokenPurpose.PASSWORD_RESET, Instant.now().plusSeconds(30 * 60));
+    emailService.sendPasswordReset(user.getEmail(), user.getFullName(),
+        frontendBaseUrl + "/auth/reset-password?token=" + token);
+    return new ForgotPasswordResponse(
+        "Password reset email sent. Check your inbox and spam.",
+        null
+    );
+  }
+
+  @Transactional
+  public void resetPassword(String token, String newPassword) {
+    var authToken = validToken(token, AuthTokenPurpose.PASSWORD_RESET);
+    User user = authToken.getUser();
+    user.setPasswordHash(passwordEncoder.encode(newPassword));
+    authToken.setUsed(true);
+    userRepository.save(user);
+    authTokenRepository.save(authToken);
   }
 
   @Transactional

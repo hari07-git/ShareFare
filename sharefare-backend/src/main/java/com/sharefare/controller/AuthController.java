@@ -82,7 +82,7 @@ public class AuthController {
 
   @PostMapping("/reset-password")
   public ResponseEntity<MessageResponse> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
-    authService.resetPasswordByOtp("", request.token(), request.password());
+    authService.resetPassword(request.token(), request.password());
     return ResponseEntity.ok(new MessageResponse("Password updated. You can now login."));
   }
 }

@@ -31,13 +31,13 @@ public class AuthDtos {
 
   public record RegisterResponse(
       String message,
-      String otp,          // non-null only when MAIL_ENABLED=false
+      String otp,
       boolean emailVerified
   ) {}
 
   public record ForgotPasswordResponse(
       String message,
-      String otp           // non-null only when MAIL_ENABLED=false
+      String otp
   ) {}
 
   public record EmailRequest(

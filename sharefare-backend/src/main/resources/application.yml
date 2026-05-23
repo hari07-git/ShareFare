@@ -17,7 +17,6 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC
-        dialect: ${DB_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
     open-in-view: false
   servlet:
     multipart:
@@ -27,17 +26,6 @@ spring:
     console:
       enabled: true
       path: /h2-console
-  mail:
-    host: ${SPRING_MAIL_HOST:${SMTP_HOST:${MAIL_HOST:}}}
-    port: ${SPRING_MAIL_PORT:${SMTP_PORT:${MAIL_PORT:587}}}
-    username: ${SPRING_MAIL_USERNAME:${SMTP_USERNAME:${MAIL_USERNAME:}}}
-    password: ${SPRING_MAIL_PASSWORD:${SMTP_PASSWORD:${MAIL_PASSWORD:}}}
-    properties:
-      mail:
-        smtp:
-          auth: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH:${SMTP_AUTH:${MAIL_SMTP_AUTH:true}}}
-          starttls:
-            enable: ${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE:${SMTP_STARTTLS:${MAIL_SMTP_STARTTLS_ENABLE:true}}}
 
 app:
   jwt:
@@ -51,10 +39,8 @@ app:
     rides: ${SAMPLE_DATA_RIDES:9}
   brevo:
     apiKey: ${BREVO_API_KEY:}
+    sender: ${BREVO_SENDER:ShareFare <no-reply@sharefare.local>}
   mail:
-    enabled: ${MAIL_ENABLED:true}
-    fromEmail: ${MAIL_FROM_EMAIL:sharefaree@gmail.com}
-    fromName: ${MAIL_FROM_NAME:ShareFare}
     supportEmail: ${MAIL_SUPPORT_EMAIL:sharefaree@gmail.com}
   frontendBaseUrl: ${FRONTEND_BASE_URL:http://localhost:5173}
   reminders:
