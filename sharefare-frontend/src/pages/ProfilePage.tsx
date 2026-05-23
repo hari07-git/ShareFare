@@ -148,6 +148,8 @@ export function ProfilePage() {
         const base64 = reader.result as string;
         localStorage.setItem(`profile_avatar_${me.id}`, base64);
         setAvatar(base64);
+        // Notify Navbar to update avatar immediately
+        window.dispatchEvent(new Event(`avatar-updated-${me.id}`));
       };
       reader.readAsDataURL(file);
     }
@@ -439,6 +441,8 @@ export function ProfilePage() {
                           if (me?.id) {
                             localStorage.removeItem(`profile_avatar_${me.id}`);
                             setAvatar(null);
+                            // Notify Navbar to clear avatar immediately
+                            window.dispatchEvent(new Event(`avatar-updated-${me.id}`));
                           }
                         }}
                         className="text-xs font-semibold text-rose-600 hover:text-rose-700"

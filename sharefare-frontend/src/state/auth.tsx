@@ -3,6 +3,7 @@ import { clearToken, getToken, setToken } from "./authStorage";
 import { api } from "../lib/api";
 
 type AuthUser = {
+  id?: number;
   email: string;
   role: string;
   fullName: string;
@@ -33,6 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const res = await api.get("/api/me");
       setMe({
+        id: res.data.id,
         email: res.data.email,
         role: res.data.role,
         fullName: res.data.fullName,

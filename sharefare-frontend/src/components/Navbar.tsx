@@ -42,7 +42,7 @@ function MobileNavItem({ to, children, onClick }: { to: string; children: React.
   );
 }
 
-function ProfileAvatar({ name, verified, size = "sm" }: { name: string; verified?: boolean; size?: "sm" | "md" }) {
+function ProfileAvatar({ name, verified, avatarUrl, size = "sm" }: { name: string; verified?: boolean; avatarUrl?: string | null; size?: "sm" | "md" }) {
   const initials = name
     .split(" ")
     .map((n) => n[0])
@@ -52,9 +52,17 @@ function ProfileAvatar({ name, verified, size = "sm" }: { name: string; verified
   const sz = size === "md" ? "h-10 w-10 text-sm" : "h-8 w-8 text-xs";
   return (
     <span className="relative inline-flex shrink-0">
-      <span className={`${sz} inline-flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 font-bold text-white ring-2 ring-white shadow-sm`}>
-        {initials}
-      </span>
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt={name}
+          className={`${sz} rounded-full object-cover ring-2 ring-white shadow-sm`}
+        />
+      ) : (
+        <span className={`${sz} inline-flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 font-bold text-white ring-2 ring-white shadow-sm`}>
+          {initials}
+        </span>
+      )}
       {verified && (
         <span className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald-500 ring-1 ring-white">
           <ShieldCheck className="h-2.5 w-2.5 text-white" strokeWidth={2.5} />
@@ -69,8 +77,31 @@ export function Navbar() {
   const navigate = useNavigate();
   const [unread, setUnread] = useState<number>(0);
   const [open, setOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   const isVerified = me?.accountStatus === "VERIFIED_STUDENT";
+
+  useEffect(() => {
+    if (me?.id) {
+      const stored = localStorage.getItem(`profile_avatar_${me.id}`);
+      setAvatarUrl(stored ?? null);
+
+      // Listen for avatar changes from ProfilePage (same tab via custom event)
+      const handleAvatarUpdate = () => {
+        const updated = localStorage.getItem(`profile_avatar_${me.id}`);
+        setAvatarUrl(updated ?? null);
+      };
+      window.addEventListener(`avatar-updated-${me.id}`, handleAvatarUpdate);
+      // Also listen for storage events from other tabs
+      window.addEventListener("storage", handleAvatarUpdate);
+      return () => {
+        window.removeEventListener(`avatar-updated-${me.id}`, handleAvatarUpdate);
+        window.removeEventListener("storage", handleAvatarUpdate);
+      };
+    } else {
+      setAvatarUrl(null);
+    }
+  }, [me?.id]);
 
   useEffect(() => {
     let cancelled = false;
@@ -144,7 +175,7 @@ export function Navbar() {
                   to="/me/profile"
                   className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700"
                 >
-                  <ProfileAvatar name={me?.fullName ?? "SF"} verified={isVerified} />
+                  <ProfileAvatar name={me?.fullName ?? "SF"} verified={isVerified} avatarUrl={avatarUrl} />
                   <span className="hidden max-w-[100px] truncate lg:block">{me?.fullName?.split(" ")[0] ?? "Profile"}</span>
                 </Link>
                 <GradientButton
@@ -187,7 +218,7 @@ export function Navbar() {
                   onClick={() => setOpen(false)}
                   className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3 mb-3"
                 >
-                  <ProfileAvatar name={me?.fullName ?? "SF"} verified={isVerified} size="md" />
+                   <ProfileAvatar name={me?.fullName ?? "SF"} verified={isVerified} avatarUrl={avatarUrl} size="md" />
                   <div>
                     <div className="text-sm font-semibold text-slate-900">{me?.fullName}</div>
                     <div className="text-xs text-slate-500">{isVerified ? "✓ Verified Student" : "Pending verification"}</div>
