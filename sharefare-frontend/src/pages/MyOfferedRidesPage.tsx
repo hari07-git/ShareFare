@@ -251,7 +251,7 @@ export function MyOfferedRidesPage() {
             </div>
             <h3 className="text-base font-bold text-slate-900">No Offered Drives Yet</h3>
             <p className="mt-1 text-sm text-slate-600 max-w-xs mx-auto">
-              Share your commute route to BITS Hyderabad campus! Save split-costs and find student travel buddies.
+              Share your commute route with campus riders! Save split-costs and find student travel buddies.
             </p>
           </div>
         ) : (

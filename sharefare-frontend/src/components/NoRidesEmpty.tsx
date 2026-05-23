@@ -6,7 +6,7 @@ export function NoRidesEmpty({ onClear }: { onClear?: () => void }) {
     <EmptyState
       icon={CarFront}
       title="No rides found"
-      description="Try nearby Hyderabad routes like Gachibowli, HITEC City, JNTU, Kukatpally, or your college name."
+      description="Try nearby routes like your college, metro station, tech parks, or residential areas."
       actionLabel={onClear ? "Clear filters" : undefined}
       onAction={onClear}
     />

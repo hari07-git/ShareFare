@@ -318,7 +318,7 @@ export function BookingRequestsPage() {
                             )}
                           </div>
                           <div className="text-xs text-slate-600 font-medium mt-1">
-                            {b.passengerCollegeName ?? "BITS Pilani Hyderabad"}
+                            {b.passengerCollegeName ?? "Campus Student"}
                           </div>
                         </div>
                       </div>
@@ -484,13 +484,13 @@ export function BookingRequestsPage() {
                     </span>
                   </div>
                   <div className="flex justify-between items-center border-b border-slate-100/50 pb-2">
-                    <span className="text-slate-600 font-medium">BITS Mail Verification</span>
+                    <span className="text-slate-600 font-medium">Campus Email Verification</span>
                     <span className="font-bold text-emerald-600">VERIFIED</span>
                   </div>
                   <div className="flex justify-between items-center border-b border-slate-100/50 pb-2">
                     <span className="text-slate-600 font-medium">College Name</span>
                     <span className="font-bold text-slate-900 truncate max-w-[240px]">
-                      {detailsBooking.passengerCollegeName ?? "BITS Pilani Hyderabad"}
+                      {detailsBooking.passengerCollegeName ?? "Verified Campus Student"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">

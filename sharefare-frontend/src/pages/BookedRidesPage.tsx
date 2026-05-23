@@ -279,7 +279,7 @@ export function BookedRidesPage() {
                             </span>
                           )}
                         </h4>
-                        <p className="text-[10px] text-slate-600 font-medium">{b.driverGender ?? "Driver"} • BITS Commuter</p>
+                        <p className="text-[10px] text-slate-600 font-medium">{b.driverGender ?? "Driver"} • Campus Commuter</p>
                       </div>
                     </div>
 

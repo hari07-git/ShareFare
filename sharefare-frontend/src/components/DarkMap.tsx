@@ -241,7 +241,7 @@ export function DarkMap({
       {/* Top-left & Top-right premium floating overlays */}
       <div className="pointer-events-none absolute left-3 top-3 flex flex-col gap-2 z-[400] select-none">
         <span className="rounded-full border border-slate-200 bg-white/95 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-700 shadow-sm backdrop-blur">
-          📍 Live Hyderabad map
+          📍 Live route map
         </span>
         {pickup && drop && (
           <span className="rounded-full border border-emerald-200/50 bg-emerald-50/95 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-800 shadow-sm backdrop-blur flex items-center gap-1.5">

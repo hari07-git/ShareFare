@@ -257,7 +257,7 @@ export function RideDetailsPage() {
               )}
             </h3>
             <div className="mt-1 flex items-center gap-2 text-xs font-semibold text-slate-500">
-              <span>BITS Hyderabad Commuter</span>
+              <span>Verified Campus Commuter</span>
               {avgRating && (
                 <span className="flex items-center gap-1">
                   • <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
@@ -269,7 +269,7 @@ export function RideDetailsPage() {
         </div>
 
         <div className="w-full sm:w-auto flex flex-col sm:items-end gap-2 border-t sm:border-t-0 border-slate-100 pt-3.5 sm:pt-0">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">BITS Trust Score</span>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Campus Trust Score</span>
           <div className="flex items-center gap-2">
             <div className="h-1.5 w-24 overflow-hidden rounded-full bg-slate-100">
               <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500" style={{ width: `${trustScore}%` }} />
@@ -381,7 +381,7 @@ export function RideDetailsPage() {
             <div className="rounded-2xl border border-amber-100 bg-amber-50/30 p-4 flex gap-3 text-amber-900 text-xs">
               <Shield className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <span className="font-extrabold uppercase tracking-wider block text-[10px] text-amber-800">BITS Campus Commute Preferences</span>
+                <span className="font-extrabold uppercase tracking-wider block text-[10px] text-amber-800">Campus Commute Preferences</span>
                 <p className="mt-0.5 text-amber-700 leading-relaxed font-semibold">
                   This ride is subject to female passenger preference: <span className="font-extrabold text-slate-950">{ride.femalePreferred ? "Yes (Female preferred)" : "No preference"}</span>. 
                   Verified students only: <span className="font-extrabold text-slate-950">{ride.verifiedOnly ? "Yes (Strict verification)" : "All students"}</span>.
@@ -395,7 +395,7 @@ export function RideDetailsPage() {
             <div className="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <h3 className="text-sm font-black text-slate-950 uppercase tracking-wider">Student Commute Reviews</h3>
-                <p className="text-xs text-slate-500 mt-0.5">{reviews.length} reviews from BITS passengers</p>
+                <p className="text-xs text-slate-500 mt-0.5">{reviews.length} reviews from campus passengers</p>
               </div>
               {avgRating && (
                 <div className="flex items-center gap-2">
@@ -452,12 +452,12 @@ export function RideDetailsPage() {
                     <h4 className="text-xs font-black text-slate-950 uppercase tracking-wider">Leave student feedback</h4>
                     {isDriver ? (
                       <div>
-                        <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Passenger BITS Email</label>
+                        <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Passenger Email</label>
                         <input
                           type="email"
                           value={revieweeEmail}
                           onChange={(e) => setRevieweeEmail(e.target.value)}
-                          placeholder="BITS student email..."
+                          placeholder="Passenger email address..."
                           className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-xs outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10"
                         />
                       </div>
@@ -568,7 +568,7 @@ export function RideDetailsPage() {
             <div className="space-y-2.5 border-t border-slate-100 pt-4 text-[10px] text-slate-500 font-medium">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
-                <span>BITS Hyderabad Campus Verified Route</span>
+                <span>Campus Verified Route</span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-slate-400 shrink-0" />
