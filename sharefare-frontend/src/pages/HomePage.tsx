@@ -308,7 +308,7 @@ export function HomePage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <Stat label="Total bookings" value={bookings.filter((b) => b.status !== "CANCELLED").length} icon={Calendar} tone="indigo" />
-        <Stat label="Unread notifications" value={unreadCount} icon={Users} tone="blue" />
+        <Stat label="Offered drives" value={driverRides.length} icon={Car} tone="blue" />
         <Stat label="Rating" value={"4.9"} icon={Star} tone="amber" />
         <Stat label="CO₂ saved" value={"85kg"} icon={Leaf} tone="green" />
       </div>
@@ -471,29 +471,7 @@ export function HomePage() {
             )}
           </Card>
 
-          <Card title="Recent notifications" subtitle="Ride updates and booking alerts">
-            {notifs.length === 0 ? (
-              <div className="text-sm text-slate-600">No notifications yet.</div>
-            ) : (
-              <div className="space-y-3">
-                {notifs.slice(0, 6).map((n) => (
-                  <div
-                    key={n.id}
-                    onClick={() => void handleNotificationClick(n)}
-                    className={`rounded-2xl border p-4 transition cursor-pointer hover:bg-slate-50/60 ${
-                      n.read ? "border-slate-200 bg-white hover:border-slate-300" : "border-indigo-200 bg-indigo-50/30 hover:border-indigo-300"
-                    }`}
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="text-sm font-semibold text-slate-950">{n.title}</div>
-                      <div className="text-xs text-slate-500">{new Date(n.createdAt).toLocaleString()}</div>
-                    </div>
-                    <div className="mt-2 text-sm text-slate-600 line-clamp-2">{n.message}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
+
 
           <Card title="My Drives" subtitle="Manage rides you offered">
               <div className="flex flex-wrap items-center gap-2">
