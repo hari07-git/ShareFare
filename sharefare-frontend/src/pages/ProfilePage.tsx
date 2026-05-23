@@ -11,7 +11,7 @@ import {
   Shield, ShieldCheck, Star, Clock, Users, Leaf, BadgeCheck,
   Edit3, Bell, Lock, Eye, Phone, ChevronRight, HeartHandshake,
   Music, Wind, Dog, Cigarette, MapPin, Zap, Award, Activity,
-  User, CheckCircle2, AlertCircle, Camera, Upload
+  User, CheckCircle2, AlertCircle, Camera, Upload, BadgeIndianRupee
 } from "lucide-react";
 
 type Me = {
@@ -493,35 +493,38 @@ export function ProfilePage() {
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500">Campus Preferences</div>
               <div className="space-y-2">
-                <SettingsCard icon={MapPin} title="Saved Locations" subtitle="Home, college, metro stations" />
-                <SettingsCard icon={Zap} title="Ride Preferences" subtitle="Female only, verified students, AC" />
-                <SettingsCard icon={Users} title="Saved Riders" subtitle="People you've travelled with" />
+                <SettingsCard icon={MapPin} title="Saved Locations" subtitle="Home, college, metro stations" onClick={() => navigate("/me/settings/address")} />
+                <SettingsCard icon={Zap} title="Dark Mode" subtitle="Switch themes or preview app layouts" onClick={() => navigate("/me/settings/dark-mode")} />
+                <SettingsCard icon={Users} title="Saved Riders" subtitle="People you've travelled with" onClick={() => navigate("/me/settings/saved-passengers")} />
               </div>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500">Safety Settings</div>
               <div className="space-y-2">
-                <SettingsCard icon={HeartHandshake} title="Emergency Contacts" subtitle="Contacts notified during SOS" />
-                <SettingsCard icon={Eye} title="Privacy Controls" subtitle="Who can see your profile & phone" />
-                <SettingsCard icon={Shield} title="Blocked Users" subtitle="Manage your block list" />
+                <SettingsCard icon={HeartHandshake} title="Emergency Contacts" subtitle="Contacts notified during SOS" onClick={() => {
+                  const el = document.getElementById("emergency-contacts-section");
+                  if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+                }} />
+                <SettingsCard icon={Star} title="Ratings & Reviews" subtitle="Review your community standing and stars" onClick={() => navigate("/me/settings/ratings")} />
+                <SettingsCard icon={ShieldCheck} title="Data Protection" subtitle="How we handle your campus files securely" onClick={() => navigate("/data-protection")} />
               </div>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500">Account Security</div>
               <div className="space-y-2">
-                <SettingsCard icon={Lock} title="Change Password" subtitle="Update your login credentials" />
-                <SettingsCard icon={Phone} title="Phone Number" subtitle={me?.phone ?? "Not added yet"} />
-                <SettingsCard icon={Bell} title="Notification Controls" subtitle="Booking alerts, ride reminders" />
+                <SettingsCard icon={Lock} title="Change Password" subtitle="Update your login credentials" onClick={() => navigate("/me/settings/password")} />
+                <SettingsCard icon={Bell} title="Notification Controls" subtitle="Booking alerts, ride reminders" onClick={() => navigate("/me/settings/communication")} />
+                <SettingsCard icon={BadgeIndianRupee} title="Payments & Refunds" subtitle="Transactions, refunds, and bank payouts" onClick={() => navigate("/me/settings/payments")} />
               </div>
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500">Support</div>
               <div className="space-y-2">
-                <SettingsCard icon={User} title="Support Center" subtitle="Get help with rides and accounts" />
-                <SettingsCard icon={Activity} title="Report an Issue" subtitle="Report safety or technical problems" />
+                <SettingsCard icon={User} title="Support Center" subtitle="Get help with rides and accounts" onClick={() => navigate("/support")} />
+                <SettingsCard icon={Activity} title="Report an Issue" subtitle="Report safety or technical problems" onClick={() => navigate("/support")} />
               </div>
             </div>
 

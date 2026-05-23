@@ -59,17 +59,17 @@ export function Footer({ className }: { className?: string }) {
               <Link to="/terms" className="hover:text-slate-950 transition-colors">Terms of service</Link>
               <Link to="/privacy" className="hover:text-slate-950 transition-colors">Privacy policy</Link>
               <Link to="/cookies" className="hover:text-slate-950 transition-colors">Cookie policy</Link>
+              <Link to="/data-protection" className="hover:text-slate-950 transition-colors">Data protection</Link>
             </div>
           </div>
 
           <div>
             <div className="text-sm font-semibold text-slate-950">Support</div>
-            <div className="mt-4 text-sm text-slate-600">
-              <div>
-                Email: <span className="text-slate-950">sharefaree@gmail.com</span>
-              </div>
-              <div className="mt-2 opacity-80">
-                For booking and ride help, reach out any time.
+            <div className="mt-4 grid gap-2 text-sm text-slate-600">
+              <Link to="/support" className="hover:text-slate-950 transition-colors">Help Center & FAQ</Link>
+              <Link to="/rate-app" className="hover:text-slate-950 transition-colors">Rate the App</Link>
+              <div className="text-xs text-slate-500 pt-2 border-t border-slate-100 mt-1">
+                Email: <span className="text-slate-950 font-medium">sharefaree@gmail.com</span>
               </div>
             </div>
           </div>

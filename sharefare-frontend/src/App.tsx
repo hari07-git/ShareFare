@@ -25,6 +25,16 @@ const DriverInboxPage = lazy(() => import("./pages/DriverInboxPage").then((m) =>
 const TermsPage = lazy(() => import("./pages/TermsPage").then((m) => ({ default: m.TermsPage })));
 const PrivacyPage = lazy(() => import("./pages/PrivacyPage").then((m) => ({ default: m.PrivacyPage })));
 const CookiePolicyPage = lazy(() => import("./pages/CookiePolicyPage").then((m) => ({ default: m.CookiePolicyPage })));
+const SupportPage = lazy(() => import("./pages/SupportPage").then((m) => ({ default: m.SupportPage })));
+const DataProtectionPage = lazy(() => import("./pages/DataProtectionPage").then((m) => ({ default: m.DataProtectionPage })));
+const RateAppPage = lazy(() => import("./pages/RateAppPage").then((m) => ({ default: m.RateAppPage })));
+const PasswordPage = lazy(() => import("./pages/PasswordPage").then((m) => ({ default: m.PasswordPage })));
+const AddressPage = lazy(() => import("./pages/AddressPage").then((m) => ({ default: m.AddressPage })));
+const DarkModePage = lazy(() => import("./pages/DarkModePage").then((m) => ({ default: m.DarkModePage })));
+const SavedPassengersPage = lazy(() => import("./pages/SavedPassengersPage").then((m) => ({ default: m.SavedPassengersPage })));
+const RatingsPage = lazy(() => import("./pages/RatingsPage").then((m) => ({ default: m.RatingsPage })));
+const CommunicationPreferencesPage = lazy(() => import("./pages/CommunicationPreferencesPage").then((m) => ({ default: m.CommunicationPreferencesPage })));
+const PaymentsPage = lazy(() => import("./pages/PaymentsPage").then((m) => ({ default: m.PaymentsPage })));
 
 function PageLoader() {
   return (
@@ -62,6 +72,9 @@ export default function App() {
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/cookies" element={<CookiePolicyPage />} />
+          <Route path="/support" element={<SupportPage />} />
+          <Route path="/data-protection" element={<DataProtectionPage />} />
+          <Route path="/rate-app" element={<RateAppPage />} />
 
           <Route path="/rides/find" element={<FindRidePage />} />
           <Route path="/rides/:rideId" element={<RideDetailsPage />} />
@@ -87,6 +100,62 @@ export default function App() {
             element={
               <RequireAuth>
                 <ProfilePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/me/settings/password"
+            element={
+              <RequireAuth>
+                <PasswordPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/me/settings/address"
+            element={
+              <RequireAuth>
+                <AddressPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/me/settings/dark-mode"
+            element={
+              <RequireAuth>
+                <DarkModePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/me/settings/saved-passengers"
+            element={
+              <RequireAuth>
+                <SavedPassengersPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/me/settings/ratings"
+            element={
+              <RequireAuth>
+                <RatingsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/me/settings/communication"
+            element={
+              <RequireAuth>
+                <CommunicationPreferencesPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/me/settings/payments"
+            element={
+              <RequireAuth>
+                <PaymentsPage />
               </RequireAuth>
             }
           />
