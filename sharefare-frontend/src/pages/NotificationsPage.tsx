@@ -77,28 +77,50 @@ export function NotificationsPage() {
       }
     }
 
-    const rideMatch = n.message.match(/ride #(\d+)/i);
+    // Extract ride ID from message — matches "ride #1", "ride#1", "ride 1"
+    const rideMatch = n.message.match(/ride\s*#?\s*(\d+)/i);
     const rideId = rideMatch ? rideMatch[1] : null;
-
-    let targetUrl = "/home";
 
     const title = n.title.toLowerCase();
     const msg = n.message.toLowerCase();
     const type = n.type.toLowerCase();
 
+    let targetUrl = "/home";
+
     if (
-      title.includes("new booking request") ||
-      title.includes("booking cancelled") ||
+      // Driver-side: someone requested to join their ride → go to that specific ride's details
       msg.includes("requested to join your ride") ||
-      msg.includes("cancelled booking") ||
-      msg.includes("passenger pickup")
+      msg.includes("cancelled booking")
     ) {
-      targetUrl = rideId ? `/me/driver/inbox?rideId=${rideId}` : "/me/driver/inbox";
-    } else if (type === "booking" || type === "ride" || title.includes("booking") || title.includes("ride")) {
-      targetUrl = "/me/bookings";
-    } else if (type === "message" || title.includes("message") || title.includes("new message")) {
-      targetUrl = "/me/bookings";
-    } else if (type === "system" || type === "verification" || title.includes("verif") || title.includes("approved")) {
+      // Go directly to the specific ride page if we have the ID
+      targetUrl = rideId ? `/rides/${rideId}` : "/ride-requests";
+    } else if (
+      // Passenger-side: their booking was accepted/rejected → go to my bookings
+      msg.includes("your booking") ||
+      msg.includes("your request") ||
+      title.includes("booking accepted") ||
+      title.includes("booking rejected") ||
+      title.includes("booking confirmed")
+    ) {
+      targetUrl = rideId ? `/rides/${rideId}` : "/my-bookings";
+    } else if (
+      // Generic booking notifications with ride ID → go to ride page
+      (type.includes("booking") || title.includes("booking")) && rideId
+    ) {
+      targetUrl = `/rides/${rideId}`;
+    } else if (type.includes("booking") || title.includes("booking")) {
+      targetUrl = "/my-bookings";
+    } else if (
+      // Ride reminder / departure → go to specific ride
+      type.includes("ride") || title.includes("ride") || title.includes("reminder") || title.includes("departure")
+    ) {
+      targetUrl = rideId ? `/rides/${rideId}` : "/rides/find";
+    } else if (
+      // Chat messages → navigate to ride page if we know which ride
+      type.includes("message") || title.includes("message")
+    ) {
+      targetUrl = rideId ? `/rides/${rideId}` : "/my-bookings";
+    } else if (type.includes("system") || type.includes("verif") || title.includes("verif") || title.includes("approved")) {
       targetUrl = "/me/profile";
     }
 
@@ -232,6 +254,8 @@ export function NotificationsPage() {
           <AnimatePresence>
             {visible.map((n, idx) => {
               const { icon: Icon, color } = notifIcon(n.type);
+              const rideMatch = n.message.match(/ride\s*#?\s*(\d+)/i);
+              const rideId = rideMatch ? rideMatch[1] : null;
               return (
                 <motion.div
                   key={n.id}
@@ -257,24 +281,32 @@ export function NotificationsPage() {
                         <span className="shrink-0 text-xs text-slate-400">{relativeTime(n.createdAt)}</span>
                       </div>
                       <div className="mt-1 text-sm text-slate-600 leading-relaxed">{n.message}</div>
-                      {!n.read && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            void markRead(n.id);
-                          }}
-                          disabled={busyId === n.id}
-                          className="mt-2 flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition"
-                        >
-                          <CheckCircle2 className="h-3.5 w-3.5" />
-                          {busyId === n.id ? "Marking..." : "Mark as read"}
-                        </button>
-                      )}
+                      <div className="mt-2 flex items-center gap-3">
+                        {!n.read && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              void markRead(n.id);
+                            }}
+                            disabled={busyId === n.id}
+                            className="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition"
+                          >
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            {busyId === n.id ? "Marking..." : "Mark as read"}
+                          </button>
+                        )}
+                        {rideId && (
+                          <span className="flex items-center gap-1 text-xs font-semibold text-indigo-500 group-hover:text-indigo-700 transition">
+                            View ride #{rideId} <ChevronRight className="h-3 w-3" />
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </motion.div>
               );
             })}
+
           </AnimatePresence>
         </div>
       )}
