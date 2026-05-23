@@ -22,12 +22,22 @@ public class ProfileDtos {
       String gender,
       Double safetyScore,
       Integer totalCompletedRides,
-      Double cancellationRate
+      Double cancellationRate,
+      String collegeName,
+      String bio,
+      String genderPreference,
+      String emergencyContact,
+      String dailyCommuteRoutes
   ) {}
 
   public record UpdateMeRequest(
       @NotBlank String fullName,
       String phone,
-      String collegeId
+      String collegeId,
+      String collegeName,
+      String bio,
+      String genderPreference,
+      String emergencyContact,
+      String dailyCommuteRoutes
   ) {}
 }

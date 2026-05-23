@@ -85,6 +85,7 @@ public class RideService {
             r.getId(), r.getOrigin(), r.getDestination(), r.getDepartureTime(),
             r.getSeatsAvailable(), r.getPricePerSeat(),
             r.getDriver().getFullName(), r.getDriver().getGender(), r.getDriver().getTrustScore(),
+            r.getDriver().getCollegeName(),
             r.isFemalePreferred(), r.isVerifiedOnly(), r.getSafetyLevel()
         ));
   }
@@ -153,6 +154,7 @@ public class RideService {
         r.getPickupNote(),
         r.getDriver().getGender(),
         r.getDriver().getTrustScore(),
+        r.getDriver().getCollegeName(),
         r.isFemalePreferred(),
         r.isVerifiedOnly(),
         r.getSafetyLevel()

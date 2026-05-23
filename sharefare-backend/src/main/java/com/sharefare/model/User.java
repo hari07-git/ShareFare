@@ -29,7 +29,7 @@ public class User {
   @Column(nullable = false, length = 24)
   private UserRole role = UserRole.USER;
 
-  @Column(length = 30)
+  @Column(unique = true, length = 30)
   private String phone;
 
   @Column(length = 64)
@@ -81,6 +81,18 @@ public class User {
 
   @Column(length = 200)
   private String collegeName;
+
+  @Column(length = 1000)
+  private String bio;
+
+  @Column(length = 50)
+  private String genderPreference;
+
+  @Column(length = 30)
+  private String emergencyContact;
+
+  @Column(length = 500)
+  private String dailyCommuteRoutes;
 
   private Instant verifiedAt;
 
@@ -262,4 +274,16 @@ public class User {
 
   public Double getCancellationRate() { return cancellationRate; }
   public void setCancellationRate(Double cancellationRate) { this.cancellationRate = cancellationRate; }
+
+  public String getBio() { return bio; }
+  public void setBio(String bio) { this.bio = bio; }
+
+  public String getGenderPreference() { return genderPreference; }
+  public void setGenderPreference(String genderPreference) { this.genderPreference = genderPreference; }
+
+  public String getEmergencyContact() { return emergencyContact; }
+  public void setEmergencyContact(String emergencyContact) { this.emergencyContact = emergencyContact; }
+
+  public String getDailyCommuteRoutes() { return dailyCommuteRoutes; }
+  public void setDailyCommuteRoutes(String dailyCommuteRoutes) { this.dailyCommuteRoutes = dailyCommuteRoutes; }
 }

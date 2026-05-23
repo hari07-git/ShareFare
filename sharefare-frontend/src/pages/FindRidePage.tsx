@@ -23,6 +23,7 @@ type Ride = {
   driverName: string;
   driverGender: string;
   driverTrustScore: number;
+  driverCollegeName?: string | null;
   femalePreferred: boolean;
   verifiedOnly: boolean;
   safetyLevel: string | null;
@@ -310,6 +311,11 @@ export function FindRidePage() {
                             <span className="text-xs font-bold text-slate-900 truncate">{ride.driverName.split(" ")[0]}</span>
                             {ride.driverGender === 'FEMALE' && <span className="inline-flex items-center rounded bg-purple-50 px-1 py-0.2 text-[8px] font-bold text-purple-700 ring-1 ring-inset ring-purple-700/10">Female</span>}
                             {ride.driverTrustScore > 5 && <span className="inline-flex items-center rounded bg-emerald-50 px-1 py-0.2 text-[8px] font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Trusted</span>}
+                            {ride.driverCollegeName && (
+                              <span className="inline-flex items-center rounded bg-blue-50 px-1 py-0.2 text-[8px] font-bold text-blue-700 ring-1 ring-inset ring-blue-700/10" title={ride.driverCollegeName}>
+                                🎓 {ride.driverCollegeName}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>

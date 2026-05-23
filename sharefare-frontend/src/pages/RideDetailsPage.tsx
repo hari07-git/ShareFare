@@ -20,6 +20,7 @@ type Ride = {
   driverPhone: string | null;
   driverGender: string | null;
   driverTrustScore: number | null;
+  driverCollegeName: string | null;
   origin: string;
   destination: string;
   originLat: number | null;
@@ -259,6 +260,11 @@ export function RideDetailsPage() {
             </h3>
             <div className="mt-0.5 flex items-center gap-1.5 text-[10px] font-semibold text-slate-500">
               <span>Campus Commuter</span>
+              {ride.driverCollegeName && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-1.5 py-0.2 text-[8px] font-bold text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                  🎓 {ride.driverCollegeName}
+                </span>
+              )}
               {avgRating && (
                 <span className="flex items-center gap-0.5">
                   • <Star className="w-3 h-3 fill-amber-400 text-amber-400" />

@@ -11,6 +11,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   boolean existsByEmailIgnoreCase(String email);
 
+  boolean existsByPhone(String phone);
+
+  boolean existsByPhoneAndIdNot(String phone, Long id);
+
+  boolean existsByEmailIgnoreCaseAndIdNot(String email, Long id);
+
   int countByHashedRollNumberAndIdNot(String hashedRollNumber, Long id);
 
   List<User> findTop10ByOrderByIdDesc();

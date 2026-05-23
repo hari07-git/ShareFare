@@ -15,9 +15,11 @@ import com.sharefare.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -36,6 +38,16 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
     return ResponseEntity.ok(authService.login(request));
+  }
+
+  @GetMapping("/check-email")
+  public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+    return ResponseEntity.ok(authService.existsByEmail(email));
+  }
+
+  @GetMapping("/check-phone")
+  public ResponseEntity<Boolean> checkPhone(@RequestParam String phone) {
+    return ResponseEntity.ok(authService.existsByPhone(phone));
   }
 
   @PostMapping("/verify-email")

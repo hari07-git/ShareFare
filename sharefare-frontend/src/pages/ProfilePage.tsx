@@ -11,7 +11,8 @@ import {
   Shield, ShieldCheck, Star, Clock, Users, Leaf, BadgeCheck,
   Edit3, Bell, Lock, Eye, Phone, ChevronRight, HeartHandshake,
   Music, Wind, Dog, Cigarette, MapPin, Zap, Award, Activity,
-  User, CheckCircle2, AlertCircle, Camera, Upload, BadgeIndianRupee
+  User, CheckCircle2, AlertCircle, Camera, Upload, BadgeIndianRupee,
+  Search, ChevronDown
 } from "lucide-react";
 
 type Me = {
@@ -31,6 +32,11 @@ type Me = {
   safetyScore: number;
   totalCompletedRides: number;
   cancellationRate: number;
+  collegeName: string | null;
+  bio: string | null;
+  genderPreference: string | null;
+  emergencyContact: string | null;
+  dailyCommuteRoutes: string | null;
 };
 
 type Tab = "about" | "settings";
@@ -117,11 +123,136 @@ function PrefToggle({ label, icon: Icon, defaultOn = false }: { label: string; i
   );
 }
 
+const COLLEGES = [
+  "JNTU Hyderabad",
+  "University of Hyderabad",
+  "CBIT",
+  "VNR VJIET",
+  "MGIT",
+  "Vasavi College",
+  "GRIET",
+  "Malla Reddy",
+  "OU",
+  "BITS Hyderabad"
+];
+
+function CollegeSelector({
+  value,
+  onChange,
+  error
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  error?: string | null;
+}) {
+  const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
+  const [customMode, setCustomMode] = useState(Boolean(value && !COLLEGES.includes(value)));
+
+  const filtered = COLLEGES.filter(c => c.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div className="space-y-1 relative">
+      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1">
+        College / University
+      </label>
+      
+      {!customMode ? (
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setOpen(!open)}
+            className="w-full rounded-xl border border-slate-205 bg-white px-4 py-3 text-left text-sm font-semibold text-slate-950 outline-none shadow-xs hover:border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 flex justify-between items-center transition"
+          >
+            <span className={value ? "text-slate-950" : "text-slate-400 font-medium"}>
+              {value || "Select your college"}
+            </span>
+            <ChevronDown className="w-4 h-4 text-slate-500" />
+          </button>
+
+          {open && (
+            <div className="absolute z-50 w-full mt-1.5 rounded-xl border border-slate-200 bg-white shadow-xl max-h-56 overflow-y-auto p-2 space-y-1">
+              <div className="relative flex items-center mb-1">
+                <Search className="absolute left-3 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="Search college..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="w-full rounded-lg bg-slate-50 border border-slate-200 pl-9 pr-3 py-1.5 text-xs font-semibold outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              {filtered.length === 0 ? (
+                <div className="text-slate-400 text-xs text-center py-2 font-medium">No results found</div>
+              ) : (
+                filtered.map(c => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => {
+                      onChange(c);
+                      setOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition ${value === c ? "bg-indigo-50 text-indigo-700" : "text-slate-700 hover:bg-slate-50"}`}
+                  >
+                    {c}
+                  </button>
+                ))
+              )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  setCustomMode(true);
+                  onChange("");
+                  setOpen(false);
+                }}
+                className="w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-indigo-650 hover:bg-indigo-50 transition border-t border-slate-100 mt-1"
+              >
+                ✍️ Type custom college name...
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="relative">
+          <input
+            type="text"
+            required
+            placeholder="Type your college name..."
+            value={value}
+            onChange={e => onChange(e.target.value)}
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-semibold text-slate-950 outline-none shadow-xs hover:border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              setCustomMode(false);
+              onChange("");
+              setSearch("");
+            }}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-indigo-600 hover:text-indigo-700"
+          >
+            Choose from list
+          </button>
+        </div>
+      )}
+      {error && <span className="text-[10px] font-bold text-rose-600 px-1">{error}</span>}
+    </div>
+  );
+}
+
 export function ProfilePage() {
   const [me, setMe] = useState<Me | null>(null);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [collegeId, setCollegeId] = useState("");
+  const [collegeName, setCollegeName] = useState("");
+  const [bio, setBio] = useState("");
+  const [genderPreference, setGenderPreference] = useState("");
+  const [emergencyContact, setEmergencyContact] = useState("");
+  const [dailyCommuteRoutes, setDailyCommuteRoutes] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -167,6 +298,11 @@ export function ProfilePage() {
       setFullName(res.data.fullName ?? "");
       setPhone(res.data.phone ?? "");
       setCollegeId(res.data.collegeId ?? "");
+      setCollegeName(res.data.collegeName ?? "");
+      setBio(res.data.bio ?? "");
+      setGenderPreference(res.data.genderPreference ?? "");
+      setEmergencyContact(res.data.emergencyContact ?? "");
+      setDailyCommuteRoutes(res.data.dailyCommuteRoutes ?? "");
     } catch (err: any) {
       setError(err?.response?.data?.message ?? "Failed to load profile");
     }
@@ -184,6 +320,11 @@ export function ProfilePage() {
         fullName,
         phone: phone.trim() || null,
         collegeId: collegeId.trim() || null,
+        collegeName: collegeName.trim() || null,
+        bio: bio.trim() || null,
+        genderPreference: genderPreference.trim() || null,
+        emergencyContact: emergencyContact.trim() || null,
+        dailyCommuteRoutes: dailyCommuteRoutes.trim() || null,
       });
       setMe((prev) => prev ? { ...prev, ...res.data } : res.data);
       setSaveMsg("Profile saved!");
@@ -254,13 +395,18 @@ export function ProfilePage() {
                 onChange={handleAvatarChange}
               />
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 text-center sm:text-left">
               <h1 className="text-2xl font-bold tracking-tight">{me?.fullName ?? "Loading..."}</h1>
+              {me?.collegeName && (
+                <div className="mt-0.5 text-sm font-semibold text-white/90 flex items-center gap-1.5 justify-center sm:justify-start">
+                  <span>🎓</span> {me.collegeName}
+                </div>
+              )}
               <div className="mt-1 text-sm font-medium text-white/70 truncate">{me?.email}</div>
               <div className="mt-2 flex flex-wrap gap-2 justify-center sm:justify-start">
-                {isVerified && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-semibold backdrop-blur">
-                    <BadgeCheck className="h-3.5 w-3.5 text-emerald-300" /> Verified Student
+                {(isVerified || me?.verifiedStudent || me?.collegeVerified) && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-semibold backdrop-blur text-emerald-200 ring-1 ring-emerald-400/30">
+                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-300" /> Verified Campus Student
                   </span>
                 )}
                 <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-medium backdrop-blur">
@@ -335,6 +481,14 @@ export function ProfilePage() {
               <StatCard icon={Users} label="Trusted by" value="12 riders" color="bg-violet-50 text-violet-600" />
             </div>
 
+            {/* Bio Card */}
+            {me?.bio && (
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Student Bio</div>
+                <p className="text-sm font-medium text-slate-700 italic">"{me.bio}"</p>
+              </div>
+            )}
+
             {/* Trust Badges */}
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500">Trust Badges</div>
@@ -374,6 +528,32 @@ export function ProfilePage() {
               </div>
             </div>
 
+            {/* Safety Preferences & Emergency Contact */}
+            {(me?.emergencyContact || me?.genderPreference) && (
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500">Safety & Travel Rules</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {me?.genderPreference && (
+                    <div className="rounded-xl bg-slate-50 p-4 border border-slate-100">
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Co-Rider Preference</div>
+                      <div className="mt-1 text-sm font-bold text-slate-900">
+                        {me.genderPreference === "FEMALE_ONLY" ? "Female Passengers Only" : me.genderPreference === "MALE_ONLY" ? "Male Passengers Only" : "No Preference"}
+                      </div>
+                    </div>
+                  )}
+                  {me?.emergencyContact && (
+                    <div className="rounded-xl bg-slate-50 p-4 border border-slate-100">
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Emergency Contact (SOS)</div>
+                      <div className="mt-1 text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                        <Phone className="h-3.5 w-3.5 text-rose-500 animate-pulse" />
+                        {me.emergencyContact}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Travel Preferences */}
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500">Travel Preferences</div>
@@ -391,24 +571,35 @@ export function ProfilePage() {
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500">Frequent Routes</div>
               <div className="space-y-2">
+                {me?.dailyCommuteRoutes && (
+                  <div className="flex items-center gap-3 rounded-xl bg-indigo-50/40 border border-indigo-100 p-3">
+                    <MapPin className="h-4 w-4 shrink-0 text-indigo-650 animate-bounce" />
+                    <div className="flex-1 text-sm font-semibold text-slate-800">
+                      <span className="text-[9px] font-bold text-indigo-600 uppercase tracking-wide block">Daily Commute Route</span>
+                      {me.dailyCommuteRoutes}
+                    </div>
+                  </div>
+                )}
                 {[
                   { from: "IIIT Hyderabad", to: "Gachibowli", count: "12 trips" },
                   { from: "JNTU", to: "Kukatpally Metro", count: "8 trips" },
                 ].map((route) => (
                   <div key={route.from} className="flex items-center gap-3 rounded-xl bg-slate-50 p-3">
-                    <MapPin className="h-4 w-4 shrink-0 text-indigo-500" />
+                    <MapPin className="h-4 w-4 shrink-0 text-indigo-505" />
                     <div className="flex-1 text-sm font-medium text-slate-800">{route.from} → {route.to}</div>
                     <span className="text-xs text-slate-500">{route.count}</span>
                   </div>
                 ))}
-                <div className="rounded-xl border border-dashed border-slate-200 p-3 text-center text-xs text-slate-400">
-                  Routes appear after completing trips
-                </div>
+                {!me?.dailyCommuteRoutes && (
+                  <div className="rounded-xl border border-dashed border-slate-200 p-3 text-center text-xs text-slate-400">
+                    Routes appear after completing trips
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Edit Profile Form */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-500">
                 <Edit3 className="h-4 w-4" /> Edit Profile
               </div>
@@ -416,14 +607,50 @@ export function ProfilePage() {
                 <FormField label="Full name">
                   <Input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
                 </FormField>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <FormField label="Phone (optional)">
                     <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 9XXXXXXXXX" />
                   </FormField>
                   <FormField label="College ID (optional)">
-                    <Input value={collegeId} onChange={(e) => setCollegeId(e.target.value)} />
+                    <Input value={collegeId} onChange={(e) => setCollegeId(e.target.value)} placeholder="Enter College ID Number" />
                   </FormField>
                 </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <CollegeSelector value={collegeName} onChange={setCollegeName} />
+                  <FormField label="Preferred Commute Route (optional)">
+                    <Input value={dailyCommuteRoutes} onChange={(e) => setDailyCommuteRoutes(e.target.value)} placeholder="e.g. CBIT to JNTU" />
+                  </FormField>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField label="Co-Rider Preference">
+                    <select
+                      value={genderPreference}
+                      onChange={(e) => setGenderPreference(e.target.value)}
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-950 outline-none shadow-xs hover:border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition"
+                    >
+                      <option value="">No Preference</option>
+                      <option value="FEMALE_ONLY">Female Only</option>
+                      <option value="MALE_ONLY">Male Only</option>
+                    </select>
+                  </FormField>
+                  <FormField label="Emergency Contact (SOS)">
+                    <Input value={emergencyContact} onChange={(e) => setEmergencyContact(e.target.value)} placeholder="+91 9XXXXXXXXX" />
+                  </FormField>
+                </div>
+
+                <FormField label="Bio (optional)">
+                  <textarea
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="Tell other students about yourself, your commute schedule, or co-rider expectations..."
+                    rows={3}
+                    className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-semibold text-slate-950 outline-none shadow-xs hover:border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition resize-none"
+                  />
+                </FormField>
+
                 <FormField label="Profile photo">
                   <div className="flex items-center gap-4">
                     <button
@@ -452,10 +679,10 @@ export function ProfilePage() {
                     )}
                   </div>
                 </FormField>
-                {error && <div className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-700">{error}</div>}
-                {saveMsg && <div className="rounded-xl bg-emerald-50 px-4 py-2 text-sm text-emerald-700">{saveMsg}</div>}
-                <Button disabled={busy} type="submit">
-                  {busy ? "Saving..." : "Save profile"}
+                {error && <div className="rounded-xl bg-rose-50 px-4 py-2 text-sm text-rose-700 font-bold">{error}</div>}
+                {saveMsg && <div className="rounded-xl bg-emerald-50 px-4 py-2 text-sm text-emerald-700 font-bold">{saveMsg}</div>}
+                <Button disabled={busy} type="submit" className="w-full sm:w-auto px-6 py-3 font-bold bg-gradient-to-r from-blue-600 to-indigo-650 text-white shadow-md">
+                  {busy ? "Saving..." : "Save Profile"}
                 </Button>
               </form>
             </div>

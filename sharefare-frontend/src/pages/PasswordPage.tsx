@@ -20,31 +20,33 @@ export function PasswordPage() {
   const hasMinLength = newPassword.length >= 8;
   const hasNumber = /\d/.test(newPassword);
   const hasCapital = /[A-Z]/.test(newPassword);
-  const hasSpecial = /[^A-Za-z0-9]/.test(newPassword);
+  const hasLower = /[a-z]/.test(newPassword);
 
   const criteriaList = [
     { label: "At least 8 characters", met: hasMinLength },
     { label: "Contains at least 1 number", met: hasNumber },
     { label: "Contains 1 uppercase letter", met: hasCapital },
-    { label: "Contains 1 special character", met: hasSpecial }
+    { label: "Contains 1 lowercase letter", met: hasLower }
   ];
 
   const metCount = criteriaList.filter(c => c.met).length;
   const matches = newPassword === confirm && confirm.length > 0;
+  const allCriteriaMet = hasMinLength && hasNumber && hasCapital && hasLower;
+
   const strengthCls =
     metCount === 4 ? "bg-emerald-500" :
     metCount === 3 ? "bg-blue-500" :
     metCount === 2 ? "bg-amber-500" : "bg-rose-500";
 
   const strengthText =
-    metCount === 4 ? "Very Strong" :
-    metCount === 3 ? "Strong" :
-    metCount === 2 ? "Moderate" : "Weak";
+    metCount === 4 ? "Strong (Passed)" :
+    metCount === 3 ? "Good" :
+    metCount === 2 ? "Fair" : "Weak";
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (metCount < 3) {
-      toast("Please fulfill at least 3 strength criteria.", "error");
+    if (!allCriteriaMet) {
+      toast("Please fulfill all password security rules.", "error");
       return;
     }
     if (!matches) {
@@ -185,7 +187,7 @@ export function PasswordPage() {
             )}
           </div>
 
-          <GradientButton type="submit" disabled={busy || !matches || metCount < 2} className="w-full">
+          <GradientButton type="submit" disabled={busy || !matches || !allCriteriaMet} className="w-full">
             {busy ? "Saving new credentials..." : "Update Password"}
           </GradientButton>
         </form>

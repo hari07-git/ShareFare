@@ -1,17 +1,184 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
-import { FormField } from "../components/FormField";
-import { Input } from "../components/Input";
-import { GradientButton } from "../components/GradientButton";
 import { AuthShell } from "../components/AuthShell";
-import { Lock, Mail, Phone, User, Copy, CheckCircle2, ArrowRight } from "lucide-react";
+import { Lock, Mail, Phone, User, Copy, CheckCircle2, ArrowRight, Eye, EyeOff, Search, ChevronDown } from "lucide-react";
 
 type RegisterResponse = {
   message: string;
   otp: string | null;        // non-null only when MAIL_ENABLED=false (dev/fallback)
   emailVerified: boolean;
 };
+
+const COLLEGES = [
+  "JNTU Hyderabad",
+  "University of Hyderabad",
+  "CBIT",
+  "VNR VJIET",
+  "MGIT",
+  "Vasavi College",
+  "GRIET",
+  "Malla Reddy",
+  "OU",
+  "BITS Hyderabad"
+];
+
+function FloatingInput({
+  label,
+  icon: Icon,
+  type = "text",
+  value,
+  onChange,
+  onBlur,
+  error,
+  required = false,
+  rightElement
+}: {
+  label: string;
+  icon: any;
+  type?: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  error?: string | null;
+  required?: boolean;
+  rightElement?: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1">
+      <div className="relative rounded-xl border border-slate-200 bg-white shadow-xs focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all duration-200">
+        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+          <Icon className="h-4.5 w-4.5" />
+        </span>
+        <input
+          type={type}
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
+          required={required}
+          placeholder=" "
+          className="peer w-full rounded-xl bg-transparent pl-11 pr-10 pt-5 pb-2 text-sm font-semibold text-slate-950 outline-none"
+        />
+        <label className="pointer-events-none absolute left-11 top-3.5 -translate-y-1/2 text-[10px] font-bold text-indigo-550 uppercase tracking-wider transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-sm peer-placeholder-shown:font-medium peer-placeholder-shown:text-slate-400 peer-placeholder-shown:normal-case peer-placeholder-shown:tracking-normal peer-focus:top-3.5 peer-focus:text-[10px] peer-focus:font-bold peer-focus:text-indigo-650 peer-focus:uppercase peer-focus:tracking-wider">
+          {label}
+        </label>
+        {rightElement && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center">
+            {rightElement}
+          </div>
+        )}
+      </div>
+      {error && <span className="text-[10px] font-bold text-rose-600 px-1">{error}</span>}
+    </div>
+  );
+}
+
+function CollegeSelector({
+  value,
+  onChange,
+  error
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  error?: string | null;
+}) {
+  const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
+  const [customMode, setCustomMode] = useState(false);
+
+  const filtered = COLLEGES.filter(c => c.toLowerCase().includes(search.toLowerCase()));
+
+  return (
+    <div className="space-y-1 relative">
+      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1">
+        College / University
+      </label>
+      
+      {!customMode ? (
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setOpen(!open)}
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-left text-sm font-semibold text-slate-950 outline-none shadow-xs hover:border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 flex justify-between items-center transition"
+          >
+            <span className={value ? "text-slate-950" : "text-slate-400 font-medium"}>
+              {value || "Select your college"}
+            </span>
+            <ChevronDown className="w-4 h-4 text-slate-500" />
+          </button>
+
+          {open && (
+            <div className="absolute z-50 w-full mt-1.5 rounded-xl border border-slate-200 bg-white shadow-xl max-h-56 overflow-y-auto p-2 space-y-1">
+              <div className="relative flex items-center mb-1">
+                <Search className="absolute left-3 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="Search college..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="w-full rounded-lg bg-slate-50 border border-slate-200 pl-9 pr-3 py-1.5 text-xs font-semibold outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              {filtered.length === 0 ? (
+                <div className="text-slate-400 text-xs text-center py-2 font-medium">No results found</div>
+              ) : (
+                filtered.map(c => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => {
+                      onChange(c);
+                      setOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition ${value === c ? "bg-indigo-50 text-indigo-700" : "text-slate-700 hover:bg-slate-50"}`}
+                  >
+                    {c}
+                  </button>
+                ))
+              )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  setCustomMode(true);
+                  onChange("");
+                  setOpen(false);
+                }}
+                className="w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-indigo-650 hover:bg-indigo-50 transition border-t border-slate-100 mt-1"
+              >
+                ✍️ Type custom college name...
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="relative">
+          <input
+            type="text"
+            required
+            placeholder="Type your college name..."
+            value={value}
+            onChange={e => onChange(e.target.value)}
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-semibold text-slate-950 outline-none shadow-xs hover:border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              setCustomMode(false);
+              onChange("");
+              setSearch("");
+            }}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-indigo-600 hover:text-indigo-700"
+          >
+            Choose from list
+          </button>
+        </div>
+      )}
+      {error && <span className="text-[10px] font-bold text-rose-600 px-1">{error}</span>}
+    </div>
+  );
+}
 
 export function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -24,15 +191,75 @@ export function RegisterPage() {
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<RegisterResponse | null>(null);
   const [copied, setCopied] = useState(false);
+  
+  // Custom auth states
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+
   const navigate = useNavigate();
+
+  const getPasswordStrength = (pwd: string) => {
+    if (!pwd) return { score: 0, label: "None", color: "bg-slate-200 w-0" };
+    let score = 0;
+    if (pwd.length >= 8) score += 1;
+    if (/[A-Z]/.test(pwd)) score += 1;
+    if (/[a-z]/.test(pwd)) score += 1;
+    if (/\d/.test(pwd)) score += 1;
+    
+    if (score <= 1) return { score, label: "Weak", color: "bg-rose-500 w-1/4" };
+    if (score === 2) return { score, label: "Fair", color: "bg-amber-500 w-2/4" };
+    if (score === 3) return { score, label: "Good", color: "bg-blue-500 w-3/4" };
+    return { score, label: "Strong", color: "bg-emerald-500 w-full" };
+  };
+
+  const strength = getPasswordStrength(password);
+
+  const checkEmailDuplicate = async () => {
+    if (!email || !email.includes("@")) return;
+    try {
+      const res = await api.get<boolean>(`/api/auth/check-email?email=${encodeURIComponent(email)}`);
+      if (res.data) {
+        setEmailError("An account already exists with this email.");
+      } else {
+        setEmailError(null);
+      }
+    } catch {
+      // Fail silently in case of network issues
+    }
+  };
+
+  const checkPhoneDuplicate = async () => {
+    const cleanPhone = phone.trim();
+    if (!cleanPhone || cleanPhone.length < 10) return;
+    try {
+      const res = await api.get<boolean>(`/api/auth/check-phone?phone=${encodeURIComponent(cleanPhone)}`);
+      if (res.data) {
+        setPhoneError("Mobile number already linked to another account.");
+      } else {
+        setPhoneError(null);
+      }
+    } catch {
+      // Fail silently
+    }
+  };
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (emailError || phoneError) {
+      setError("Please fix the validation errors before submitting.");
+      return;
+    }
+    if (!gender) { setError("Please select your gender"); return; }
+    if (!collegeName) { setError("Please select your college"); return; }
+    if (strength.score < 4) {
+      setError("Password must satisfy all security rules.");
+      return;
+    }
+    
     setBusy(true);
     try {
-      if (!gender) { setError("Please select your gender"); setBusy(false); return; }
-      if (!collegeName) { setError("Please select your college"); setBusy(false); return; }
       const res = await api.post<RegisterResponse>("/api/auth/register", {
         email, password, fullName,
         phone: phone.trim() || null,
@@ -120,10 +347,10 @@ export function RegisterPage() {
           )}
 
           <div className="flex flex-col gap-3">
-            <GradientButton type="button" className="w-full"
+            <button type="button" className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm py-3 transition shadow-md flex items-center justify-center gap-1.5"
               onClick={() => navigate(`/auth/verify-otp?email=${encodeURIComponent(email)}`)}>
-              Enter OTP <ArrowRight className="ml-1.5 inline h-4 w-4" />
-            </GradientButton>
+              Enter OTP <ArrowRight className="h-4 w-4" />
+            </button>
             <Link to={`/auth/login?email=${encodeURIComponent(email)}`}
               className="block text-center text-sm font-semibold text-blue-600 hover:underline">
               Already verified? Go to Login
@@ -143,78 +370,112 @@ export function RegisterPage() {
       sideBody="Save money, meet verified campus commuters, and travel sustainably across Hyderabad. Any verified student can offer or book rides — no separate driver account needed."
     >
       <form className="space-y-4" onSubmit={onSubmit}>
-        <FormField label="Full name">
-          <div className="relative">
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-              <User className="h-4 w-4" />
-            </span>
-            <Input value={fullName} onChange={(e) => setFullName(e.target.value)} className="pl-11" required />
-          </div>
-        </FormField>
-        <FormField label="Email">
-          <div className="relative">
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-              <Mail className="h-4 w-4" />
-            </span>
-            <Input value={email} onChange={(e) => setEmail(e.target.value)} className="pl-11" type="email" required />
-          </div>
-        </FormField>
-        <FormField label="Phone (recommended)">
-          <div className="relative">
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-              <Phone className="h-4 w-4" />
-            </span>
-            <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="pl-11" placeholder="+91 9XXXXXXXXX" />
-          </div>
-          <div className="mt-2 text-xs text-slate-500">Shown to riders only after booking.</div>
-        </FormField>
-        <FormField label="Gender">
-          <select value={gender} onChange={(e) => setGender(e.target.value)}
-            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-950 outline-none shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-            required>
+        <FloatingInput
+          label="Full name"
+          icon={User}
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          required
+        />
+
+        <FloatingInput
+          label="Email"
+          icon={Mail}
+          type="email"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (emailError) setEmailError(null);
+          }}
+          onBlur={checkEmailDuplicate}
+          error={emailError}
+          required
+        />
+
+        <FloatingInput
+          label="Phone (mobile)"
+          icon={Phone}
+          type="tel"
+          value={phone}
+          onChange={(e) => {
+            setPhone(e.target.value);
+            if (phoneError) setPhoneError(null);
+          }}
+          onBlur={checkPhoneDuplicate}
+          error={phoneError}
+          required
+        />
+
+        <div className="space-y-1">
+          <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1">
+            Gender
+          </label>
+          <select
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-semibold text-slate-950 outline-none shadow-xs hover:border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition"
+            required
+          >
             <option value="" disabled>Select Gender</option>
             <option value="FEMALE">Female</option>
             <option value="MALE">Male</option>
             <option value="OTHER">Other</option>
           </select>
-        </FormField>
-        <FormField label="College / University">
-          <select value={collegeName} onChange={(e) => setCollegeName(e.target.value)}
-            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-950 outline-none shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-            required>
-            <option value="" disabled>Select your College</option>
-            <option value="IIIT Hyderabad">IIIT Hyderabad</option>
-            <option value="JNTU Hyderabad">JNTU Hyderabad</option>
-            <option value="Osmania University">Osmania University</option>
-            <option value="BITS Pilani Hyderabad Campus">BITS Pilani Hyderabad Campus</option>
-            <option value="CBIT">CBIT</option>
-            <option value="VNR VJIET">VNR VJIET</option>
-            <option value="GRIET">GRIET</option>
-            <option value="Woxsen University">Woxsen University</option>
-            <option value="MLRIT">MLRIT</option>
-            <option value="Vasavi College of Engineering">Vasavi College of Engineering</option>
-            <option value="SNIST">SNIST</option>
-            <option value="Vardhaman College of Engineering">Vardhaman College of Engineering</option>
-            <option value="KMIT">KMIT</option>
-            <option value="GNITS">GNITS</option>
-            <option value="Anurag University">Anurag University</option>
-            <option value="Other Hyderabad College">Other Hyderabad College</option>
-          </select>
-        </FormField>
-        <FormField label="Password (min 8 chars)">
-          <div className="relative">
-            <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-              <Lock className="h-4 w-4" />
-            </span>
-            <Input value={password} onChange={(e) => setPassword(e.target.value)} className="pl-11" type="password" required />
+        </div>
+
+        <CollegeSelector
+          value={collegeName}
+          onChange={setCollegeName}
+        />
+
+        <FloatingInput
+          label="Password (min 8 chars)"
+          icon={Lock}
+          type={showPassword ? "text" : "password"}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          rightElement={
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="text-slate-400 hover:text-slate-600 transition p-1"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          }
+        />
+
+        {password && (
+          <div className="space-y-1.5 px-1">
+            <div className="flex justify-between items-center text-[10px] font-bold text-slate-500">
+              <span>PASSWORD STRENGTH</span>
+              <span className="uppercase tracking-wider font-extrabold">{strength.label}</span>
+            </div>
+            <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+              <div className={`h-full rounded-full transition-all duration-300 ${strength.color}`} />
+            </div>
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[9px] font-bold text-slate-400">
+              <span className={password.length >= 8 ? "text-emerald-600" : ""}>✓ Min 8 characters</span>
+              <span className={/[A-Z]/.test(password) ? "text-emerald-600" : ""}>✓ 1 uppercase letter</span>
+              <span className={/[a-z]/.test(password) ? "text-emerald-600" : ""}>✓ 1 lowercase letter</span>
+              <span className={/\d/.test(password) ? "text-emerald-600" : ""}>✓ 1 number</span>
+            </div>
           </div>
-        </FormField>
-        {error && <div className="text-sm text-rose-600">{error}</div>}
-        <GradientButton disabled={busy} type="submit" className="w-full">
+        )}
+
+        {error && <div className="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-100 p-3 rounded-xl">{error}</div>}
+
+        <button
+          disabled={busy}
+          type="submit"
+          className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-indigo-650 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-sm py-3.5 transition shadow-lg hover:shadow-indigo-500/10 active:scale-[0.98]"
+        >
           {busy ? "Creating..." : "Create account"}
-        </GradientButton>
+        </button>
       </form>
-      <div className="mt-5 text-sm text-slate-600">
+      <div className="mt-5 text-sm text-slate-600 text-center sm:text-left">
         Already have an account?{" "}
         <Link className="font-semibold text-blue-600 hover:underline" to="/auth/login">Login</Link>
       </div>

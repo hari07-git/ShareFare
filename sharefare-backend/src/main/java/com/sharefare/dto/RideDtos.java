@@ -61,6 +61,7 @@ public class RideDtos {
       String pickupNote,
       String driverGender,
       Double driverTrustScore,
+      String driverCollegeName,
       boolean femalePreferred,
       boolean verifiedOnly,
       String safetyLevel
@@ -76,6 +77,7 @@ public class RideDtos {
       String driverName,
       String driverGender,
       Double driverTrustScore,
+      String driverCollegeName,
       boolean femalePreferred,
       boolean verifiedOnly,
       String safetyLevel

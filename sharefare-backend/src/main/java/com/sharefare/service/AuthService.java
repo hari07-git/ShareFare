@@ -62,12 +62,15 @@ public class AuthService {
   @Transactional
   public RegisterResponse register(RegisterRequest request) {
     if (userRepository.existsByEmailIgnoreCase(request.email())) {
-      throw new ApiException(HttpStatus.CONFLICT, "Email already registered");
+      throw new ApiException(HttpStatus.CONFLICT, "An account already exists with this email.");
+    }
+    if (request.phone() != null && !request.phone().isBlank() && userRepository.existsByPhone(request.phone().trim())) {
+      throw new ApiException(HttpStatus.CONFLICT, "Mobile number already linked to another account.");
     }
     User user = new User();
     user.setEmail(request.email().toLowerCase());
     user.setFullName(request.fullName());
-    user.setPhone(request.phone());
+    user.setPhone(request.phone() != null ? request.phone().trim() : null);
     user.setGender(request.gender());
     user.setCollegeName(request.collegeName());
     if (request.email().equalsIgnoreCase("sharefaree@gmail.com")) {
@@ -272,6 +275,18 @@ public class AuthService {
       throw new ApiException(HttpStatus.BAD_REQUEST, "Invalid or expired link");
     }
     return authToken;
+  }
+
+  @Transactional(readOnly = true)
+  public boolean existsByEmail(String email) {
+    if (email == null || email.isBlank()) return false;
+    return userRepository.existsByEmailIgnoreCase(email.trim());
+  }
+
+  @Transactional(readOnly = true)
+  public boolean existsByPhone(String phone) {
+    if (phone == null || phone.isBlank()) return false;
+    return userRepository.existsByPhone(phone.trim());
   }
 
   private static String newToken() {
