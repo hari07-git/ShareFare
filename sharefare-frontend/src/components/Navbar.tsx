@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { api } from "../lib/api";
 import { cn } from "../lib/cn";
 import { GradientButton } from "./GradientButton";
-import { Bell, LayoutDashboard, LogIn, LogOut, MapPinned, Menu, Plus, Search, Shield, ShieldCheck, X, Users, TrendingUp } from "lucide-react";
+import { Bell, Car, LayoutDashboard, LogIn, LogOut, MapPinned, Menu, Plus, Search, Shield, ShieldCheck, X, Users, TrendingUp } from "lucide-react";
 
 function NavItem({ to, children }: { to: string; children: React.ReactNode }) {
   return (
@@ -142,6 +142,9 @@ export function Navbar() {
                 <NavItem to="/my-bookings">
                   <span className="inline-flex items-center gap-1.5"><MapPinned className="h-3.5 w-3.5" /> My Trips</span>
                 </NavItem>
+                <NavItem to="/offered-rides">
+                  <span className="inline-flex items-center gap-1.5"><Car className="h-3.5 w-3.5" /> My Drives</span>
+                </NavItem>
                 <NavLink
                   to="/me/notifications"
                   className={({ isActive }) =>
@@ -228,6 +231,7 @@ export function Navbar() {
                 <MobileNavItem to="/rides/find" onClick={() => setOpen(false)}>Find a ride</MobileNavItem>
                 <MobileNavItem to="/rides/offer" onClick={() => setOpen(false)}>Offer a ride</MobileNavItem>
                 <MobileNavItem to="/my-bookings" onClick={() => setOpen(false)}>My Trips</MobileNavItem>
+                <MobileNavItem to="/offered-rides" onClick={() => setOpen(false)}>My Drives</MobileNavItem>
                 <MobileNavItem to="/me/notifications" onClick={() => setOpen(false)}>
                   Notifications {unread > 0 && <span className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[11px] font-bold text-white">{unread}</span>}
                 </MobileNavItem>

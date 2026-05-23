@@ -2,6 +2,7 @@ package com.sharefare.controller;
 
 import com.sharefare.dto.RideDtos.CreateRideRequest;
 import com.sharefare.dto.RideDtos.RideResponse;
+import com.sharefare.dto.RideDtos.UpdateRideRequest;
 import com.sharefare.dto.RideDtos.SearchRideResponse;
 import com.sharefare.service.RideService;
 import jakarta.validation.Valid;
@@ -12,7 +13,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,6 +42,21 @@ public class RideController {
   @GetMapping("/{id}")
   public ResponseEntity<RideResponse> get(@PathVariable Long id) {
     return ResponseEntity.ok(rideService.getRide(id));
+  }
+
+  @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+  @PutMapping("/{id}")
+  public ResponseEntity<RideResponse> update(@PathVariable Long id,
+                                              @Valid @RequestBody UpdateRideRequest request,
+                                              Authentication auth) {
+    return ResponseEntity.ok(rideService.updateRide(id, request, auth.getName()));
+  }
+
+  @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> delete(@PathVariable Long id, Authentication auth) {
+    rideService.deleteRide(id, auth.getName());
+    return ResponseEntity.noContent().build();
   }
 
   @GetMapping("/search")

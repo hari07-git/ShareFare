@@ -29,6 +29,17 @@ public class RideDtos {
       boolean verifiedOnly
   ) {}
 
+  public record UpdateRideRequest(
+      OffsetDateTime departureTime,
+      @Min(1) @Max(6) Integer seatsTotal,
+      @DecimalMin("0.0") BigDecimal pricePerSeat,
+      String vehicleType,
+      String vehicleNumber,
+      String pickupNote,
+      Boolean femalePreferred,
+      Boolean verifiedOnly
+  ) {}
+
   public record RideResponse(
       Long id,
       String driverEmail,

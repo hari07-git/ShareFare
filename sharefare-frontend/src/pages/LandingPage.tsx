@@ -1,11 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
+import { api } from "../lib/api";
 import { useAuth } from "../state/auth";
 import { GradientButton } from "../components/GradientButton";
 import { LocationAutocomplete } from "../components/LocationAutocomplete";
 import { DarkMap } from "../components/DarkMap";
 import {
   ArrowRight, BadgeIndianRupee, Calendar, Clock3, MapPin,
-  Navigation, ShieldCheck, Sparkles, Star, Users, BadgeCheck, Zap
+  Navigation, ShieldCheck, Sparkles, Star, Users, BadgeCheck, Zap, Search
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PlaceResult } from "../lib/geocode";
@@ -13,10 +14,10 @@ import { distanceKm, estimateEtaMinutes } from "../lib/route";
 import { motion } from "framer-motion";
 
 const routes = [
-  { from: "IIIT Hyderabad", to: "Gachibowli", price: "₹59", seats: "3 seats", riders: "24 riders" },
-  { from: "JNTU College", to: "Kukatpally Metro", price: "₹40", seats: "2 seats", riders: "18 riders" },
-  { from: "HITEC City", to: "Financial District", price: "₹70", seats: "4 seats", riders: "31 riders" },
-  { from: "Secunderabad", to: "Ameerpet", price: "₹35", seats: "2 seats", riders: "19 riders" }
+  { from: "JNTU College", to: "HITEC City", price: "₹55", seats: "3 seats", riders: "24 riders" },
+  { from: "Gachibowli", to: "Madhapur", price: "₹45", seats: "2 seats", riders: "18 riders" },
+  { from: "Kukatpally Metro", to: "Financial District", price: "₹85", seats: "4 seats", riders: "31 riders" },
+  { from: "Secunderabad", to: "Gachibowli", price: "₹90", seats: "2 seats", riders: "19 riders" }
 ];
 
 const defaultPickup = { lat: 17.4448, lng: 78.3498 };
@@ -65,6 +66,23 @@ export function LandingPage() {
     if (date) params.set("date", date);
     navigate(`/rides/find?${params.toString()}`);
   }
+
+  const handleRouteClick = async (fromVal: string, toVal: string) => {
+    try {
+      const res = await api.get(`/api/rides/search?origin=${encodeURIComponent(fromVal)}&destination=${encodeURIComponent(toVal)}&size=5`);
+      if (res.data && res.data.content && res.data.content.length > 0) {
+        // Redirect to the first specific ride details page
+        const firstRide = res.data.content[0];
+        navigate(`/rides/${firstRide.id}`);
+      } else {
+        // Fallback to the search results page
+        navigate(`/rides/find?origin=${encodeURIComponent(fromVal)}&destination=${encodeURIComponent(toVal)}`);
+      }
+    } catch (err) {
+      console.error("Error searching for route rides:", err);
+      navigate(`/rides/find?origin=${encodeURIComponent(fromVal)}&destination=${encodeURIComponent(toVal)}`);
+    }
+  };
 
   return (
     <div className="space-y-12 overflow-hidden">
@@ -238,6 +256,7 @@ export function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08 }}
               whileHover={{ y: -4, boxShadow: "0 20px 40px -16px rgba(99,102,241,0.18)" }}
+              onClick={() => handleRouteClick(route.from, route.to)}
               className="group cursor-pointer rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all"
             >
               <div className="space-y-2 text-sm">
@@ -262,6 +281,124 @@ export function LandingPage() {
               </div>
             </motion.div>
           ))}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════
+          HOW IT WORKS SECTION
+      ═══════════════════════════════════════════════════ */}
+      <section className="py-4">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-600 shadow-sm mb-3">
+            <Sparkles className="h-3.5 w-3.5" /> How It Works
+          </div>
+          <h2 className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+            Commuting made <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">effortless</span>
+          </h2>
+          <p className="mt-3 text-sm text-slate-600 max-w-lg mx-auto">
+            Join thousands of Hyderabad college students already saving money and time with verified campus rides.
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-3">
+          {[
+            {
+              step: "01",
+              title: "Search Your Route",
+              desc: "Enter your college, metro, or destination. Instantly discover verified rides heading your way.",
+              icon: Search,
+              gradient: "from-indigo-500 to-blue-500",
+              bg: "bg-indigo-50",
+              text: "text-indigo-600"
+            },
+            {
+              step: "02",
+              title: "Book in One Click",
+              desc: "Choose your preferred driver, schedule, and price. Secure your seat with a single tap.",
+              icon: Calendar,
+              gradient: "from-violet-500 to-purple-500",
+              bg: "bg-violet-50",
+              text: "text-violet-600"
+            },
+            {
+              step: "03",
+              title: "Ride & Save Together",
+              desc: "Meet at the pickup, share the journey, split the costs. Save money and cut carbon emissions.",
+              icon: Navigation,
+              gradient: "from-emerald-500 to-teal-500",
+              bg: "bg-emerald-50",
+              text: "text-emerald-600"
+            }
+          ].map((item, idx) => (
+            <motion.div
+              key={item.step}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.12, duration: 0.5 }}
+              className="relative rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition hover:shadow-md hover:-translate-y-1"
+            >
+              <div className={`inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br ${item.gradient} text-white text-sm font-bold shadow-lg`}>
+                {item.step}
+              </div>
+              <div className={`mt-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl ${item.bg}`}>
+                <item.icon className={`h-6 w-6 ${item.text}`} />
+              </div>
+              <h3 className="mt-4 text-lg font-bold text-slate-950">{item.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{item.desc}</p>
+              {idx < 2 && (
+                <div className="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 z-10">
+                  <ArrowRight className="h-5 w-5 text-slate-300" />
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════
+          WHY CHOOSE SHAREFARE
+      ═══════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 px-8 py-14 shadow-2xl">
+        <div className="pointer-events-none absolute -right-24 top-0 h-72 w-72 rounded-full bg-indigo-500/20 blur-3xl" />
+        <div className="pointer-events-none absolute -left-16 -bottom-12 h-56 w-56 rounded-full bg-violet-500/15 blur-3xl" />
+
+        <div className="relative text-center mb-10">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/90 backdrop-blur mb-3">
+            <Star className="h-3.5 w-3.5 text-amber-300 fill-amber-300" /> Why ShareFare
+          </div>
+          <h2 className="text-2xl font-black leading-tight text-white sm:text-3xl lg:text-4xl">
+            The smart way to commute
+            <span className="bg-gradient-to-r from-indigo-300 via-violet-300 to-cyan-300 bg-clip-text text-transparent"> across campus</span>
+          </h2>
+        </div>
+
+        <div className="relative grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { icon: ShieldCheck, title: "Verified Students", desc: "Every rider is campus-verified with college ID. Ride with peers, not strangers.", iconClr: "text-emerald-400" },
+            { icon: Zap, title: "Zero Commission", desc: "We don't take a cut. Every rupee stays between riders. Fair and transparent.", iconClr: "text-amber-400" },
+            { icon: Users, title: "Community First", desc: "Built for and by Hyderabad college students. A mobility network you can trust.", iconClr: "text-blue-400" },
+            { icon: Navigation, title: "Eco-Friendly", desc: "Share rides, reduce emissions. Every carpool saves an average of 2.3kg CO₂.", iconClr: "text-emerald-400" }
+          ].map((f, idx) => (
+            <motion.div
+              key={f.title}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1, duration: 0.4 }}
+              className="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur transition hover:bg-white/15"
+            >
+              <f.icon className={`h-6 w-6 ${f.iconClr}`} />
+              <h3 className="mt-3 text-sm font-bold text-white">{f.title}</h3>
+              <p className="mt-1.5 text-xs leading-5 text-white/60">{f.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="relative mt-10 text-center">
+          <GradientButton onClick={() => navigate(token ? "/home" : "/auth/register")} className="px-8 py-3.5 text-base font-bold shadow-lg shadow-indigo-500/25">
+            {token ? "Open dashboard" : "Get started free"} <ArrowRight className="h-4 w-4" />
+          </GradientButton>
         </div>
       </section>
 
