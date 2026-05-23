@@ -37,7 +37,11 @@
 | Feature | Description |
 |---|---|
 | 🎓 **Verified Campus Network** | Only students with verified campus IDs can publish or book rides |
+| 🏫 **College Name Selector** | Searchable dropdown with top 10 Hyderabad colleges + custom college entry |
 | 🔐 **JWT Authentication** | Secure sign-up, login, and session management with role-based access |
+| 🛡️ **Duplicate Account Prevention** | Real-time email & phone uniqueness checks block duplicate registrations |
+| 🔑 **Password Strength Meter** | Visual complexity indicator with 8+ chars, uppercase, lowercase, number rules |
+| 👁️ **Password Visibility Toggles** | Eye/Eye-off icons on login, register, and change password pages |
 | 🗺️ **Interactive Live Maps** | Leaflet.js maps with real road routing via OSRM, pickup/drop pin placement |
 | 🚗 **Offer & Edit/Delete Rides** | Full ride CRUD operations — publish, search, update details, delete, request, confirm |
 | 👩‍💼 **Admin Dashboard** | Verify student IDs, moderate content, manage users and ride data |
@@ -46,24 +50,22 @@
 | 🔔 **In-App Notifications** | Ride updates, booking approvals, verification status changes |
 | 📧 **Transactional Email** | Gmail SMTP-powered emails for ride reminders and verification updates |
 | 🚺 **Gender Safety Preferences** | Female-commuter-only filter for safer travel options |
-| 🛡️ **Trust Score System** | Dynamic trust badges and scores based on ride history and verification |
-| 📊 **Profile Ecosystem** | Profile completeness, trust rings, CO₂ saved tracker, reliability score |
-| 🩹 **Crash Recovery screen** | High-fidelity Error Boundary to diagnose frontend failures and resume with one click |
+| 💬 **Extended Profile** | Bio, emergency contact, gender preference, and daily commute routes |
+| 📊 **Trust Score System** | Dynamic trust badges, campus rings, CO₂ saved tracker, reliability score |
+| 🩹 **Crash Recovery Screen** | High-fidelity Error Boundary to diagnose frontend failures and resume with one click |
 | 📱 **Responsive Premium UI** | Glassmorphism, dark mode hero sections, Framer Motion micro-animations |
 
 ---
 
 ## 🖥️ Screenshots
 
-> _Add screenshots to the `docs/screenshots/` folder and reference them below._
-
 | Landing Page | Find a Ride | Offer a Ride |
 |---|---|---|
 | ![Landing](docs/screenshots/landing.png) | ![Find Ride](docs/screenshots/find-ride.png) | ![Offer Ride](docs/screenshots/offer-ride.png) |
 
-| Profile Dashboard | Admin Panel | Ride Details |
+| Profile Dashboard | Admin Panel | My Bookings |
 |---|---|---|
-| ![Profile](docs/screenshots/profile.png) | ![Admin](docs/screenshots/admin.png) | ![Ride Details](docs/screenshots/ride-details.png) |
+| ![Profile](docs/screenshots/profile.png) | ![Admin](docs/screenshots/admin.png) | ![My Bookings](docs/screenshots/my-bookings.png) |
 
 ---
 
@@ -357,6 +359,12 @@ sharefare/
 - [x] Admin moderation dashboard
 - [x] AI support assistant chat widget
 - [x] Ride CRUD updates (editing and deleting published rides)
+- [x] Searchable college name dropdown with top Hyderabad colleges
+- [x] Strict duplicate email/phone prevention at backend + frontend
+- [x] Password strength meter and visibility toggles
+- [x] Extended profile (bio, emergency contact, commute routes)
+- [x] College verification badge on profile and ride cards
+- [x] Open Graph / SEO meta tags for social sharing
 - [ ] Real-time WebSocket ride tracking
 - [ ] Rating and review system post-ride
 - [ ] Push notifications (Firebase)
