@@ -6,6 +6,7 @@ import { MobileBottomNavigation, pageContainer } from "./design-system";
 import { useAuth } from "../state/auth";
 import { cn } from "../lib/cn";
 import { ToastHost } from "./Toast";
+import { SupportChatbot } from "./SupportChatbot";
 
 export function AppLayout() {
   const location = useLocation();
@@ -25,6 +26,7 @@ export function AppLayout() {
         <Footer className="pb-10" />
       </main>
       <MobileBottomNavigation enabled={Boolean(token)} />
+      <SupportChatbot />
       <ToastHost />
     </div>
   );

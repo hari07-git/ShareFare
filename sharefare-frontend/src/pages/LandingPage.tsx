@@ -6,7 +6,8 @@ import { LocationAutocomplete } from "../components/LocationAutocomplete";
 import { DarkMap } from "../components/DarkMap";
 import {
   ArrowRight, BadgeIndianRupee, Calendar, Clock3, MapPin,
-  Navigation, ShieldCheck, Sparkles, Star, Users, BadgeCheck, Zap, Search
+  Navigation, ShieldCheck, Sparkles, Star, Users, BadgeCheck, Zap, Search,
+  ChevronDown, ChevronUp, Shield, Lock, Car
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PlaceResult } from "../lib/geocode";
@@ -285,49 +286,120 @@ export function LandingPage() {
       </section>
 
       {/* ═══════════════════════════════════════════════════
-          HOW IT WORKS SECTION
+          WHY STUDENTS USE SHAREFARE (FEATURES SECTION)
       ═══════════════════════════════════════════════════ */}
       <section className="py-4">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-600 shadow-sm mb-3">
-            <Sparkles className="h-3.5 w-3.5" /> How It Works
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-655 shadow-xs mb-3">
+            <Sparkles className="h-3.5 w-3.5" /> Features
           </div>
-          <h2 className="text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
-            Commuting made <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">effortless</span>
+          <h2 className="text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
+            Why students use ShareFare
           </h2>
-          <p className="mt-3 text-sm text-slate-600 max-w-lg mx-auto">
-            Join thousands of Hyderabad college students already saving money and time with verified campus rides.
+          <p className="mt-2 text-sm text-slate-600 max-w-md mx-auto leading-normal">
+            Built for safe, affordable, and verified campus commuting.
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            {
+              icon: ShieldCheck,
+              title: "Verified Students",
+              desc: "Every rider is manually verified using college ID approval.",
+              gradient: "from-emerald-450 to-teal-500"
+            },
+            {
+              icon: Navigation,
+              title: "Smart Route Matching",
+              desc: "Find rides between colleges, metro stations, and campuses instantly.",
+              gradient: "from-blue-500 to-indigo-600"
+            },
+            {
+              icon: Users,
+              title: "Safe Community Travel",
+              desc: "Verified profiles, ratings, and booking approvals increase trust.",
+              gradient: "from-violet-500 to-purple-600"
+            },
+            {
+              icon: BadgeIndianRupee,
+              title: "Affordable Daily Commute",
+              desc: "Share travel costs and reduce daily transportation expenses.",
+              gradient: "from-amber-400 to-orange-500"
+            },
+            {
+              icon: Search,
+              title: "Live Route Preview",
+              desc: "Preview pickup and destination routes before booking.",
+              gradient: "from-sky-400 to-indigo-500"
+            },
+            {
+              icon: Zap,
+              title: "Mobile Friendly",
+              desc: "Smooth responsive experience for phones, tablets, and desktops.",
+              gradient: "from-rose-500 to-pink-500"
+            }
+          ].map((item, idx) => (
+            <motion.div
+              key={item.title}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.08, duration: 0.5 }}
+              whileHover={{ y: -4 }}
+              className="rounded-2xl border border-white/20 bg-white/45 backdrop-blur-md p-5 shadow-3xs hover:shadow-xs hover:bg-white/75 transition-all duration-300"
+            >
+              <div className={`inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${item.gradient} text-white shadow-sm`}>
+                <item.icon className="h-5 w-5" />
+              </div>
+              <h3 className="mt-3.5 text-sm font-black text-slate-955">{item.title}</h3>
+              <p className="mt-1.5 text-xs leading-5 text-slate-650 font-semibold">{item.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════
+          HOW SHAREFARE WORKS (HOW IT WORKS SECTION)
+      ═══════════════════════════════════════════════════ */}
+      <section className="py-4">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-violet-100 bg-violet-50 px-3 py-1 text-xs font-bold text-violet-655 shadow-xs mb-3">
+            <Zap className="h-3.5 w-3.5" /> Guide
+          </div>
+          <h2 className="text-2xl font-black tracking-tight text-slate-955 sm:text-3xl">
+            How ShareFare works
+          </h2>
+          <p className="mt-2 text-sm text-slate-600 max-w-sm mx-auto leading-normal">
+            A secure campus network built to get you moving in 3 quick steps.
+          </p>
+        </div>
+
+        <div className="relative grid gap-6 md:grid-cols-3 max-w-4xl mx-auto">
+          {/* Animated Connecting Line on desktop */}
+          <div className="hidden md:block absolute top-[44px] left-[15%] right-[15%] h-0.5 border-t-2 border-dashed border-slate-200" />
+
           {[
             {
               step: "01",
-              title: "Search Your Route",
-              desc: "Enter your college, metro, or destination. Instantly discover verified rides heading your way.",
-              icon: Search,
-              gradient: "from-indigo-500 to-blue-500",
-              bg: "bg-indigo-50",
-              text: "text-indigo-600"
+              title: "Verify Account",
+              desc: "Upload your college ID and get approved.",
+              icon: BadgeCheck,
+              gradient: "from-blue-600 to-indigo-605"
             },
             {
               step: "02",
-              title: "Book in One Click",
-              desc: "Choose your preferred driver, schedule, and price. Secure your seat with a single tap.",
-              icon: Calendar,
-              gradient: "from-violet-500 to-purple-500",
-              bg: "bg-violet-50",
-              text: "text-violet-600"
+              title: "Find or Offer Ride",
+              desc: "Search available rides or publish your own route.",
+              icon: Search,
+              gradient: "from-violet-600 to-purple-650"
             },
             {
               step: "03",
-              title: "Ride & Save Together",
-              desc: "Meet at the pickup, share the journey, split the costs. Save money and cut carbon emissions.",
-              icon: Navigation,
-              gradient: "from-emerald-500 to-teal-500",
-              bg: "bg-emerald-50",
-              text: "text-emerald-600"
+              title: "Travel Together",
+              desc: "Book securely and coordinate with verified students.",
+              icon: Users,
+              gradient: "from-emerald-500 to-teal-600"
             }
           ].map((item, idx) => (
             <motion.div
@@ -336,72 +408,321 @@ export function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.12, duration: 0.5 }}
-              className="relative rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition hover:shadow-md hover:-translate-y-1"
+              className="relative text-center rounded-2xl bg-white/30 border border-slate-200/60 p-5 flex flex-col items-center"
             >
-              <div className={`inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br ${item.gradient} text-white text-sm font-bold shadow-lg`}>
-                {item.step}
-              </div>
-              <div className={`mt-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl ${item.bg}`}>
-                <item.icon className={`h-6 w-6 ${item.text}`} />
-              </div>
-              <h3 className="mt-4 text-lg font-bold text-slate-950">{item.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-slate-600">{item.desc}</p>
-              {idx < 2 && (
-                <div className="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 z-10">
-                  <ArrowRight className="h-5 w-5 text-slate-300" />
+              <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-md border border-slate-100">
+                <div className={`h-11 w-11 rounded-full bg-gradient-to-br ${item.gradient} text-white flex items-center justify-center`}>
+                  <item.icon className="h-5 w-5" />
                 </div>
-              )}
+                <span className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-slate-905 border-2 border-white font-mono text-[10px] font-black text-white flex items-center justify-center">
+                  {item.step}
+                </span>
+              </div>
+              <h3 className="mt-4 text-xs font-black text-slate-900">{item.title}</h3>
+              <p className="mt-1.5 text-xs text-slate-600 leading-normal max-w-xs font-semibold">{item.desc}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
       {/* ═══════════════════════════════════════════════════
-          WHY CHOOSE SHAREFARE
+          BUILT WITH STUDENT SAFETY FIRST (SAFETY SECTION)
       ═══════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 px-8 py-14 shadow-2xl">
-        <div className="pointer-events-none absolute -right-24 top-0 h-72 w-72 rounded-full bg-indigo-500/20 blur-3xl" />
-        <div className="pointer-events-none absolute -left-16 -bottom-12 h-56 w-56 rounded-full bg-violet-500/15 blur-3xl" />
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 p-8 shadow-xl text-white">
+        {/* Glow Effects */}
+        <div className="pointer-events-none absolute -right-24 top-0 h-64 w-64 rounded-full bg-indigo-500/15 blur-3xl" />
+        <div className="pointer-events-none absolute -left-20 -bottom-10 h-48 w-48 rounded-full bg-violet-600/10 blur-3xl" />
 
-        <div className="relative text-center mb-10">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/90 backdrop-blur mb-3">
-            <Star className="h-3.5 w-3.5 text-amber-300 fill-amber-300" /> Why ShareFare
+        <div className="relative grid gap-8 lg:grid-cols-12 items-center">
+          <div className="lg:col-span-7 space-y-4">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-indigo-300">
+              <Shield className="h-3.5 w-3.5 text-indigo-400" /> Security Audit
+            </div>
+            <h2 className="text-2xl font-black leading-tight sm:text-3xl lg:text-4xl tracking-tight">
+              Built with student safety first
+            </h2>
+            <p className="text-sm leading-relaxed text-slate-350 font-medium">
+              We understand campus commuting safety is paramount. ShareFare restricts account activation to verified email domains and college identities. Every ride request and routing is transparently tracked.
+            </p>
+            
+            {/* Glowing safety badges */}
+            <div className="flex flex-wrap gap-2.5 pt-2">
+              {[
+                "Verified Student-Only",
+                "Admin ID Approval",
+                "Secure Bookings",
+                "Reviews & Ratings",
+                "Female Commuter Filters"
+              ].map((badge) => (
+                <span
+                  key={badge}
+                  className="rounded-full bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1 text-[10px] font-black tracking-wide text-slate-200 transition"
+                >
+                  ✓ {badge}
+                </span>
+              ))}
+            </div>
           </div>
-          <h2 className="text-2xl font-black leading-tight text-white sm:text-3xl lg:text-4xl">
-            The smart way to commute
-            <span className="bg-gradient-to-r from-indigo-300 via-violet-300 to-cyan-300 bg-clip-text text-transparent"> across campus</span>
+
+          {/* Glowing Verification Card */}
+          <div className="lg:col-span-5 relative">
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-650 blur-xl opacity-20" />
+            <div className="relative rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur space-y-3 shadow-2xl">
+              <div className="flex items-center gap-2.5">
+                <div className="h-7 w-7 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                  <ShieldCheck className="h-4.5 w-4.5" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-100">Identity Verified</h4>
+                  <span className="text-[9px] text-slate-400 font-bold">Updated just now</span>
+                </div>
+              </div>
+              <div className="h-px bg-white/10" />
+              <div className="space-y-2 text-[11px] font-semibold text-slate-300">
+                <div className="flex justify-between">
+                  <span>Student ID Status</span>
+                  <span className="text-emerald-400 font-black">VALIDATED</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Domain Approval</span>
+                  <span className="text-indigo-400">@edu domains only</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Routing Encrypted</span>
+                  <span className="text-indigo-400 font-black">SSL SECURE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════
+          STATS SECTION (ANIMATED STATISTICS)
+      ═══════════════════════════════════════════════════ */}
+      <section className="py-2.5">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          {[
+            { label: "Verified Students", target: 12500, suffix: "+", icon: Users, tone: "from-blue-500 to-indigo-550" },
+            { label: "Total Rides Completed", target: 45000, suffix: "+", icon: Car, tone: "from-violet-500 to-purple-650" },
+            { label: "Routes Active", target: 180, suffix: "+", icon: Navigation, tone: "from-sky-500 to-blue-600" },
+            { label: "Average Savings", target: 3200, prefix: "₹", suffix: "/mo", icon: BadgeIndianRupee, tone: "from-emerald-500 to-teal-600" }
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="rounded-2xl border border-slate-200 bg-white p-4 shadow-3xs transition hover:-translate-y-0.5"
+            >
+              <div className={`inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br ${stat.tone} text-white shadow-2xs`}>
+                <stat.icon className="h-4.5 w-4.5" />
+              </div>
+              <div className="mt-3 text-[9px] font-black uppercase tracking-wider text-slate-400">{stat.label}</div>
+              <div className="mt-1 text-2xl font-black text-slate-905 tracking-tight">
+                <AnimatedCounter target={stat.target} prefix={stat.prefix} suffix={stat.suffix} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════
+          STUDENT TESTIMONIALS (AUTO-SCROLL MARQUEE CAROUSEL)
+      ═══════════════════════════════════════════════════ */}
+      <section className="py-4 overflow-hidden relative">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-655 shadow-xs mb-3">
+            <Heart className="h-3.5 w-3.5 text-rose-500" /> Testimonials
+          </div>
+          <h2 className="text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
+            Commuter Experiences
+          </h2>
+          <p className="mt-2 text-sm text-slate-600 max-w-sm mx-auto leading-normal font-semibold">
+            Hear from students across Hyderabad carpooling daily.
+          </p>
+        </div>
+
+        {/* Marquee Wrapper */}
+        <div className="relative w-full overflow-hidden py-1">
+          {/* Side Fades */}
+          <div className="absolute top-0 bottom-0 left-0 w-8 md:w-20 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none" />
+          <div className="absolute top-0 bottom-0 right-0 w-8 md:w-20 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none" />
+          
+          <div className="flex gap-4 w-[200%] animate-marquee hover:[animation-play-state:paused]">
+            <style>{`
+              @keyframes marquee {
+                0% { transform: translateX(0%); }
+                100% { transform: translateX(-50%); }
+              }
+              .animate-marquee {
+                animation: marquee 25s linear infinite;
+              }
+            `}</style>
+
+            {/* Testimonials List (duplicated for loop effect) */}
+            {Array.from({ length: 2 }).map((_, loopIdx) => (
+              <div key={loopIdx} className="flex gap-4 w-1/2 justify-around">
+                {[
+                  {
+                    name: "Neha S.",
+                    college: "CBIT student",
+                    text: "ShareFare has made my daily commute from Kukatpally to CBIT so much easier. I've met awesome people from other batches!",
+                    rating: 5,
+                    avatar: "NS"
+                  },
+                  {
+                    name: "Rahul K.",
+                    college: "Woxsen University",
+                    text: "As a driver, I split my fuel costs between Gachibowli and Woxsen. Highly recommend the verification system.",
+                    rating: 5,
+                    avatar: "RK"
+                  },
+                  {
+                    name: "Anjali D.",
+                    college: "BITS Hyderabad",
+                    text: "The female-preferred filter makes night commutes from campuses feel completely safe. It's an essential app.",
+                    rating: 5,
+                    avatar: "AD"
+                  },
+                  {
+                    name: "Vikram M.",
+                    college: "JNTUH student",
+                    text: "Saved almost ₹3,000 this month alone compared to cabs. It's zero commission and 100% student-focused!",
+                    rating: 5,
+                    avatar: "VM"
+                  }
+                ].map((t, idx) => (
+                  <div
+                    key={idx}
+                    className="w-72 md:w-80 shrink-0 rounded-2xl border border-slate-200 bg-white p-4.5 shadow-3xs space-y-3 whitespace-normal flex flex-col justify-between"
+                  >
+                    <p className="text-xs text-slate-750 italic leading-relaxed font-semibold">"{t.text}"</p>
+                    
+                    <div className="flex items-center justify-between border-t border-slate-100 pt-3">
+                      <div className="flex items-center gap-2">
+                        <div className="h-7 w-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-white font-extrabold flex items-center justify-center text-[10px] shadow-3xs">
+                          {t.avatar}
+                        </div>
+                        <div>
+                          <h4 className="text-[10px] font-black text-slate-900 leading-none">{t.name}</h4>
+                          <span className="text-[8px] text-slate-500 font-bold mt-1 block leading-none">{t.college}</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-0.5">
+                        {Array.from({ length: t.rating }).map((_, s) => (
+                          <Star key={s} className="h-3 w-3 fill-amber-400 text-amber-400" />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════
+          ACCORDION FAQ SECTION
+      ═══════════════════════════════════════════════════ */}
+      <section className="py-4 max-w-2xl mx-auto px-4">
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-655 shadow-xs mb-2">
+            <Sparkles className="h-3.5 w-3.5" /> FAQ
+          </div>
+          <h2 className="text-xl font-black tracking-tight text-slate-950 uppercase tracking-wide">
+            Frequently Asked Questions
           </h2>
         </div>
 
-        <div className="relative grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="border-t border-slate-200">
           {[
-            { icon: ShieldCheck, title: "Verified Students", desc: "Every rider is campus-verified with college ID. Ride with peers, not strangers.", iconClr: "text-emerald-400" },
-            { icon: Zap, title: "Zero Commission", desc: "We don't take a cut. Every rupee stays between riders. Fair and transparent.", iconClr: "text-amber-400" },
-            { icon: Users, title: "Community First", desc: "Built for and by Hyderabad college students. A mobility network you can trust.", iconClr: "text-blue-400" },
-            { icon: Navigation, title: "Eco-Friendly", desc: "Share rides, reduce emissions. Every carpool saves an average of 2.3kg CO₂.", iconClr: "text-emerald-400" }
-          ].map((f, idx) => (
-            <motion.div
-              key={f.title}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1, duration: 0.4 }}
-              className="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur transition hover:bg-white/15"
-            >
-              <f.icon className={`h-6 w-6 ${f.iconClr}`} />
-              <h3 className="mt-3 text-sm font-bold text-white">{f.title}</h3>
-              <p className="mt-1.5 text-xs leading-5 text-white/60">{f.desc}</p>
-            </motion.div>
+            {
+              question: "How do I sign up?",
+              answer: "Click the Register button in the top menu and enter your student credentials. Be sure to use your student domain email if available!"
+            },
+            {
+              question: "How do I book a ride?",
+              answer: "Visit Find Ride page, search your pickup and drop, open ride details, choose seats count and send request."
+            },
+            {
+              question: "How are students verified?",
+              answer: "Upload your college ID photo from the profile settings. Our admins review the card details and university records before verifying."
+            },
+            {
+              question: "Can female students filter rides?",
+              answer: "Yes. Drivers can toggle female-preferred ride pools, and female passengers can filter specifically for those rides when booking."
+            },
+            {
+              question: "Is ShareFare free to use?",
+              answer: "Absolutely! There are zero platform commissions. Passengers divide exact fuel and parking costs directly with drivers."
+            },
+            {
+              question: "How do ride requests work?",
+              answer: "When booking a seat, drivers receive approval cards with verification details. Once they Accept, contact details are shared."
+            }
+          ].map((faq, i) => (
+            <FAQItem key={i} question={faq.question} answer={faq.answer} />
           ))}
         </div>
+      </section>
 
-        <div className="relative mt-10 text-center">
-          <GradientButton onClick={() => navigate(token ? "/home" : "/auth/register")} className="px-8 py-3.5 text-base font-bold shadow-lg shadow-indigo-500/25">
-            {token ? "Open dashboard" : "Get started free"} <ArrowRight className="h-4 w-4" />
+      {/* Footer CTA */}
+      <section className="relative overflow-hidden rounded-3xl bg-indigo-600/10 border border-indigo-200/50 p-8 text-center max-w-xl mx-auto">
+        <h3 className="text-lg font-black text-slate-950">Ready to save on your daily commute?</h3>
+        <p className="text-xs text-slate-655 mt-1 font-semibold">Join verified student carpoolers inside Hyderabad today.</p>
+        <div className="mt-4 flex justify-center gap-3">
+          <GradientButton onClick={() => navigate(token ? "/home" : "/auth/register")} className="px-6 py-2.5 text-xs font-bold shadow-md shadow-indigo-500/15">
+            {token ? "Dashboard" : "Register Free"}
           </GradientButton>
         </div>
       </section>
 
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════
+   HELPER UTILITY COMPONENTS FOR LANDING PAGE
+═══════════════════════════════════════════════════ */
+function AnimatedCounter({ target, duration = 1200, prefix = "", suffix = "" }: { target: number; duration?: number; prefix?: string; suffix?: string }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let startTimestamp: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      setCount(Math.floor(progress * target));
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      }
+    };
+    window.requestAnimationFrame(step);
+  }, [target, duration]);
+
+  return <span>{prefix}{count.toLocaleString("en-IN")}{suffix}</span>;
+}
+
+function FAQItem({ question, answer }: { question: string; answer: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="border-b border-slate-200/80 py-3.5">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between text-left font-bold text-slate-900 text-xs py-1.5 focus:outline-none"
+      >
+        <span>{question}</span>
+        <span className="text-indigo-650 font-black text-xs transition-transform duration-300">
+          {isOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+        </span>
+      </button>
+      <div
+        className={cn(
+          "transition-all duration-300 overflow-hidden text-[11px] text-slate-550 leading-relaxed font-semibold",
+          isOpen ? "max-h-40 mt-2 opacity-100" : "max-h-0 opacity-0"
+        )}
+      >
+        {answer}
+      </div>
     </div>
   );
 }
