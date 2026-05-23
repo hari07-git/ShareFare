@@ -5,11 +5,11 @@ import { useEffect, useState } from "react";
 import { distanceKm, estimateEtaMinutes } from "../lib/route";
 
 // Fix default marker icons in bundlers
-// @ts-ignore
+// @ts-expect-error - image asset import
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-// @ts-ignore
+// @ts-expect-error - image asset import
 import markerIcon from "leaflet/dist/images/marker-icon.png";
-// @ts-ignore
+// @ts-expect-error - image asset import
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 const DefaultIcon = L.icon({

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { MessageSquare, X, Send, Sparkles, AlertCircle, Bot } from "lucide-react";
+import { MessageSquare, X, Send, Sparkles, AlertCircle, Bot, Minus } from "lucide-react";
 import { useAuth } from "../state/auth";
 import { cn } from "../lib/cn";
 import { motion, AnimatePresence } from "framer-motion";
@@ -12,14 +12,13 @@ type Message = {
 };
 
 const FAQ_RESPONSES: Record<string, string> = {
-  "How do I sign up?": "Click the **Sign Up** button on the homepage and create your account using your student email.",
-  "How do I verify my account?": "Upload your college ID from your **Profile** page. Admin approval usually takes a short time.",
-  "How do I book a ride?": "Go to the **Find Ride** page, choose your route, click on a ride card to view details, select your seats, and click **Book Now** to send a request.",
-  "How do I offer a ride?": "Open the **Offer Ride** page, enter pickup and destination details, seats available, price, and vehicle number, then publish your ride.",
-  "How do ride requests work?": "When a passenger books a seat, you'll receive a request on your **Booking Requests** page. You can review their profile, safety score, and click Accept or Reject.",
-  "Is ShareFare free?": "Yes! ShareFare is 100% free with **zero commission**. All fare splits happen directly between students.",
-  "How does student verification work?": "We manually review student college IDs to verify active enrollment. Only verified students can search, book, or offer rides.",
-  "How can I contact support?": "You can reach out to our team at **support@sharefare.edu** or visit the support page from the side menu."
+  "How do I sign up?": "To sign up, click **Sign up** in the top right. Enter your name, student email (preferably university domain), and set a password. Verify your email with the OTP sent to you.",
+  "How do I book a ride?": "Go to the **Find Ride** page, search your route, choose a ride card to view details, select seats, and click **Book Now**. The driver will receive your request.",
+  "How do I offer a ride?": "Open the **Offer Ride** page, select your vehicle, time of departure, seats, price per seat, and publish. Make sure your profile has your phone and vehicle details first!",
+  "What is student verification?": "We verify active enrollment by reviewing student IDs. Go to your **Profile** page, upload your college ID, and wait for admin approval (usually in a few hours).",
+  "How do I contact a driver?": "Once a driver accepts your booking, their phone contact appears on the ride details page. You can also chat directly via the Message button.",
+  "Is ShareFare free?": "Yes! ShareFare is free for students with **zero platform commission**. You split the exact fuel and toll costs directly with other riders.",
+  "How do ride approvals work?": "When you request a booking, the driver receives a pending notification. They can check your safety score and accept/reject. You'll get notified upon approval."
 };
 
 const QUICK_ACTIONS = Object.keys(FAQ_RESPONSES);
@@ -27,17 +26,33 @@ const QUICK_ACTIONS = Object.keys(FAQ_RESPONSES);
 export function SupportChatbot() {
   const { token } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      sender: "bot",
-      text: "Hi 👋 I can help you understand how ShareFare works.",
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const welcomeMessage = `Hi 👋 I’m ShareFare Assistant.
+I can help you with:
+• Creating an account
+• Booking rides
+• Offering rides
+• Verification issues
+• Profile setup
+• Safety & support`;
+
+  // Initialize messages on mount or reset
+  useEffect(() => {
+    if (messages.length === 0) {
+      setMessages([
+        {
+          id: 1,
+          sender: "bot",
+          text: welcomeMessage,
+          timestamp: new Date()
+        }
+      ]);
+    }
+  }, [messages.length]);
 
   // Auto-scroll to bottom of chat
   useEffect(() => {
@@ -75,18 +90,18 @@ export function SupportChatbot() {
       if (botResponse.includes("still learning")) {
         if (query.includes("sign up") || query.includes("register") || query.includes("create")) {
           botResponse = FAQ_RESPONSES["How do I sign up?"];
-        } else if (query.includes("verify") || query.includes("id") || query.includes("approval")) {
-          botResponse = FAQ_RESPONSES["How do I verify my account?"];
+        } else if (query.includes("verify") || query.includes("id") || query.includes("approval") || query.includes("verification")) {
+          botResponse = FAQ_RESPONSES["What is student verification?"];
         } else if (query.includes("book") || query.includes("passenger") || query.includes("join")) {
           botResponse = FAQ_RESPONSES["How do I book a ride?"];
         } else if (query.includes("offer") || query.includes("publish") || query.includes("driver")) {
           botResponse = FAQ_RESPONSES["How do I offer a ride?"];
         } else if (query.includes("free") || query.includes("commission") || query.includes("cost") || query.includes("money")) {
           botResponse = FAQ_RESPONSES["Is ShareFare free?"];
-        } else if (query.includes("verification") || query.includes("safe") || query.includes("safety")) {
-          botResponse = FAQ_RESPONSES["How does student verification work?"];
-        } else if (query.includes("contact") || query.includes("support") || query.includes("help")) {
-          botResponse = FAQ_RESPONSES["How can I contact support?"];
+        } else if (query.includes("contact") || query.includes("driver") || query.includes("phone")) {
+          botResponse = FAQ_RESPONSES["How do I contact a driver?"];
+        } else if (query.includes("approve") || query.includes("accept") || query.includes("requests")) {
+          botResponse = FAQ_RESPONSES["How do ride approvals work?"];
         }
       }
 
@@ -97,7 +112,7 @@ export function SupportChatbot() {
         timestamp: new Date()
       };
       setMessages((prev) => [...prev, botMsg]);
-    }, 900);
+    }, 850);
   };
 
   const handleInputSubmit = (e: React.FormEvent) => {
@@ -108,31 +123,45 @@ export function SupportChatbot() {
     handleSendMessage(text);
   };
 
+  const handleResetChat = () => {
+    setMessages([]);
+    setIsOpen(false);
+  };
+
   return (
     <>
-      {/* Floating Action Button */}
+      <style>{`
+        @keyframes float {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-4px); }
+          100% { transform: translateY(0px); }
+        }
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+      `}</style>
+
+      {/* Floating Pill Action Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "fixed z-40 h-12 w-12 rounded-full bg-gradient-to-r from-blue-600 to-indigo-650 text-white flex items-center justify-center shadow-xl hover:shadow-indigo-500/20 active:scale-95 transition-all duration-300",
+          "fixed z-40 rounded-full bg-gradient-to-r from-blue-600 to-indigo-650 text-white flex items-center justify-center gap-2 px-4 py-2.5 shadow-xl shadow-indigo-500/10 hover:shadow-indigo-500/25 active:scale-95 transition-all duration-300 font-black text-xs border border-white/10 select-none backdrop-blur-md cursor-pointer animate-float",
           token ? "bottom-20 sm:bottom-6 md:bottom-8" : "bottom-6 md:bottom-8",
-          isOpen ? "right-6 md:right-8 rotate-90 bg-slate-900" : "right-6 md:right-8"
+          "right-5 sm:right-6 md:right-8"
         )}
       >
-        {isOpen ? (
-          <X className="h-5 w-5" />
-        ) : (
-          <div className="relative">
-            <MessageSquare className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-            </span>
-          </div>
-        )}
+        <div className="relative flex items-center justify-center">
+          <MessageSquare className="h-4.5 w-4.5 text-white" />
+          <span className="absolute -top-1 -right-1 flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+        </div>
+        <span className="hidden sm:inline tracking-tight">Chat with ShareFare</span>
+        <span className="inline sm:hidden tracking-tight">Help</span>
       </button>
 
-      {/* Chat Window */}
+      {/* Chat Window Dialog */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -141,13 +170,13 @@ export function SupportChatbot() {
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", duration: 0.4 }}
             className={cn(
-              "fixed z-40 w-[calc(100vw-2.5rem)] sm:w-96 h-[440px] max-h-[70vh] rounded-2xl border border-slate-200/80 bg-white/95 backdrop-blur-xl shadow-2xl flex flex-col overflow-hidden",
+              "fixed z-40 w-[calc(100vw-2.5rem)] sm:w-96 h-[460px] max-h-[70vh] rounded-2xl border border-slate-200/80 bg-white/95 backdrop-blur-xl shadow-2xl flex flex-col overflow-hidden",
               token ? "bottom-36 sm:bottom-20 md:bottom-24" : "bottom-20 md:bottom-24",
               "right-5 sm:right-6 md:right-8"
             )}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-650 p-3.5 text-white flex items-center justify-between">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-650 p-3.5 text-white flex items-center justify-between shadow-xs">
               <div className="flex items-center gap-2">
                 <div className="h-8 w-8 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
                   <Bot className="h-4.5 w-4.5 text-white" />
@@ -156,16 +185,29 @@ export function SupportChatbot() {
                   <h3 className="text-xs font-black tracking-wide uppercase">ShareFare Assistant</h3>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-[9px] font-bold text-indigo-100">Usually replies instantly</span>
+                    <span className="text-[9px] font-bold text-indigo-150">Usually replies instantly</span>
                   </div>
                 </div>
               </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-white/80 hover:text-white rounded-lg p-1 hover:bg-white/10 transition"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              
+              <div className="flex items-center gap-1">
+                {/* Minimize Button */}
+                <button
+                  onClick={() => setIsOpen(false)}
+                  title="Minimize"
+                  className="text-white/80 hover:text-white rounded-lg p-1.5 hover:bg-white/10 transition"
+                >
+                  <Minus className="h-3.5 w-3.5" />
+                </button>
+                {/* Reset / Close Button */}
+                <button
+                  onClick={handleResetChat}
+                  title="Reset conversation"
+                  className="text-white/80 hover:text-white rounded-lg p-1.5 hover:bg-white/10 transition"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
             </div>
 
             {/* Message Area */}
@@ -180,9 +222,9 @@ export function SupportChatbot() {
                 >
                   <div
                     className={cn(
-                      "px-3 py-2.5 rounded-2xl font-semibold leading-relaxed shadow-3xs",
+                      "px-3 py-2.5 rounded-2xl font-semibold leading-relaxed shadow-3xs whitespace-pre-line",
                       m.sender === "user"
-                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-tr-none"
+                        ? "bg-gradient-to-r from-blue-600 to-indigo-650 text-white rounded-tr-none"
                         : "bg-white text-slate-800 border border-slate-200/60 rounded-tl-none"
                     )}
                   >

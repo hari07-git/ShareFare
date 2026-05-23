@@ -9,7 +9,7 @@ import {
   Navigation, ShieldCheck, Sparkles, Star, Users, BadgeCheck, Zap, Search,
   ChevronDown, ChevronUp, Shield, Lock, Car, Heart
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { PlaceResult } from "../lib/geocode";
 import { distanceKm, estimateEtaMinutes } from "../lib/route";
 import { motion } from "framer-motion";

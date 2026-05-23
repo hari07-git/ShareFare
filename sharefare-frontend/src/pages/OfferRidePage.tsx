@@ -78,7 +78,7 @@ export function OfferRidePage() {
     if (!manualPrice && suggestedFare !== null) setPricePerSeat(suggestedFare);
   }, [manualPrice, suggestedFare]);
 
-  function useMyLocation(which: "o" | "d") {
+  function locateMyLocation(which: "o" | "d") {
     if (!navigator.geolocation) {
       setError("Geolocation not supported in this browser.");
       return;
@@ -407,7 +407,7 @@ export function OfferRidePage() {
           <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
             <Button variant={pinTarget === "pickup" ? "primary" : "secondary"} type="button" className="py-2.5 text-xs px-2" onClick={() => setPinTarget("pickup")}>Pickup pin</Button>
             <Button variant={pinTarget === "drop" ? "primary" : "secondary"} type="button" className="py-2.5 text-xs px-2" onClick={() => setPinTarget("drop")}>Drop pin</Button>
-            <Button variant="secondary" type="button" className="py-2.5 text-xs px-2" disabled={geoBusy !== null} onClick={() => useMyLocation("o")}>
+            <Button variant="secondary" type="button" className="py-2.5 text-xs px-2" disabled={geoBusy !== null} onClick={() => locateMyLocation("o")}>
               {geoBusy === "o" ? "Locating..." : "My location"}
             </Button>
             <Button variant="secondary" type="button" className="py-2.5 text-xs px-2" onClick={() => { setOriginPin(null); setDestinationPin(null); setOriginPlace(null); setDestinationPlace(null); }}>Clear</Button>
