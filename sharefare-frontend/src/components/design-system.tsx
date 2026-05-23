@@ -144,9 +144,9 @@ import { useAuth } from "../state/auth";
 const mobileItems = [
   { to: "/home", label: "Home", icon: Home },
   { to: "/rides/find", label: "Find", icon: Search },
-  { to: "/my-booked-rides", label: "Trips", icon: MapPinned },
-  { to: "/driver/booking-requests", label: "Requests", icon: Users },
-  { to: "/my-offered-rides", label: "Offered", icon: LayoutDashboard },
+  { to: "/rides/offer", label: "Offer", icon: Plus },
+  { to: "/my-bookings", label: "Trips", icon: MapPinned },
+  { to: "/me/notifications", label: "Alerts", icon: Bell },
 ];
 
 export function MobileBottomNavigation({ enabled }: { enabled: boolean }) {

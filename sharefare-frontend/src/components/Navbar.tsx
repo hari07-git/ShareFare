@@ -1,4 +1,5 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Logo } from "./Logo";
 import { useAuth } from "../state/auth";
 import { useEffect, useState } from "react";
 import { api } from "../lib/api";
@@ -92,48 +93,7 @@ export function Navbar() {
       <div className="border-b border-slate-200/80 bg-white/90 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-0 group select-none">
-            {/* Orange S with car cutout */}
-            <span className="relative inline-flex items-center justify-center shrink-0 scale-90 sm:scale-100 origin-left" style={{ width: 44, height: 52 }}>
-              <svg viewBox="0 0 44 52" width="44" height="52" fill="none" xmlns="http://www.w3.org/2000/svg">
-                {/* Orange S letter */}
-                <text
-                  x="2" y="46"
-                  fontFamily="'Georgia', 'Times New Roman', serif"
-                  fontWeight="900"
-                  fontSize="54"
-                  fill="#f04e12"
-                  letterSpacing="-4"
-                >S</text>
-                {/* Car silhouette cutout — white car body */}
-                <rect x="4" y="22" width="36" height="10" rx="3" fill="white" opacity="0.95"/>
-                {/* Car roof */}
-                <rect x="10" y="16" width="20" height="9" rx="3" fill="white" opacity="0.95"/>
-                {/* Windshield (slight tint) */}
-                <rect x="11" y="17" width="8" height="7" rx="1.5" fill="#f0e8e0" opacity="0.8"/>
-                <rect x="21" y="17" width="8" height="7" rx="1.5" fill="#f0e8e0" opacity="0.8"/>
-                {/* Left wheel */}
-                <circle cx="12" cy="32" r="4.5" fill="#1a1a1a"/>
-                <circle cx="12" cy="32" r="2" fill="#888"/>
-                {/* Right wheel */}
-                <circle cx="32" cy="32" r="4.5" fill="#1a1a1a"/>
-                <circle cx="32" cy="32" r="2" fill="#888"/>
-                {/* Horizontal speed stripe */}
-                <rect x="0" y="27" width="44" height="2" fill="#f04e12" opacity="0.25"/>
-              </svg>
-            </span>
-
-            {/* Text: "hare" + "FARE" stacked */}
-            <div className="ml-0.5 leading-none">
-              <div className="flex items-baseline gap-0">
-                <span className="text-[22px] font-black tracking-tight text-slate-900" style={{ fontFamily: "'Inter', sans-serif", letterSpacing: "-0.03em" }}>hare</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[13px] font-black tracking-[0.06em] text-[#f04e12]" style={{ fontFamily: "'Inter', sans-serif" }}>FARE</span>
-                <span className="hidden text-[9px] font-semibold tracking-[0.12em] text-slate-400 sm:block" style={{ fontFamily: "'Inter', sans-serif" }}>HYDERABAD CAMPUS RIDES</span>
-              </div>
-            </div>
-          </Link>
+          <Logo />
 
           {/* Desktop Nav */}
           <nav className="hidden items-center gap-1 md:flex">
@@ -148,19 +108,13 @@ export function Navbar() {
                 <NavItem to="/rides/offer">
                   <span className="inline-flex items-center gap-1.5"><Plus className="h-3.5 w-3.5" /> Offer a ride</span>
                 </NavItem>
-                <NavItem to="/my-booked-rides">
-                  <span className="inline-flex items-center gap-1.5"><MapPinned className="h-3.5 w-3.5" /> My bookings</span>
-                </NavItem>
-                <NavItem to="/driver/booking-requests">
-                  <span className="inline-flex items-center gap-1.5"><Users className="h-3.5 w-3.5" /> Booking Requests</span>
-                </NavItem>
-                <NavItem to="/my-offered-rides">
-                  <span className="inline-flex items-center gap-1.5"><TrendingUp className="h-3.5 w-3.5" /> Offered Rides</span>
+                <NavItem to="/my-bookings">
+                  <span className="inline-flex items-center gap-1.5"><MapPinned className="h-3.5 w-3.5" /> My Trips</span>
                 </NavItem>
                 <NavLink
                   to="/me/notifications"
                   className={({ isActive }) =>
-                    cn("relative rounded-2xl px-3 py-2 text-sm font-semibold transition",
+                    cn("relative rounded-xl px-3 py-2 text-sm font-semibold transition",
                       isActive ? "bg-slate-100 text-slate-950" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
                     )
                   }
@@ -172,11 +126,6 @@ export function Navbar() {
                     </span>
                   )}
                 </NavLink>
-                {me?.role === "ADMIN" && (
-                  <NavItem to="/admin">
-                    <span className="inline-flex items-center gap-1.5"><Shield className="h-3.5 w-3.5" /> Admin</span>
-                  </NavItem>
-                )}
               </>
             ) : (
               <>
@@ -247,14 +196,11 @@ export function Navbar() {
                 <MobileNavItem to="/home" onClick={() => setOpen(false)}>Home</MobileNavItem>
                 <MobileNavItem to="/rides/find" onClick={() => setOpen(false)}>Find a ride</MobileNavItem>
                 <MobileNavItem to="/rides/offer" onClick={() => setOpen(false)}>Offer a ride</MobileNavItem>
-                <MobileNavItem to="/my-booked-rides" onClick={() => setOpen(false)}>My bookings</MobileNavItem>
-                <MobileNavItem to="/driver/booking-requests" onClick={() => setOpen(false)}>Booking Requests</MobileNavItem>
-                <MobileNavItem to="/my-offered-rides" onClick={() => setOpen(false)}>Offered Rides</MobileNavItem>
+                <MobileNavItem to="/my-bookings" onClick={() => setOpen(false)}>My Trips</MobileNavItem>
                 <MobileNavItem to="/me/notifications" onClick={() => setOpen(false)}>
                   Notifications {unread > 0 && <span className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[11px] font-bold text-white">{unread}</span>}
                 </MobileNavItem>
                 <MobileNavItem to="/me/profile" onClick={() => setOpen(false)}>My Profile</MobileNavItem>
-                {me?.role === "ADMIN" && <MobileNavItem to="/admin" onClick={() => setOpen(false)}>Admin</MobileNavItem>}
                 <div className="pt-2">
                   <GradientButton
                     variant="ghost"

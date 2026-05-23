@@ -92,9 +92,13 @@ export default function App() {
           />
           <Route
             path="/me/bookings"
+            element={<Navigate to="/my-bookings" replace />}
+          />
+          <Route
+            path="/my-bookings"
             element={
               <RequireAuth>
-                <MyBookingsPage />
+                <BookedRidesPage />
               </RequireAuth>
             }
           />
@@ -172,6 +176,10 @@ export default function App() {
           />
           <Route
             path="/driver/booking-requests"
+            element={<Navigate to="/ride-requests" replace />}
+          />
+          <Route
+            path="/ride-requests"
             element={
               <RequireAuth>
                 <BookingRequestsPage />
@@ -180,14 +188,14 @@ export default function App() {
           />
           <Route
             path="/my-booked-rides"
-            element={
-              <RequireAuth>
-                <BookedRidesPage />
-              </RequireAuth>
-            }
+            element={<Navigate to="/my-bookings" replace />}
           />
           <Route
             path="/my-offered-rides"
+            element={<Navigate to="/offered-rides" replace />}
+          />
+          <Route
+            path="/offered-rides"
             element={
               <RequireAuth>
                 <MyOfferedRidesPage />
@@ -196,11 +204,7 @@ export default function App() {
           />
           <Route
             path="/me/driver/inbox"
-            element={
-              <RequireAuth roles={["USER", "ADMIN"]}>
-                <DriverInboxPage />
-              </RequireAuth>
-            }
+            element={<Navigate to="/ride-requests" replace />}
           />
           <Route
             path="/admin"

@@ -111,6 +111,35 @@ function MapResizer() {
   return null;
 }
 
+function MovingCar({ route }: { route: LatLng[] }) {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (route.length < 2) return;
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % route.length);
+    }, 120);
+    return () => clearInterval(interval);
+  }, [route]);
+
+  const carPoint = route[index];
+  if (!carPoint) return null;
+
+  const CAR_HTML = `
+    <div style="font-size:24px; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.3)); transform:scaleX(-1); text-align:center;">
+      🚗
+    </div>
+  `;
+  const carIcon = L.divIcon({
+    className: "sf-moving-car-pin",
+    html: CAR_HTML,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
+  });
+
+  return <Marker icon={carIcon} position={[carPoint.lat, carPoint.lng]} />;
+}
+
 export function DarkMap({
   pickup,
   drop,
@@ -200,6 +229,8 @@ export function DarkMap({
               positions={route.map((p) => [p.lat, p.lng] as [number, number])}
               pathOptions={{ color: "#4f46e5", weight: 4, opacity: 0.9, dashArray: undefined }}
             />
+            {/* Moving Car animation along the polyline! */}
+            <MovingCar route={route} />
           </>
         )}
 
@@ -207,19 +238,31 @@ export function DarkMap({
         {clickTarget && onPick && <ClickToSet enabled={true} onClick={onPick} />}
       </MapContainer>
 
-      {/* Top-left info badges */}
-      <div className="pointer-events-none absolute inset-x-3 top-3 flex flex-wrap gap-2 z-[400]">
-        <span className="rounded-full border border-slate-200 bg-white/95 px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm backdrop-blur">
+      {/* Top-left & Top-right premium floating overlays */}
+      <div className="pointer-events-none absolute left-3 top-3 flex flex-col gap-2 z-[400] select-none">
+        <span className="rounded-full border border-slate-200 bg-white/95 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-700 shadow-sm backdrop-blur">
           📍 Live Hyderabad map
         </span>
-        {route && (
-          <span className="rounded-full border border-indigo-200 bg-white/95 px-3 py-1.5 text-xs font-semibold text-indigo-700 shadow-sm backdrop-blur">
-            {routeLoading
-              ? "⏳ Routing..."
-              : `🛣 ${distance?.toFixed(1)} km · ${eta} min`}
+        {pickup && drop && (
+          <span className="rounded-full border border-emerald-200/50 bg-emerald-50/95 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-800 shadow-sm backdrop-blur flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            Verified student route
           </span>
         )}
       </div>
+
+      {route && !routeLoading && (
+        <div className="pointer-events-none absolute right-3 top-3 flex flex-col gap-2 z-[400] select-none">
+          <div className="rounded-2xl border border-white/40 bg-white/85 p-3 shadow-lg backdrop-blur-md flex flex-col gap-0.5 min-w-[110px] scale-90 sm:scale-100 origin-top-right">
+            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Distance</span>
+            <span className="text-sm font-extrabold text-slate-900">{distance?.toFixed(1)} km</span>
+          </div>
+          <div className="rounded-2xl border border-white/40 bg-white/85 p-3 shadow-lg backdrop-blur-md flex flex-col gap-0.5 min-w-[110px] scale-90 sm:scale-100 origin-top-right">
+            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">ETA</span>
+            <span className="text-sm font-extrabold text-indigo-700">{eta} mins</span>
+          </div>
+        </div>
+      )}
 
       {/* Click mode indicator */}
       {clickTarget && (
