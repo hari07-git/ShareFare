@@ -4,7 +4,7 @@ export function Logo({ className = "" }: { className?: string }) {
   return (
     <Link to="/" className={`flex items-center gap-1 group select-none ${className}`}>
       {/* Orange S with Car SVG */}
-      <span className="relative inline-flex items-center justify-center shrink-0 scale-95 sm:scale-100 origin-left" style={{ width: 44, height: 52 }}>
+      <span className="relative inline-flex items-center justify-center shrink-0 scale-80 sm:scale-90 md:scale-100 origin-left" style={{ width: 44, height: 52 }}>
         <svg viewBox="0 0 44 52" width="44" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" className="transition-transform duration-300 group-hover:scale-105">
           {/* Orange S letter */}
           <text
@@ -47,13 +47,13 @@ export function Logo({ className = "" }: { className?: string }) {
 
       {/* Typography: "hare" in black, "FARE" in orange, "HYDERABAD CAMPUS RIDES" in grey */}
       <div className="flex flex-col justify-center ml-0.5 leading-none">
-        <span className="text-[25px] font-black tracking-tight text-slate-950 leading-[0.9]" style={{ fontFamily: "'Inter', sans-serif" }}>
+        <span className="text-[20px] sm:text-[25px] font-black tracking-tight text-slate-950 leading-[0.9]" style={{ fontFamily: "'Inter', sans-serif" }}>
           hare
         </span>
-        <span className="text-[17px] font-black tracking-widest text-[#f04e12] leading-[0.9] mt-[2px]" style={{ fontFamily: "'Inter', sans-serif" }}>
+        <span className="text-[14px] sm:text-[17px] font-black tracking-widest text-[#f04e12] leading-[0.9] mt-[2px]" style={{ fontFamily: "'Inter', sans-serif" }}>
           FARE
         </span>
-        <span className="text-[7.5px] font-extrabold tracking-[0.14em] text-slate-400 uppercase mt-[4px]" style={{ fontFamily: "'Inter', sans-serif" }}>
+        <span className="hidden sm:inline-block text-[7.5px] font-extrabold tracking-[0.14em] text-slate-400 uppercase mt-[4px]" style={{ fontFamily: "'Inter', sans-serif" }}>
           HYDERABAD CAMPUS RIDES
         </span>
       </div>

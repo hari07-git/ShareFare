@@ -184,21 +184,21 @@ export function FindRidePage() {
     <div>
       <section className="mb-5 grid gap-5 lg:grid-cols-[minmax(0,460px)_1fr]">
         <div className="space-y-5">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="sticky top-[52px] lg:top-24 z-30 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 p-3 sm:p-5 shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600">
+                <div className="hidden sm:inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600">
                   <Search className="h-3.5 w-3.5" />
                   Live ride search
                 </div>
-                <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">Find a ride</h1>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
+                <h1 className="mt-1 sm:mt-4 text-xl sm:text-3xl font-bold tracking-tight text-slate-950">Find a ride</h1>
+                <p className="hidden sm:block mt-2 text-sm leading-6 text-slate-600">
                   Search Hyderabad routes, preview student pickup pins, and book from a map-first ride list.
                 </p>
               </div>
             </div>
 
-            <div className="mt-5 space-y-3">
+            <div className="mt-3 sm:mt-5 space-y-2">
               <LocationAutocomplete
                 value={origin}
                 onValue={(value) => {
@@ -227,28 +227,28 @@ export function FindRidePage() {
                   setDestination(place.displayName);
                 }}
               />
-                <div className="grid gap-3 grid-cols-1 sm:grid-cols-[1fr_auto]">
-                  <div className="relative">
-                    <Calendar className="pointer-events-none absolute left-3.5 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-indigo-500" />
-                    <Input type="date" value={date} onChange={(event) => setDate(event.target.value)} className="pl-10" />
-                  </div>
-                  <GradientButton onClick={applySearch} className="w-full sm:w-auto sm:min-w-32">
-                    Search <Search className="h-4 w-4" />
-                  </GradientButton>
+              <div className="grid gap-2 grid-cols-[1.2fr_1fr] sm:grid-cols-[1fr_auto]">
+                <div className="relative">
+                  <Calendar className="pointer-events-none absolute left-3 top-1/2 z-10 h-3.5 w-3.5 -translate-y-1/2 text-indigo-500" />
+                  <Input type="date" value={date} onChange={(event) => setDate(event.target.value)} className="pl-9 py-1.5 text-xs" />
                 </div>
-              </div>
-              
-              <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 text-sm text-slate-700">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={verifiedOnly} onChange={e => setVerifiedOnly(e.target.checked)} className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
-                  <span className="font-medium text-slate-700">Verified Students Only</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={femaleOnly} onChange={e => setFemaleOnly(e.target.checked)} className="rounded border-slate-300 text-purple-600 focus:ring-purple-500" />
-                  <span className="font-medium text-purple-700">Female Commuters Only</span>
-                </label>
+                <GradientButton onClick={applySearch} className="w-full text-xs py-1.5 px-3">
+                  Search <Search className="h-3.5 w-3.5" />
+                </GradientButton>
               </div>
             </div>
+            
+            <div className="pt-3 mt-3 border-t border-slate-100 flex flex-row flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-700">
+              <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                <input type="checkbox" checked={verifiedOnly} onChange={e => setVerifiedOnly(e.target.checked)} className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 h-3.5 w-3.5" />
+                <span className="font-semibold text-slate-650">Verified Only</span>
+              </label>
+              <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                <input type="checkbox" checked={femaleOnly} onChange={e => setFemaleOnly(e.target.checked)} className="rounded border-slate-300 text-purple-600 focus:ring-purple-500 h-3.5 w-3.5" />
+                <span className="font-semibold text-purple-750">Female Only</span>
+              </label>
+            </div>
+          </div>
 
           <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <div className="mb-4 flex items-center justify-between gap-3">
@@ -286,61 +286,63 @@ export function FindRidePage() {
                 }}
               />
             ) : null}
-            <div className="space-y-3">
+            <div className="space-y-2">
               {data?.content.map((ride, index) => (
                 <motion.div
                   key={ride.id}
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.03 }}
+                  transition={{ delay: index * 0.02 }}
                   onMouseEnter={() => void loadRideDetails(ride.id)}
                   onClick={() => void loadRideDetails(ride.id)}
-                  className={`cursor-pointer rounded-2xl border p-4 transition duration-200 ${
-                    activeId === ride.id ? "border-indigo-200 bg-indigo-50" : "border-slate-200 bg-white hover:bg-slate-50"
+                  className={`cursor-pointer rounded-xl border p-3 transition duration-200 ${
+                    activeId === ride.id ? "border-indigo-200 bg-indigo-50/70" : "border-slate-200 bg-white hover:bg-slate-50"
                   }`}
                 >
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-indigo-600 text-sm font-bold text-white shadow-sm overflow-hidden">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 text-xs font-bold text-white shadow-sm overflow-hidden">
                           {ride.driverGender === 'FEMALE' ? '👩‍🎓' : 'SF'}
                         </div>
                         <div className="min-w-0">
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            <span className="text-sm font-bold text-slate-900 truncate">{ride.driverName}</span>
-                            {ride.driverGender === 'FEMALE' && <span className="inline-flex items-center rounded-md bg-purple-50 px-1.5 py-0.5 text-[9px] font-semibold text-purple-700 ring-1 ring-inset ring-purple-700/10">Female</span>}
-                            {ride.driverTrustScore > 5 && <span className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Trusted</span>}
+                          <div className="flex flex-wrap items-center gap-1">
+                            <span className="text-xs font-bold text-slate-900 truncate">{ride.driverName.split(" ")[0]}</span>
+                            {ride.driverGender === 'FEMALE' && <span className="inline-flex items-center rounded bg-purple-50 px-1 py-0.2 text-[8px] font-bold text-purple-700 ring-1 ring-inset ring-purple-700/10">Female</span>}
+                            {ride.driverTrustScore > 5 && <span className="inline-flex items-center rounded bg-emerald-50 px-1 py-0.2 text-[8px] font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Trusted</span>}
                           </div>
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <div className="text-xl font-bold text-indigo-600">₹{ride.pricePerSeat}</div>
-                        <div className="text-[10px] font-medium text-slate-500">per seat</div>
+                        <div className="text-base font-black text-indigo-600">₹{ride.pricePerSeat}</div>
+                        <div className="text-[9px] font-medium text-slate-500 -mt-0.5">per seat</div>
                       </div>
                     </div>
 
-                    <div className="space-y-1 pl-1">
-                      <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
-                        <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
-                        <span className="truncate">{ride.origin}</span>
+                    <div className="space-y-0.5 pl-1">
+                      <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
+                        <span className="truncate">{ride.origin.split(",")[0]}</span>
                       </div>
-                      <div className="ml-1 h-3 border-l border-dashed border-slate-200" />
-                      <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                        <span className="h-2 w-2 shrink-0 rounded-full bg-blue-600" />
-                        <span className="truncate">{ride.destination}</span>
+                      <div className="ml-0.75 h-2 border-l border-dashed border-slate-350" />
+                      <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600" />
+                        <span className="truncate">{ride.destination.split(",")[0]}</span>
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-slate-100 pt-3 text-[11px] font-medium text-slate-500">
-                      <span className="inline-flex items-center gap-1"><Clock3 className="h-3.5 w-3.5 text-slate-400" /> {new Date(ride.departureTime).toLocaleString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
-                      <span className="inline-flex items-center gap-1"><Users className="h-3.5 w-3.5 text-slate-400" /> {ride.seatsAvailable} seats left</span>
-                      <span className="inline-flex items-center gap-1"><Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400" /> 4.9</span>
+                    <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 border-t border-slate-100 pt-2 text-[10px] font-bold text-slate-500">
+                      <span className="inline-flex items-center gap-0.5"><Clock3 className="h-3 w-3 text-slate-400" /> {new Date(ride.departureTime).toLocaleString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+                      <span>•</span>
+                      <span className="inline-flex items-center gap-0.5"><Users className="h-3 w-3 text-slate-400" /> {ride.seatsAvailable} seats left</span>
+                      <span>•</span>
+                      <span className="inline-flex items-center gap-0.5"><Star className="h-3 w-3 text-amber-450 fill-amber-455 text-amber-500" /> 4.9</span>
                     </div>
 
-                    <div className="flex items-center justify-between gap-4 mt-2">
-                      <span className="text-[11px] text-indigo-600 font-medium">Tap to focus route</span>
+                    <div className="flex items-center justify-between gap-2 mt-1">
+                      <span className="text-[10px] text-indigo-600 font-bold">Tap to view route</span>
                       <Link to={`/rides/${ride.id}`} className="shrink-0">
-                        <GradientButton className="py-2.5 px-4 text-xs" variant="primary">Details</GradientButton>
+                        <GradientButton className="py-1.5 px-3 text-[10px] font-black" variant="primary">Details</GradientButton>
                       </Link>
                     </div>
                   </div>
