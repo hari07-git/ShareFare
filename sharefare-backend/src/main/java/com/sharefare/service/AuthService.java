@@ -69,6 +69,7 @@ public class AuthService {
     user.setFullName(request.fullName());
     user.setPhone(request.phone());
     user.setGender(request.gender());
+    user.setCollegeName(request.collegeName());
     if (request.email().equalsIgnoreCase("sharefaree@gmail.com")) {
       user.setRole(UserRole.ADMIN);
       user.setEmailVerified(true);

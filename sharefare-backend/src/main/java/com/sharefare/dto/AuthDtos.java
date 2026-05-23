@@ -12,7 +12,8 @@ public class AuthDtos {
       @NotBlank @Size(min = 8, max = 72) String password,
       @NotBlank String fullName,
       String phone,
-      @NotBlank String gender
+      @NotBlank String gender,
+      String collegeName
   ) {}
 
   public record LoginRequest(

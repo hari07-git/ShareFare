@@ -19,6 +19,7 @@ export function RegisterPage() {
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [gender, setGender] = useState("");
+  const [collegeName, setCollegeName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<RegisterResponse | null>(null);
@@ -31,10 +32,12 @@ export function RegisterPage() {
     setBusy(true);
     try {
       if (!gender) { setError("Please select your gender"); setBusy(false); return; }
+      if (!collegeName) { setError("Please select your college"); setBusy(false); return; }
       const res = await api.post<RegisterResponse>("/api/auth/register", {
         email, password, fullName,
         phone: phone.trim() || null,
         gender,
+        collegeName,
       });
       setResult(res.data);
       // If email was sent (otp is null) → go straight to OTP entry page
@@ -173,6 +176,29 @@ export function RegisterPage() {
             <option value="FEMALE">Female</option>
             <option value="MALE">Male</option>
             <option value="OTHER">Other</option>
+          </select>
+        </FormField>
+        <FormField label="College / University">
+          <select value={collegeName} onChange={(e) => setCollegeName(e.target.value)}
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-950 outline-none shadow-sm transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+            required>
+            <option value="" disabled>Select your College</option>
+            <option value="IIIT Hyderabad">IIIT Hyderabad</option>
+            <option value="JNTU Hyderabad">JNTU Hyderabad</option>
+            <option value="Osmania University">Osmania University</option>
+            <option value="BITS Pilani Hyderabad Campus">BITS Pilani Hyderabad Campus</option>
+            <option value="CBIT">CBIT</option>
+            <option value="VNR VJIET">VNR VJIET</option>
+            <option value="GRIET">GRIET</option>
+            <option value="Woxsen University">Woxsen University</option>
+            <option value="MLRIT">MLRIT</option>
+            <option value="Vasavi College of Engineering">Vasavi College of Engineering</option>
+            <option value="SNIST">SNIST</option>
+            <option value="Vardhaman College of Engineering">Vardhaman College of Engineering</option>
+            <option value="KMIT">KMIT</option>
+            <option value="GNITS">GNITS</option>
+            <option value="Anurag University">Anurag University</option>
+            <option value="Other Hyderabad College">Other Hyderabad College</option>
           </select>
         </FormField>
         <FormField label="Password (min 8 chars)">
