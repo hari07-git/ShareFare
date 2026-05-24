@@ -228,12 +228,12 @@ export function FindRidePage() {
                   setDestination(place.displayName);
                 }}
               />
-              <div className="grid gap-2 grid-cols-[1.2fr_1fr] sm:grid-cols-[1fr_auto]">
+              <div className="grid gap-2 grid-cols-1 sm:grid-cols-[1fr_auto]">
                 <div className="relative">
                   <Calendar className="pointer-events-none absolute left-3 top-1/2 z-10 h-3.5 w-3.5 -translate-y-1/2 text-indigo-500" />
-                  <Input type="date" value={date} onChange={(event) => setDate(event.target.value)} className="pl-9 py-1.5 text-xs" />
+                  <Input type="date" value={date} onChange={(event) => setDate(event.target.value)} className="pl-9 py-2 sm:py-1.5 text-xs sm:text-sm" />
                 </div>
-                <GradientButton onClick={applySearch} className="w-full text-xs py-1.5 px-3">
+                <GradientButton onClick={applySearch} className="w-full text-sm sm:text-xs py-2 sm:py-1.5 px-3">
                   Search <Search className="h-3.5 w-3.5" />
                 </GradientButton>
               </div>

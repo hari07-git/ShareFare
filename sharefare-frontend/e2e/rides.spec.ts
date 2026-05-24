@@ -13,7 +13,7 @@ test("find ride search renders filters, cards, and opens route details", async (
   await expect(page.getByText(/Gachibowli/i)).toBeVisible();
   await expect(page.getByText(/HITEC City/i)).toBeVisible();
   await expect(page.getByText(/₹75|75/)).toBeVisible();
-  await page.getByText(/Gachibowli/i).first().click();
+  await page.getByRole("button", { name: /Details/i }).first().click();
   await expect(page).toHaveURL(/\/rides\/101/);
   await expect(page.getByText(/ride details|route|driver/i).first()).toBeVisible();
   await expectNoHorizontalOverflow(page);

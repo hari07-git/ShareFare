@@ -1,5 +1,13 @@
-import { Page } from "@playwright/test";
+import { Page, Request } from "@playwright/test";
 import { adminUser, bookingRequests, bookings, notifications, rides, testUser } from "../fixtures/mockData";
+
+function postJson(request: Request) {
+  try {
+    return request.postDataJSON() as Record<string, any>;
+  } catch {
+    return {};
+  }
+}
 
 function json(body: unknown, status = 200) {
   return {
@@ -17,7 +25,7 @@ export async function mockApi(page: Page) {
     const method = request.method();
 
     if (method === "POST" && path === "/api/auth/register") {
-      const payload = await request.postDataJSON().catch(() => ({}));
+      const payload = postJson(request);
       if (payload.email === "existing@sharefare.test") {
         return route.fulfill(json({ message: "An account already exists with this email." }, 409));
       }
@@ -33,7 +41,7 @@ export async function mockApi(page: Page) {
     }
 
     if (method === "POST" && path === "/api/auth/login") {
-      const payload = await request.postDataJSON().catch(() => ({}));
+      const payload = postJson(request);
       if (payload.password === "wrong-password") {
         return route.fulfill(json({ message: "Invalid credentials" }, 401));
       }
@@ -53,8 +61,12 @@ export async function mockApi(page: Page) {
       return route.fulfill(json(auth.includes("admin-token") ? adminUser : testUser));
     }
 
+    if (method === "GET" && path === "/api/me/reviews") {
+      return route.fulfill(json([{ id: 1, rideId: 101, reviewerEmail: "peer@sharefare.test", revieweeEmail: testUser.email, rating: 5, comment: "Friendly passenger", createdAt: "2026-05-23T12:00:00+05:30" }]));
+    }
+
     if (method === "PUT" && path === "/api/me") {
-      const payload = await request.postDataJSON().catch(() => ({}));
+      const payload = postJson(request);
       return route.fulfill(json({ ...testUser, ...payload }));
     }
 
@@ -68,7 +80,7 @@ export async function mockApi(page: Page) {
     }
 
     if (method === "GET" && /^\/api\/rides\/\d+\/reviews$/.test(path)) {
-      return route.fulfill(json([{ id: 1, rating: 5, comment: "Clean ride and punctual driver", reviewerName: "Meera" }]));
+      return route.fulfill(json([{ id: 1, rideId: 101, reviewerEmail: "meera@sharefare.test", revieweeEmail: rides[0].driverEmail, rating: 5, comment: "Clean ride and punctual driver", createdAt: "2026-05-23T12:00:00+05:30" }]));
     }
 
     if (method === "POST" && /^\/api\/rides\/\d+\/bookings$/.test(path)) {
@@ -76,12 +88,12 @@ export async function mockApi(page: Page) {
     }
 
     if (method === "POST" && path === "/api/rides") {
-      const payload = await request.postDataJSON().catch(() => ({}));
+      const payload = postJson(request);
       return route.fulfill(json({ ...rides[0], ...payload, id: 909, status: "ACTIVE" }, 201));
     }
 
     if (method === "PUT" && /^\/api\/rides\/\d+$/.test(path)) {
-      const payload = await request.postDataJSON().catch(() => ({}));
+      const payload = postJson(request);
       return route.fulfill(json({ ...rides[0], ...payload }));
     }
 

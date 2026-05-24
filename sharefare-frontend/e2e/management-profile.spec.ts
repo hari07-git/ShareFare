@@ -23,7 +23,7 @@ test("profile page supports edits and shows safety/account sections", async ({ p
   const assertClean = installQualityGuards(page, testInfo);
   await page.goto("/me/profile");
   await expect(page.getByText(/Hari QA/i)).toBeVisible();
-  await expect(page.getByText(/Malla Reddy/i)).toBeVisible();
+  await expect(page.getByText(/Malla Reddy/i).first()).toBeVisible();
   const phoneInput = page.locator('input[value="9876543210"]').first();
   if (await phoneInput.count()) {
     await phoneInput.fill("9876543211");

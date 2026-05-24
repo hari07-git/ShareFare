@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 test("signup redirects to OTP verification and duplicate account is blocked", async ({ page }, testInfo) => {
   const assertClean = installQualityGuards(page, testInfo);
   await page.goto("/auth/register");
-  await expect(page.getByRole("heading", { name: /create your account/i })).toBeVisible();
+  await expect(page.getByText(/create your account/i).first()).toBeVisible();
 
   const inputs = page.locator("input");
   await inputs.nth(0).fill("Hari QA");

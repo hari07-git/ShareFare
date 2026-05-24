@@ -2,10 +2,10 @@ import { Link } from "react-router-dom";
 
 export function Logo({ className = "" }: { className?: string }) {
   return (
-    <Link to="/" className={`flex items-center gap-1 group select-none ${className}`}>
+    <Link to="/" className={`flex items-center gap-0.5 group select-none ${className}`}>
       {/* Orange S with Car SVG */}
-      <span className="relative inline-flex items-center justify-center shrink-0 scale-80 sm:scale-90 md:scale-100 origin-left" style={{ width: 44, height: 52 }}>
-        <svg viewBox="0 0 44 52" width="44" height="52" fill="none" xmlns="http://www.w3.org/2000/svg" className="transition-transform duration-300 group-hover:scale-105">
+      <span className="relative inline-flex items-center justify-center shrink-0 w-9 sm:w-11">
+        <svg viewBox="0 0 44 52" className="w-full h-auto transition-transform duration-300 group-hover:scale-105" fill="none" xmlns="http://www.w3.org/2000/svg">
           {/* Orange S letter */}
           <text
             x="2"
@@ -46,7 +46,7 @@ export function Logo({ className = "" }: { className?: string }) {
       </span>
 
       {/* Typography: "hare" in black, "FARE" in orange, "HYDERABAD CAMPUS RIDES" in grey */}
-      <div className="flex flex-col justify-center ml-0.5 leading-none">
+      <div className="flex flex-col justify-center -ml-1 sm:-ml-1.5 leading-none">
         <span className="text-[20px] sm:text-[25px] font-black tracking-tight text-slate-950 leading-[0.9]" style={{ fontFamily: "'Inter', sans-serif" }}>
           hare
         </span>
