@@ -21,7 +21,7 @@ for (const route of routes) {
     const assertClean = installQualityGuards(page, testInfo);
     await page.goto(route.path);
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.getByText(route.label).first()).toBeVisible();
+    await expect(page.locator(`text=/${route.label.source}/i >> visible=true`).first()).toBeVisible();
     await expectNoHorizontalOverflow(page);
     await attachFullPageScreenshot(page, testInfo, `mobile-${route.path.replaceAll("/", "-") || "home"}`);
     await assertClean();
