@@ -39,6 +39,16 @@ type Me = {
   dailyCommuteRoutes: string | null;
 };
 
+type ReviewResponse = {
+  id: number;
+  rideId: number;
+  reviewerEmail: string;
+  revieweeEmail: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+};
+
 type Tab = "about" | "settings";
 
 function TrustRing({ score }: { score: number }) {
@@ -257,6 +267,7 @@ export function ProfilePage() {
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [tab, setTab] = useState<Tab>("about");
+  const [reviews, setReviews] = useState<ReviewResponse[]>([]);
 
   const [avatar, setAvatar] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -303,6 +314,12 @@ export function ProfilePage() {
       setGenderPreference(res.data.genderPreference ?? "");
       setEmergencyContact(res.data.emergencyContact ?? "");
       setDailyCommuteRoutes(res.data.dailyCommuteRoutes ?? "");
+      try {
+        const revRes = await api.get<ReviewResponse[]>("/api/me/reviews");
+        setReviews(revRes.data);
+      } catch (err) {
+        console.error("Failed to load reviews");
+      }
     } catch (err: any) {
       setError(err?.response?.data?.message ?? "Failed to load profile");
     }
@@ -339,6 +356,9 @@ export function ProfilePage() {
   const isVerified = me?.accountStatus === "VERIFIED_STUDENT";
   const trustScore = Math.round((me?.trustScore ?? 5) * 10);
   const memberSince = me?.createdAt ? new Date(me.createdAt).toLocaleDateString("en-IN", { month: "long", year: "numeric" }) : "";
+  const avgRating = reviews.length > 0
+    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+    : "5.0";
 
   const completionItems = [
     { label: "Email verified", done: me?.emailVerified },
@@ -476,9 +496,9 @@ export function ProfilePage() {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <StatCard icon={Activity} label="Completed rides" value={me?.totalCompletedRides ?? 0} color="bg-indigo-50 text-indigo-600" />
-              <StatCard icon={Star} label="Avg rating" value="4.9" color="bg-amber-50 text-amber-600" />
+              <StatCard icon={Star} label="Avg rating" value={avgRating} color="bg-amber-50 text-amber-600" />
               <StatCard icon={Leaf} label="CO₂ saved" value="85kg" color="bg-emerald-50 text-emerald-600" />
-              <StatCard icon={Users} label="Trusted by" value="12 riders" color="bg-violet-50 text-violet-600" />
+              <StatCard icon={Users} label="Trusted by" value={`${reviews.length} riders`} color="bg-violet-50 text-violet-600" />
             </div>
 
             {/* Bio Card */}
@@ -525,6 +545,44 @@ export function ProfilePage() {
                     <div className="mt-1 text-xs text-slate-500">{stat.label}</div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Community Reviews & Ratings */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                <Star className="h-4 w-4 text-amber-500" />
+                Community Reviews
+              </div>
+              <div className="space-y-4">
+                {reviews.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-400 font-medium">
+                    No reviews yet. Complete rides to build your community standing!
+                  </div>
+                ) : (
+                  reviews.map((rev) => (
+                    <div key={rev.id} className="rounded-xl bg-slate-50 p-4 border border-slate-100">
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-center gap-2">
+                          <div className="h-8 w-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-xs">
+                            {rev.reviewerEmail.substring(0, 2).toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="text-sm font-bold text-slate-900">{rev.reviewerEmail.split("@")[0]}</div>
+                            <div className="text-[10px] text-slate-500">{new Date(rev.createdAt).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-0.5 rounded-full bg-amber-50 px-2 py-1 text-amber-700">
+                          <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
+                          <span className="text-xs font-bold">{rev.rating}.0</span>
+                        </div>
+                      </div>
+                      {rev.comment && (
+                        <div className="mt-3 text-sm text-slate-700 italic">"{rev.comment}"</div>
+                      )}
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 

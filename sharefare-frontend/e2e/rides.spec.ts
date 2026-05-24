@@ -29,7 +29,7 @@ test("offer ride validates route form, map panel, and publish success", async ({
 
   await page.getByPlaceholder(/Pickup/i).fill("Malla Reddy University");
   await page.getByPlaceholder(/Drop/i).fill("HITEC City");
-  await page.getByLabel(/Departure time/i).fill("2026-05-28T09:30");
+  await page.locator('input[type="datetime-local"]').fill("2026-05-28T09:30");
   await page.getByPlaceholder(/\+91|9X/i).fill("9876543210");
   await page.getByPlaceholder(/Maruti|Swift|Activa|i20/i).fill("Hyundai i20");
   await page.getByPlaceholder(/TS09/i).fill("TS09QA1234");

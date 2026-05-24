@@ -35,4 +35,9 @@ public class ReviewController {
   public ResponseEntity<List<ReviewResponse>> list(@PathVariable Long rideId) {
     return ResponseEntity.ok(reviewService.listRideReviews(rideId));
   }
+
+  @GetMapping("/me/reviews")
+  public ResponseEntity<List<ReviewResponse>> listMyReviews(Authentication auth) {
+    return ResponseEntity.ok(reviewService.listUserReviews(auth.getName()));
+  }
 }

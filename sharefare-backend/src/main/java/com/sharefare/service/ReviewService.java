@@ -5,6 +5,7 @@ import com.sharefare.dto.ReviewDtos.ReviewResponse;
 import com.sharefare.exception.ApiException;
 import com.sharefare.model.BookingStatus;
 import com.sharefare.model.Review;
+import com.sharefare.model.User;
 import com.sharefare.repo.BookingRepository;
 import com.sharefare.repo.ReviewRepository;
 import com.sharefare.repo.RideRepository;
@@ -68,6 +69,37 @@ public class ReviewService {
     review.setRating(request.rating());
     review.setComment(request.comment());
     Review saved = reviewRepository.save(review);
+
+    // Dynamic trust score recalculation
+    List<Review> userReviews = reviewRepository.findByRevieweeOrderByCreatedAtDesc(reviewee);
+    double averageRating = 5.0; // Default base rating if none found
+    if (!userReviews.isEmpty()) {
+      double sum = 0.0;
+      for (Review r : userReviews) {
+        sum += r.getRating();
+      }
+      averageRating = sum / userReviews.size();
+    }
+
+    // Trust score mapping: base score = averageRating * 2.0 (out of 10.0)
+    double calculatedScore = averageRating * 2.0;
+
+    // Apply bonuses
+    if (reviewee.isCollegeVerified()) {
+      calculatedScore += 1.5; // ID verified bonus
+    }
+    if (reviewee.isEmailVerified()) {
+      calculatedScore += 0.5; // Email verified bonus
+    }
+
+    // Cap the score at 10.0 (maximum trust)
+    if (calculatedScore > 10.0) {
+      calculatedScore = 10.0;
+    }
+
+    reviewee.setTrustScore(calculatedScore);
+    userRepository.save(reviewee);
+
     return toResponse(saved);
   }
 
@@ -76,6 +108,13 @@ public class ReviewService {
     var ride = rideRepository.findById(rideId)
         .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Ride not found"));
     return reviewRepository.findByRideOrderByCreatedAtDesc(ride).stream().map(this::toResponse).toList();
+  }
+
+  @Transactional(readOnly = true)
+  public List<ReviewResponse> listUserReviews(String email) {
+    var user = userRepository.findByEmailIgnoreCase(email)
+        .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "User not found"));
+    return reviewRepository.findByRevieweeOrderByCreatedAtDesc(user).stream().map(this::toResponse).toList();
   }
 
   private ReviewResponse toResponse(Review r) {

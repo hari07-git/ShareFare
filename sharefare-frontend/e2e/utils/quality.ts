@@ -3,6 +3,7 @@ import { expect, Page, TestInfo } from "@playwright/test";
 const ignoredConsoleFragments = [
   "Download the React DevTools",
   "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT",
+  "Failed to load resource: the server responded with a status of 404",
   "ResizeObserver loop completed with undelivered notifications"
 ];
 

@@ -77,11 +77,28 @@ export async function mockApi(page: Page) {
 
     if (method === "POST" && path === "/api/rides") {
       const payload = await request.postDataJSON().catch(() => ({}));
-      return route.fulfill(json({ ...rides[0], ...payload, id: 909, status: "OPEN" }, 201));
+      return route.fulfill(json({ ...rides[0], ...payload, id: 909, status: "ACTIVE" }, 201));
+    }
+
+    if (method === "PUT" && /^\/api\/rides\/\d+$/.test(path)) {
+      const payload = await request.postDataJSON().catch(() => ({}));
+      return route.fulfill(json({ ...rides[0], ...payload }));
+    }
+
+    if (method === "DELETE" && /^\/api\/rides\/\d+$/.test(path)) {
+      return route.fulfill(json({ message: "Ride deleted" }));
     }
 
     if (method === "GET" && path === "/api/me/bookings") {
       return route.fulfill(json(bookings));
+    }
+
+    if (method === "DELETE" && /^\/api\/bookings\/\d+$/.test(path)) {
+      return route.fulfill(json({ message: "Booking cancelled" }));
+    }
+
+    if (method === "POST" && path === "/api/reviews") {
+      return route.fulfill(json({ id: 888, rating: 5, comment: "Great ride" }, 201));
     }
 
     if (method === "GET" && path === "/api/me/driver/rides") {
@@ -97,16 +114,24 @@ export async function mockApi(page: Page) {
       return route.fulfill(json({ ...bookingRequests[0], status: action }));
     }
 
-    if (method === "GET" && path === "/api/notifications") {
+    if (method === "GET" && (path === "/api/notifications" || path === "/api/me/notifications")) {
       return route.fulfill(json(notifications));
     }
 
-    if (method === "GET" && path === "/api/notifications/unread-count") {
+    if (method === "GET" && (path === "/api/notifications/unread-count" || path === "/api/me/notifications/unread-count")) {
       return route.fulfill(json({ count: 1 }));
     }
 
-    if (method === "POST" && path === "/api/notifications/read-all") {
+    if (method === "POST" && /^\/api\/me\/notifications\/\d+\/read$/.test(path)) {
+      return route.fulfill(json({ message: "Notification marked as read" }));
+    }
+
+    if (method === "POST" && (path === "/api/notifications/read-all" || path === "/api/me/notifications/read-all")) {
       return route.fulfill(json({ message: "Notifications marked as read" }));
+    }
+
+    if (method === "GET" && path === "/api/admin/metrics") {
+      return route.fulfill(json({ totalUsers: 15, totalRides: 8, totalBookings: 12, activeRides: 3 }));
     }
 
     if (method === "GET" && path.startsWith("/api/admin/")) {

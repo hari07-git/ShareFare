@@ -1,1 +1,5 @@
 .vercel
+playwright-report/
+test-results/
+lighthouse-report/
+.lighthouseci/

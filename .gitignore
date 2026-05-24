@@ -46,6 +46,10 @@ sharefare-frontend/.parcel-cache/
 sharefare-frontend/coverage/
 sharefare-frontend/.eslintcache
 sharefare-frontend/storybook-static/
+sharefare-frontend/playwright-report/
+sharefare-frontend/test-results/
+sharefare-frontend/lighthouse-report/
+sharefare-frontend/.lighthouseci/
 
 # ─── Backend (Spring Boot / Maven) ───────────────────────────
 sharefare-backend/target/

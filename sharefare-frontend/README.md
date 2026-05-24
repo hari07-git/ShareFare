@@ -26,6 +26,21 @@ npm run dev
 ## Config
 
 - `VITE_API_BASE_URL` (default `http://localhost:8080`)
+- `VITE_SENTRY_DSN` (optional runtime crash monitoring)
+- `VITE_SENTRY_RELEASE` (optional release name for Sentry)
+
+## QA and monitoring
+
+```bash
+npm run build
+npm run test:e2e
+npm run test:mobile
+npm run test:visual
+npm run lighthouse
+npm run test:all
+```
+
+See `/Users/biyyani/ShareFare/docs/testing-monitoring.md` for Playwright, Lighthouse, Sentry, visual regression, and CI details.
 
 ## Features covered (MVP)
 

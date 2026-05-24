@@ -53,6 +53,7 @@
 | 💬 **Extended Profile** | Bio, emergency contact, gender preference, and daily commute routes |
 | 📊 **Trust Score System** | Dynamic trust badges, campus rings, CO₂ saved tracker, reliability score |
 | 🩹 **Crash Recovery Screen** | High-fidelity Error Boundary to diagnose frontend failures and resume with one click |
+| 🧪 **Automated QA Pipeline** | Playwright E2E/mobile/visual checks, Lighthouse audits, and Sentry runtime monitoring |
 | 📱 **Responsive Premium UI** | Glassmorphism, dark mode hero sections, Framer Motion micro-animations |
 
 ---
@@ -213,6 +214,26 @@ npm run dev
 
 # App will be available at: http://localhost:5173
 ```
+
+### 5. Run Production QA Checks
+
+```bash
+cd sharefare-frontend
+
+# Production build
+npm run build
+
+# Desktop browser E2E checks
+npm run test:e2e
+
+# Mobile viewport checks
+npm run test:mobile
+
+# Lighthouse performance/accessibility audits
+npm run lighthouse
+```
+
+Full QA, visual regression, CI, and Sentry setup details are in [`docs/testing-monitoring.md`](docs/testing-monitoring.md).
 
 ---
 

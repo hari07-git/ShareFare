@@ -7,7 +7,13 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test:e2e": "playwright test --project=chromium --project=firefox --project=webkit",
+    "test:mobile": "playwright test e2e/mobile.spec.ts --project=\"iPhone 14\" --project=\"iPhone SE\" --project=\"Pixel 7\" --project=\"Samsung Galaxy\"",
+    "test:visual": "playwright test e2e/visual.spec.ts --project=chromium",
+    "test:e2e:report": "playwright show-report",
+    "lighthouse": "npm run build && start-server-and-test \"npm run preview -- --host 127.0.0.1 --port 4173\" http://127.0.0.1:4173 \"node scripts/lighthouse-audit.mjs\"",
+    "test:all": "npm run build && npm run test:e2e && npm run test:mobile && npm run lighthouse"
   },
   "dependencies": {
     "@sentry/react": "^10.53.1",

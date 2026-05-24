@@ -1,5 +1,6 @@
 import axios from "axios";
 import { clearToken, getToken } from "../state/authStorage";
+import { captureApiFailure } from "./monitoring";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080"
@@ -20,6 +21,11 @@ api.interceptors.response.use(
     if (error?.response?.status === 401) {
       clearToken();
     }
+    captureApiFailure(error, {
+      method: error?.config?.method,
+      url: error?.config?.url,
+      status: error?.response?.status
+    });
     return Promise.reject(error);
   }
 );
