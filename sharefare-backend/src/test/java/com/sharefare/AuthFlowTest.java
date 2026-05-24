@@ -7,9 +7,11 @@ import com.sharefare.repo.UserRepository;
 import com.sharefare.service.EmailService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,7 +30,23 @@ class AuthFlowTest {
   @Autowired ObjectMapper om;
   @Autowired AuthTokenRepository authTokenRepository;
   @Autowired UserRepository userRepository;
-  @MockBean EmailService emailService;
+
+  @TestConfiguration
+  static class EmailTestConfig {
+    @Bean
+    @Primary
+    EmailService emailService() {
+      return new EmailService("", "ShareFare Test <test@example.com>", "support@example.com", "http://localhost:5173") {
+        @Override
+        public void sendEmailVerificationOtp(String to, String name, String otp) {
+        }
+
+        @Override
+        public void sendPasswordReset(String to, String name, String resetUrl) {
+        }
+      };
+    }
+  }
 
   @Test
   void registerThenLogin() throws Exception {

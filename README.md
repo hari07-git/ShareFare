@@ -48,7 +48,7 @@
 | 🤖 **AI Support Assistant** | Built-in conversational support widget answering registration, booking, and safety questions |
 | 📋 **Booking Lifecycle** | REQUESTED → DRIVER_APPROVED → CONFIRMED → ONGOING → COMPLETED |
 | 🔔 **In-App Notifications** | Ride updates, booking approvals, verification status changes |
-| 📧 **Transactional Email** | Gmail SMTP-powered emails for ride reminders and verification updates |
+| 📧 **Transactional Email** | Brevo-powered verification, password reset, booking, and ride reminder emails |
 | 🚺 **Gender Safety Preferences** | Female-commuter-only filter for safer travel options |
 | 💬 **Extended Profile** | Bio, emergency contact, gender preference, and daily commute routes |
 | 📊 **Trust Score System** | Dynamic trust badges, campus rings, CO₂ saved tracker, reliability score |
@@ -66,6 +66,30 @@
 | Profile Dashboard | Admin Panel | My Bookings |
 |---|---|---|
 | ![Profile](docs/screenshots/profile.png) | ![Admin](docs/screenshots/admin.png) | ![My Bookings](docs/screenshots/my-bookings.png) |
+
+---
+
+## 🌟 Featured Highlights & Premium Capabilities
+
+### 🤖 AI Support Assistant (Chatbot)
+ShareFare includes an in-app conversational AI support agent designed to guide students and simplify carpooling logistics:
+* **Instant Onboarding Help:** Answers common queries about student ID verification, ride booking, fare splitting, and platform rules.
+* **High-Premium Solid UI:** Crafted with a deep indigo-900 solid header, dynamic bounce-entry animations, message scroll canvas, active green notification indicator pulse, and reset/minimize controls.
+* **Always Reachable:** Floating pill widget in the bottom-right corner, adapting seamlessly across desktop and mobile screens.
+
+### 🔒 Trust, Safety, & Identity Verification
+Designed to foster a highly secure and trusted campus network, avoiding standard open-market vulnerabilities:
+* **Verified Campus Badges:** Once verified by admins, a green `"Verified Campus Student"` badge appears on the student's profile, search listings, and ride cards.
+* **Searchable Campus Selector:** A clean, searchable dropdown featuring the top 10 college hubs in Hyderabad (e.g., JNTU, CBIT, VNR VJIET, BITS, OU), with custom-entry support if their college isn't listed.
+* **Strict Duplication Prevention:** Strong backend validation blocking registration of duplicate emails or phone numbers. Integrated with real-time API-driven frontend checkers for instant signup feedback.
+* **Extended Profile Metadata:** Complete student bio, safety rules, emergency contacts, daily commute routes, and an active trust completeness meter.
+
+### 🚗 Active Ride Management & Responsive Booking
+Car owner drivers have full control over their listed rides, integrated into a sleek responsive interface:
+* **Active Booking CTA:** Replaced flat disabled screens with a dynamic booking widget. Shows interactive blue **"Book Now"** buttons, green **"Request Sent"** indicators, and high-visibility red **"Ride Full"** statuses.
+* **Complete Owner CRUD Controls:** Drivers can **Edit Ride** details (seats, price, time, vehicle, constraints) in real-time, **Cancel/Delete** with a secure confirmation modal, or quickly **Repost** completed/cancelled rides with a single click.
+* **Adaptive Actions:** Renders a clean action dropdown (⋮) on desktop viewports and a sticky bottom sheet modal on mobile devices.
+* **Sticky Layout Optimization:** Compressed layouts keep essential prices and booking CTAs floating and visible without excessive scrolling.
 
 ---
 
@@ -206,12 +230,13 @@ Create a `.env` file in the project root by copying `.env.example`:
 | `JWT_TTL_SECONDS` | Token expiry in seconds | `86400` |
 | `ADMIN_EMAIL` | Initial admin account email | `admin@yourdomain.com` |
 | `ADMIN_PASSWORD` | Initial admin account password | `StrongPassword@123` |
-| `SPRING_MAIL_USERNAME` | Gmail address for sending emails | `your@gmail.com` |
-| `SPRING_MAIL_PASSWORD` | Gmail App Password (not your login password) | `xxxx xxxx xxxx xxxx` |
+| `BREVO_API_KEY` | Brevo transactional email API key | `xkeysib-...` |
+| `BREVO_SENDER` | Verified Brevo sender identity | `ShareFare <no-reply@yourdomain.com>` |
+| `MAIL_SUPPORT_EMAIL` | Support email shown in outgoing emails | `support@yourdomain.com` |
 | `VITE_API_BASE_URL` | Backend URL for the frontend | `http://localhost:8080` |
 | `FRONTEND_BASE_URL` | Frontend URL for email links | `http://localhost:5173` |
 
-> **Gmail App Password:** Enable 2FA on your Google account → Google Account → Security → App Passwords → Generate one for "Mail".
+> **Email delivery:** ShareFare uses Brevo transactional email only. Configure a verified sender in Brevo, then set `BREVO_API_KEY` and `BREVO_SENDER`.
 
 ---
 
@@ -282,8 +307,9 @@ DB_PASSWORD=...
 JWT_SECRET=<strong-random-secret-minimum-64-chars>
 ADMIN_EMAIL=admin@yourdomain.com
 ADMIN_PASSWORD=<strong-password>
-SPRING_MAIL_USERNAME=...
-SPRING_MAIL_PASSWORD=...
+BREVO_API_KEY=...
+BREVO_SENDER=ShareFare <no-reply@yourdomain.com>
+MAIL_SUPPORT_EMAIL=support@yourdomain.com
 FRONTEND_BASE_URL=https://your-app.vercel.app
 SAMPLE_DATA_ENABLED=false
 ```

@@ -6,7 +6,7 @@ import { Lock, Mail, Phone, User, Copy, CheckCircle2, ArrowRight, Eye, EyeOff, S
 
 type RegisterResponse = {
   message: string;
-  otp: string | null;        // non-null only when MAIL_ENABLED=false (dev/fallback)
+  otp: string | null;
   emailVerified: boolean;
 };
 
@@ -324,7 +324,7 @@ export function RegisterPage() {
             </div>
           )}
 
-          {/* Fallback: OTP shown on screen (only when MAIL_ENABLED=false) */}
+          {/* Legacy local fallback: OTP shown on screen only if the backend explicitly returns it */}
           {result.otp && (
             <div className="rounded-2xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 to-blue-50 p-6 text-center shadow-sm">
               <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-indigo-500">

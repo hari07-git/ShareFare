@@ -51,10 +51,6 @@ public class RoleMigrationRunner implements ApplicationRunner {
           "ALTER TABLE rides ALTER COLUMN origin TYPE VARCHAR(500)");
       runSilently("Widen rides.destination column (Postgres)",
           "ALTER TABLE rides ALTER COLUMN destination TYPE VARCHAR(500)");
-      runSilently("Widen ride.origin column (Postgres)",
-          "ALTER TABLE ride ALTER COLUMN origin TYPE VARCHAR(500)");
-      runSilently("Widen ride.destination column (Postgres)",
-          "ALTER TABLE ride ALTER COLUMN destination TYPE VARCHAR(500)");
     } else {
       runSilently("Widen role column (H2)",
           "ALTER TABLE users ALTER COLUMN role VARCHAR(50)");
@@ -62,10 +58,6 @@ public class RoleMigrationRunner implements ApplicationRunner {
           "ALTER TABLE rides ALTER COLUMN origin VARCHAR(500)");
       runSilently("Widen rides.destination column (H2)",
           "ALTER TABLE rides ALTER COLUMN destination VARCHAR(500)");
-      runSilently("Widen ride.origin column (H2)",
-          "ALTER TABLE ride ALTER COLUMN origin VARCHAR(500)");
-      runSilently("Widen ride.destination column (H2)",
-          "ALTER TABLE ride ALTER COLUMN destination VARCHAR(500)");
     }
 
     runSilently("Drop old role check constraint (variant 1)",

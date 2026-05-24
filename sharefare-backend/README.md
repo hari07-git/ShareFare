@@ -90,9 +90,9 @@ Environment variables:
 - `JWT_SECRET` (default is insecure; set your own 32+ char secret)
 - `JWT_TTL_SECONDS` (default `86400`)
 - `ADMIN_EMAIL` and `ADMIN_PASSWORD` (optional; if set, an admin account is created on first run)
-- `MAIL_ENABLED` (set `true` to send real emails)
-- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` for Gmail SMTP
-- `MAIL_FROM` and `MAIL_SUPPORT_EMAIL`
+- `BREVO_API_KEY` for Brevo transactional email delivery
+- `BREVO_SENDER` for the verified Brevo sender identity
+- `MAIL_SUPPORT_EMAIL` shown in outgoing emails
 - `FRONTEND_BASE_URL` (used in password reset links)
 - `REMINDERS_ENABLED` and `REMINDERS_FIXED_DELAY_MS` for scheduled ride reminders
 
@@ -103,16 +103,12 @@ export ADMIN_EMAIL="admin@sharefare.com"
 export ADMIN_PASSWORD="YourStrongAdminPassword"
 ```
 
-Gmail SMTP example:
+Brevo transactional email example:
 
 ```bash
-export MAIL_ENABLED=true
-export SMTP_HOST=smtp.gmail.com
-export SMTP_PORT=587
-export SMTP_USERNAME="your-gmail@gmail.com"
-export SMTP_PASSWORD="your-google-app-password"
-export MAIL_FROM="ShareFare <your-gmail@gmail.com>"
-export MAIL_SUPPORT_EMAIL="sharefaree@gmail.com"
+export BREVO_API_KEY="xkeysib-your-brevo-api-key"
+export BREVO_SENDER="ShareFare <no-reply@yourdomain.com>"
+export MAIL_SUPPORT_EMAIL="support@yourdomain.com"
 export FRONTEND_BASE_URL="http://localhost:5173"
 ```
 
