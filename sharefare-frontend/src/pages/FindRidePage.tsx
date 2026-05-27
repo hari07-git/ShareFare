@@ -184,7 +184,7 @@ export function FindRidePage() {
   return (
     <div>
       <section className="mb-5 grid gap-5 lg:grid-cols-[minmax(0,460px)_1fr]">
-        <div className="space-y-5">
+        <div className="flex flex-col gap-5">
           <div className="lg:sticky lg:top-24 lg:z-30 bg-white lg:bg-white/95 lg:backdrop-blur-md rounded-2xl border border-slate-200 p-3 sm:p-5 shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
